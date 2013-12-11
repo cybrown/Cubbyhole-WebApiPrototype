@@ -28,9 +28,9 @@ var shares = require('./data/shares');
 // FILES
 
 app.get('/files', function (req, res) {
-    return files.filter(function(file) {
+    res.json(files.filter(function(file) {
         return file.parent === 0;
-    });
+    }));
 });
 
 app.get('/files/:id', function (req, res) {
