@@ -53,7 +53,19 @@ app.post('/files/:id', function (req, res) {
 });
 
 app.delete('/files/:id', function (req, res) {
-
+    var index = -1;
+    for (var i = 0; i < files.length; i++) {
+        if (files[i].id == req.params.id) {
+            index = i;
+            break;
+        }
+    }
+    if (index >= 0) {
+        files.splice(index, 1);
+        res.send('');
+    } else {
+        res.status(404).send('');
+    }
 });
 
 // SHARES
