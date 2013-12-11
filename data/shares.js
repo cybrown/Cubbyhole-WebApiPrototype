@@ -1,3 +1,4 @@
-module.exports = [
-
-];
+module.exports = {
+    lastId: 1,
+    entries: []
+};
