@@ -21,55 +21,27 @@ if ('development' == app.get('env')) {
     app.use(express.errorHandler());
 }
 
-var files = [
-    {
-        id: 1,
-        name: "file1",
-        parent: 1,
-        isFolder: false,
-        cdate: new Date(),
-        mdate: new Date(),
-        owner: 1,
-        size: 500,
-        url: "AFBA34A2A11AB13EEBA"
-    },
-    {
-        id: 2,
-        name: "file2",
-        parent: 1,
-        isFolder: false,
-        cdate: new Date(),
-        mdate: new Date(),
-        owner: 1,
-        size: 500,
-        url: "AFBA34A2A11AB13EEBA"
-    },
-    {
-        id: 3,
-        name: "file3",
-        parent: 1,
-        isFolder: false,
-        cdate: new Date(),
-        mdate: new Date(),
-        owner: 1,
-        size: 500,
-        url: "AFBA34A2A11AB13EEBA"
-    }
-];
+var accounts = require('./data/accounts');
+var files = require('./data/files');
+var shares = require('./data/shares');
 
 // FILES
 
 app.get('/files', function (req, res) {
-    return files.filter(function(file) {
+    res.json(files.filter(function(file) {
         return file.parent === 0;
-    });
+    }));
 });
 
 app.get('/files/:id', function (req, res) {
-    var selectedFiles = files.filter(function (file) {
-        return file.id == req.params.id;
-    });
-    res.json(selectedFiles.length ? selectedFiles[0] : null);
+    var selectedFile = null;
+    for (var i = 0; i < files.length; i++) {
+        if (files[i].id == req.params.id) {
+            selectedFile = files[i];
+            break;
+        }
+    }
+    res.json(selectedFile);
 });
 
 app.put('/files', function (req, res) {
@@ -95,7 +67,19 @@ app.post('/files/:id', function (req, res) {
 });
 
 app.delete('/files/:id', function (req, res) {
-
+    var index = -1;
+    for (var i = 0; i < files.length; i++) {
+        if (files[i].id == req.params.id) {
+            index = i;
+            break;
+        }
+    }
+    if (index >= 0) {
+        files.splice(index, 1);
+        res.send('');
+    } else {
+        res.status(404).send('');
+    }
 });
 
 // SHARES
