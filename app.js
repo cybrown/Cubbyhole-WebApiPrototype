@@ -77,6 +77,20 @@ app.put('/files', function (req, res) {
 });
 
 app.post('/files/:id', function (req, res) {
+    var file = null;
+
+    if (req.params.hasOwnProperty('name') && req.params.hasOwnProperty('file')) {
+        for (var i = 0; i < files.length; i++) {
+            if (files[i].id == req.params.id)
+                files[i].name   = req.params.name;
+                files[i].parent = req.params.file;
+        }
+    } else if (req.params.hasOwnProperty('name')) {
+        for (var i = 0; i < files.length; i++) {
+            if (files[i].id == req.params.id)
+                files[i].name   = req.params.name;
+        }
+    }
 
 });
 
