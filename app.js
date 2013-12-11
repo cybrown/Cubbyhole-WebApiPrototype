@@ -57,13 +57,17 @@ var files = [
     }
 ];
 
+// FILES
 
 app.get('/files', function (req, res) {
 
 });
 
 app.get('/files/:id', function (req, res) {
-
+    var selectedFiles = files.filter(function (file) {
+        return file.id == req.params.id;
+    });
+    res.json(selectedFiles.length ? selectedFiles[0] : null);
 });
 
 app.put('/files', function (req, res) {
@@ -77,6 +81,10 @@ app.post('/files/:id', function (req, res) {
 app.delete('/files/:id', function (req, res) {
 
 });
+
+// SHARES
+
+// ACCOUNTS
 
 http.createServer(app).listen(app.get('port'), function(){
     console.log('Express server listening on port ' + app.get('port'));
