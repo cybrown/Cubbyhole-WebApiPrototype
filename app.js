@@ -34,10 +34,14 @@ app.get('/files', function (req, res) {
 });
 
 app.get('/files/:id', function (req, res) {
-    var selectedFiles = files.filter(function (file) {
-        return file.id == req.params.id;
-    });
-    res.json(selectedFiles.length ? selectedFiles[0] : null);
+    var selectedFile = null;
+    for (var i = 0; i < files.length; i++) {
+        if (files[i].id == req.params.id) {
+            selectedFile = files[i];
+            break;
+        }
+    }
+    res.json(selectedFile);
 });
 
 app.put('/files', function (req, res) {
