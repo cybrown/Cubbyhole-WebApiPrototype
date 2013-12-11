@@ -73,7 +73,7 @@ app.post('/files/:id', function (req, res) {
         }
 
         if (req.body.hasOwnProperty('file')) {
-            fileToModify.parent = req.body.parent;
+            fileToModify.parent = Number(req.body.parent);
         }
         if (req.body.hasOwnProperty('name')) {
             fileToModify.name = req.body.name;
@@ -204,7 +204,7 @@ app.post('/accounts/:id', function (req, res) {
         account.password = req.body.password;
     }
     if (req.body.hasOwnProperty('plan')) {
-        account.plan = req.body.plan;
+        account.plan = Number(req.body.plan);
     }
     res.json(account);
 });
@@ -221,7 +221,7 @@ app.put('/accounts', function (req, res) {
         hasData = true;
     }
     if (req.body.hasOwnProperty('plan')) {
-        account.plan = req.body.plan;
+        account.plan = Number(req.body.plan);
         hasData = true;
     }
     if (hasData) {
