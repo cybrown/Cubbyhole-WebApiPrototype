@@ -59,11 +59,13 @@ var files = [
 
 
 app.get('/files', function (req, res) {
-
+    return files.filter(function(file) {
+        return file.parent === 0;
+    });
 });
 
 app.get('/files/:id', function (req, res) {
-
+    
 });
 
 app.put('/files', function (req, res) {
