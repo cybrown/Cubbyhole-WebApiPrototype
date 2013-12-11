@@ -109,6 +109,62 @@ app.delete('/files/:id', function (req, res) {
 
 // SHARES
 
+app.get('/files/:id/shares', function(req, res) {
+
+    var selectedFile = null;
+
+    for (var i = 0; i < files.length; i++) {
+        if (files[i].id == req.params.id) {
+            selectedFile = files[i];
+            break;
+        }
+    }
+
+    if (selectedFile) {
+        shares.filter(function(share) {
+           if (share.id === selectedFile.id) {
+               res.send(share)
+           }
+        });
+    } else {
+        res.status(404).send('');
+    }
+
+});
+
+app.get('/files/:id/shares/:userId', function(req, res) {
+    var user            = null;
+    var selectedFile    = null;
+
+    for (var i = 0; i < files.length; i++) {
+        if (files[i].id == req.params.id) {
+            selectedFile = files[i];
+            break;
+        }
+    }
+
+    for (var j = 0; j < accounts.length; j++) {
+        if (accounts[j].id == req.params.userId) {
+            user = accounts[j];
+            break;
+        }
+    }
+
+
+});
+
+app.post('/files/:id/shares/:userId', function(req, res) {
+
+});
+
+app.delete('/files/:id/shares/:user', function(req, res) {
+
+});
+
+app.post('/files/:id/genurl', function(req, res) {
+
+});
+
 // ACCOUNTS
 
 app.get('/accounts', function (req, res) {
