@@ -28,16 +28,16 @@ var shares = require('./data/shares');
 // FILES
 
 app.get('/files', function (req, res) {
-    res.json(files.filter(function(file) {
+    res.json(files.entries.filter(function(file) {
         return file.parent === 0;
     }));
 });
 
 app.get('/files/:id', function (req, res) {
     var selectedFile = null;
-    for (var i = 0; i < files.length; i++) {
-        if (files[i].id == req.params.id) {
-            selectedFile = files[i];
+    for (var i = 0; i < files.entries.length; i++) {
+        if (files.entries[i].id == req.params.id) {
+            selectedFile = files.entries[i];
             break;
         }
     }
@@ -51,54 +51,56 @@ app.put('/files', function (req, res) {
 app.post('/files/:id', function (req, res) {
     var selectedFile = null;
 
-    for (var i = 0; i < files.length; i++) {
-        if (files[i].id == req.params.id) {
-            selectedFile = files[i];
+    for (var i = 0; i < files.entries.length; i++) {
+        if (files.entries[i].id == req.params.id) {
+            selectedFile = files.entries[i];
             break;
         }
     }
 
     if (selectedFile) {
-
-        if (req.params.hasOwnProperty('file')) {
-            selectedFile.parent = req.params.parent;
+        var fileToModify = selectedFile;
+        if (req.query.hasOwnProperty('copy') && req.query.copy == 'true') {
+            fileToModify = {};
+            fileToModify.name = selectedFile.name,
+            fileToModify.parent = selectedFile.parent,
+            fileToModify.isFolder = selectedFile.isFolder,
+            fileToModify.cdate = new Date(),
+            fileToModify.mdate = new Date(),
+            fileToModify.owner = selectedFile.owner,
+            fileToModify.size = selectedFile.size,
+            fileToModify.url = selectedFile.url
         }
 
-        if (req.params.hasOwnProperty('name')) {
-            selectedFile.name = req.params.name;
+        if (req.body.hasOwnProperty('file')) {
+            fileToModify.parent = req.body.parent;
+        }
+        if (req.body.hasOwnProperty('name')) {
+            fileToModify.name = req.body.name;
         }
 
-        if (req.params.hasOwnProperty('copy')) {
-            var copiedFile = {
-                name: selectedFile.name,
-                parent: selectedFile.parent,
-                isFolder: selectedFile.isFolder,
-                cdate: new Date(),
-                mdate: new Date(),
-                owner: selectedFile.owner,
-                size: selectedFile.size,
-                url: selectedFile.url
-            }
+        if (selectedFile != fileToModify) {
+            fileToModify.id = files.lastId++;
+            files.entries.push(fileToModify);
         }
 
-        if (req.params.hasOwnProperty('file') && req.params.hasOwnProperty('name')) {
-            selectedFile.parent = req.params.parent;
-            selectedFile.name = req.params.name;
-        }
+        res.json(fileToModify);
+    } else {
+        res.status(404).send('');
     }
 
 });
 
 app.delete('/files/:id', function (req, res) {
     var index = -1;
-    for (var i = 0; i < files.length; i++) {
-        if (files[i].id == req.params.id) {
+    for (var i = 0; i < files.entries.length; i++) {
+        if (files.entries[i].id == req.params.id) {
             index = i;
             break;
         }
     }
     if (index >= 0) {
-        files.splice(index, 1);
+        files.entries.splice(index, 1);
         res.send('');
     } else {
         res.status(404).send('');
