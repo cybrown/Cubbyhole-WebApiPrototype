@@ -25,6 +25,18 @@ var accounts = require('./data/accounts');
 var files = require('./data/files');
 var shares = require('./data/shares');
 
+// SYSTEM
+
+app.get('/system/reset', function (req, res) {
+    accounts.entries.length = 0;
+    accounts.lastId = 1;
+    files.entries.length = 0;
+    files.lastId = 1;
+    shares.entries.length = 0;
+    shares.lastId = 1;
+    res.send('');
+});
+
 // FILES
 
 app.get('/files', function (req, res) {
