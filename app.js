@@ -22,7 +22,25 @@ if ('development' == app.get('env')) {
 }
 
 
+app.get('/files', function (req, res) {
 
+});
+
+app.get('/files/:id', function (req, res) {
+
+});
+
+app.put('/files', function (req, res) {
+
+});
+
+app.post('/files/:id', function (req, res) {
+
+});
+
+app.delete('/files/:id', function (req, res) {
+
+});
 
 http.createServer(app).listen(app.get('port'), function(){
     console.log('Express server listening on port ' + app.get('port'));
