@@ -72,6 +72,10 @@ app.delete('/files/:id', function (req, res) {
 
 // ACCOUNTS
 
+app.get('/accounts', function (req, res) {
+    res.json(accounts);
+});
+
 http.createServer(app).listen(app.get('port'), function(){
     console.log('Express server listening on port ' + app.get('port'));
 });
