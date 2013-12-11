@@ -76,6 +76,21 @@ app.get('/accounts', function (req, res) {
     res.json(accounts);
 });
 
+app.get('/accounts/:id', function (req, res) {
+    var account = null;
+    for (var i = 0; i < accounts.length; i++) {
+        if (accounts[i].id == req.params.id) {
+            account = accounts[i];
+            break;
+        }
+    }
+    if (account) {
+        res.json(account);
+    } else {
+        res.status(404).send('');
+    }
+});
+
 http.createServer(app).listen(app.get('port'), function(){
     console.log('Express server listening on port ' + app.get('port'));
 });
