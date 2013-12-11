@@ -13,7 +13,7 @@ app.set('port', process.env.PORT || 3000);
 app.use(express.favicon());
 app.use(express.logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded());
+app.use(express.bodyParser());
 app.use(express.methodOverride());
 
 // development only
@@ -164,6 +164,88 @@ app.post('/files/:id/genurl', function(req, res) {
 });
 
 // ACCOUNTS
+
+app.get('/accounts', function (req, res) {
+    res.json(accounts.entries);
+});
+
+app.get('/accounts/:id', function (req, res) {
+    var account = null;
+    for (var i = 0; i < accounts.entries.length; i++) {
+        if (accounts.entries[i].id == req.params.id) {
+            account = accounts.entries[i];
+            break;
+        }
+    }
+    if (account) {
+        res.json(account);
+    } else {
+        res.status(404).send('');
+    }
+});
+
+app.post('/accounts/:id', function (req, res) {
+    var account = null;
+    for (var i = 0; i < accounts.entries.length; i++) {
+        if (accounts.entries[i].id == req.params.id) {
+            account = accounts.entries[i];
+            break;
+        }
+    }
+    if (!account) {
+        res.status(404).send('');
+    }
+    if (req.body.hasOwnProperty('username')) {
+        account.username = req.body.username;
+    }
+    if (req.body.hasOwnProperty('password')) {
+        account.password = req.body.password;
+    }
+    if (req.body.hasOwnProperty('plan')) {
+        account.plan = req.body.plan;
+    }
+    res.json(account);
+});
+
+app.put('/accounts', function (req, res) {
+    var account = {};
+    var hasData = false;
+    if (req.body.hasOwnProperty('username')) {
+        account.username = req.body.username;
+        hasData = true;
+    }
+    if (req.body.hasOwnProperty('password')) {
+        account.password = req.body.password;
+        hasData = true;
+    }
+    if (req.body.hasOwnProperty('plan')) {
+        account.plan = req.body.plan;
+        hasData = true;
+    }
+    if (hasData) {
+        account.id = accounts.lastId++;
+        accounts.entries.push(account);
+        res.send(account);
+    } else {
+        res.send('');
+    }
+});
+
+app.delete('/accounts/:id', function (req, res) {
+    var index = -1;
+    for (var i = 0; i < accounts.entries.length; i++) {
+        if (accounts.entries[i].id == req.params.id) {
+            index = i;
+            break;
+        }
+    }
+    if (index >= 0) {
+        accounts.entries.splice(index, 1);
+        res.send('');
+    } else {
+        res.status(404).send('');
+    }
+});
 
 http.createServer(app).listen(app.get('port'), function(){
     console.log('Express server listening on port ' + app.get('port'));
