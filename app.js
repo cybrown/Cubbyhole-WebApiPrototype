@@ -53,11 +53,30 @@ app.get('/files/:id', function (req, res) {
             break;
         }
     }
-    res.json(selectedFile);
+    if (selectedFile) {
+        res.json(selectedFile);
+    } else {
+        res.status(404).send('');
+    }
 });
 
 app.put('/files', function (req, res) {
-
+    var file = {};
+    var hasData = false;
+    if (req.body.hasOwnProperty('name')) {
+        file.name = req.body.name;
+        hasData = true;
+    }
+    if (req.body.hasOwnProperty('parent')) {
+        file.parent = Number(req.body.parent);
+        hasData = true;
+    }
+    if (hasData) {
+        file.id = files.lastId++;
+        files.entries.push(file);
+        res.json(file);
+    }
+    res.status(400).send('');
 });
 
 app.post('/files/:id', function (req, res) {

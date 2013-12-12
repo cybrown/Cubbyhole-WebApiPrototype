@@ -50,7 +50,7 @@ describe ('accounts Web Service', function () {
         });
     });
 
-    it ('Should return a list of accounts', function (done) {
+    it ('should return a list of accounts', function (done) {
         request.get('http://localhost:3000/accounts', function (err, response, body) {
             response.statusCode.should.equal(200);
             JSON.parse(body).should.eql([
@@ -71,7 +71,7 @@ describe ('accounts Web Service', function () {
         });
     });
 
-    it ('Should return an account', function (done) {
+    it ('should return an account', function (done) {
         request.get('http://localhost:3000/accounts/1', function (err, response, body) {
             response.statusCode.should.equal(200);
             JSON.parse(body).should.eql({
@@ -84,7 +84,7 @@ describe ('accounts Web Service', function () {
         });
     });
 
-    it ('Should return an account', function (done) {
+    it ('should return an account', function (done) {
         request.get('http://localhost:3000/accounts/2', function (err, response, body) {
             response.statusCode.should.equal(200);
             JSON.parse(body).should.eql({
@@ -97,7 +97,7 @@ describe ('accounts Web Service', function () {
         });
     });
 
-    it ('Should modify an account', function (done) {
+    it ('should modify an account', function (done) {
         request.post({
             uri: 'http://localhost:3000/accounts/1',
             form: {
@@ -116,7 +116,7 @@ describe ('accounts Web Service', function () {
         });
     });
 
-    it ('Should return an account', function (done) {
+    it ('should return an account', function (done) {
         request.get('http://localhost:3000/accounts/1', function (err, response, body) {
             response.should.have.status(200);
             JSON.parse(body).should.eql({
