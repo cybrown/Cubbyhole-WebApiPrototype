@@ -1,4 +1,9 @@
 module.exports = {
     lastId: 1,
-    entries: []
+    entries: [
+        {
+            id: 1,
+            user: 1
+        }
+    ]
 };

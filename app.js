@@ -166,6 +166,7 @@ app.get('/files/:id/shares', function(req, res) {
 app.get('/files/:id/shares/:userId', function(req, res) {
     var user            = null;
     var selectedFile    = null;
+    var shareByUser     = null;
 
     for (var i = 0; i < files.length; i++) {
         if (files[i].id == req.params.id) {
@@ -179,6 +180,17 @@ app.get('/files/:id/shares/:userId', function(req, res) {
             user = accounts[j];
             break;
         }
+    }
+
+    if (selectedFile && user) {
+        for (var k = 0; k < shares.length; k++) {
+            if (user.id == shares[k].user) {
+                shareByUser = shares[k];
+                res.send(shareByUser);
+            }
+        }
+    } else {
+        res.send("");
     }
 
 
