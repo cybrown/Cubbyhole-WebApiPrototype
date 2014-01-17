@@ -98,13 +98,13 @@ app.post('/files/:id', function (req, res) {
         if (req.query.hasOwnProperty('copy') && req.query.copy == 'true') {
             fileToModify = {};
             fileToModify.name = selectedFile.name,
-            fileToModify.parent = selectedFile.parent,
-            fileToModify.isFolder = selectedFile.isFolder,
-            fileToModify.cdate = new Date(),
-            fileToModify.mdate = new Date(),
-            fileToModify.owner = selectedFile.owner,
-            fileToModify.size = selectedFile.size,
-            fileToModify.url = selectedFile.url
+                fileToModify.parent = selectedFile.parent,
+                fileToModify.isFolder = selectedFile.isFolder,
+                fileToModify.cdate = new Date(),
+                fileToModify.mdate = new Date(),
+                fileToModify.owner = selectedFile.owner,
+                fileToModify.size = selectedFile.size,
+                fileToModify.url = selectedFile.url
         }
 
         if (req.body.hasOwnProperty('file')) {
@@ -157,9 +157,9 @@ app.get('/files/:id/shares', function(req, res) {
 
     if (selectedFile) {
         shares.filter(function(share) {
-           if (share.id === selectedFile.id) {
-               res.send(share)
-           }
+            if (share.id === selectedFile.id) {
+                res.send(share)
+            }
         });
     } else {
         res.status(404).send('');
