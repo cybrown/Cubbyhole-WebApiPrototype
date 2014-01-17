@@ -140,11 +140,10 @@ describe ('File Web Service', function () {
             }
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
-            JSON.parse(body).should.eql({
-                'id': 3,
-                'name': 'file1copy',
-                'parent': 0
-            });
+            var resp = JSON.parse(body);
+            resp.id.should.eql(3);
+            resp.name.should.eql('file1copy');
+            resp.parent.should.eql(0);
             done();
         });
     });
@@ -163,6 +162,46 @@ describe ('File Web Service', function () {
             url: url + '/files/3'
         }, function (err, response, body) {
             response.statusCode.should.equal(404);
+            done();
+        });
+    });
+
+    it ('should add a folder', function (done) {
+        request.put({
+            url: url + '/files',
+            form: {
+                name: 'folder1',
+                parent: 0,
+                isFolder: true
+            }
+        }, function (err, response, body) {
+            response.statusCode.should.equal(200);
+            JSON.parse(body).should.eql({
+                'id': 4,
+                'name': 'folder1',
+                'parent': 0,
+                'isFolder': true
+            });
+            done();
+        });
+    });
+
+    it ('should add a file', function (done) {
+        request.put({
+            url: url + '/files',
+            form: {
+                name: 'notAFolder',
+                parent: 0,
+                isFolder: false
+            }
+        }, function (err, response, body) {
+            response.statusCode.should.equal(200);
+            JSON.parse(body).should.eql({
+                'id': 5,
+                'name': 'notAFolder',
+                'parent': 0,
+                'isFolder': false
+            });
             done();
         });
     });
