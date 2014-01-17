@@ -71,6 +71,10 @@ app.put('/files', function (req, res) {
         file.parent = Number(req.body.parent);
         hasData = true;
     }
+    if (req.body.hasOwnProperty('isFolder')) {
+        file.isFolder = Boolean(JSON.parse(req.body.isFolder));
+        hasData = true;
+    }
     if (hasData) {
         file.id = files.lastId++;
         files.entries.push(file);
