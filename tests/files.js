@@ -6,18 +6,42 @@ describe ('File Web Service', function () {
     var scheme = 'http://';
     var host = 'localhost';
     var port = 3000;
+    var user = 'user';
+    var pass = 'pass';
 
     var url = scheme + host + ':' + port;
 
+    var req1 = function (options, next) {
+        options['auth'] = {
+            user: user,
+            pass: pass
+        };
+        request(options, next);
+    };
+
+    it ('should return 401 status code without http basic', function (done) {
+        request({
+            method: 'get',
+            url: url + '/files'
+        }, function (err, response, body) {
+            response.statusCode.should.eql(401);
+            done();
+        });
+    });
+
     it ('should reset data', function (done) {
-        request.get(url + '/system/reset', function (err, response, body) {
+        req1({
+            method: 'get',
+            url: url + '/system/reset'
+        }, function (err, response, body) {
             response.should.have.status(200);
             done();
         });
     });
 
     it ('should add a file', function (done) {
-        request.put({
+        req1({
+            method: 'put',
             url: url + '/files',
             form: {
                 name: 'file1',
@@ -35,7 +59,8 @@ describe ('File Web Service', function () {
     });
 
     it ('should add another file', function (done) {
-        request.put({
+        req1({
+            method: 'put',
             url: url + '/files',
             form: {
                 name: 'file2',
@@ -53,7 +78,8 @@ describe ('File Web Service', function () {
     });
 
     it ('should return two files', function (done) {
-        request.get({
+        req1({
+            method: 'get',
             url: url + '/files'
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
@@ -74,7 +100,8 @@ describe ('File Web Service', function () {
     });
 
     it ('should return one file', function (done) {
-        request.get({
+        req1({
+            method: 'get',
             url: url + '/files/1'
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
@@ -88,7 +115,8 @@ describe ('File Web Service', function () {
     });
 
     it ('should return one file', function (done) {
-        request.get({
+        req1({
+            method: 'get',
             url: url + '/files/2'
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
@@ -102,7 +130,8 @@ describe ('File Web Service', function () {
     });
 
     it ('should rename one file', function (done) {
-        request.post({
+        req1({
+            method: 'post',
             url: url + '/files/1',
             form: {
                 name: 'newFile1'
@@ -119,7 +148,8 @@ describe ('File Web Service', function () {
     });
 
     it ('should return one file', function (done) {
-        request.get({
+        req1({
+            method: 'get',
             url: url + '/files/1'
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
@@ -133,7 +163,8 @@ describe ('File Web Service', function () {
     });
 
     it ('should copy one file', function (done) {
-        request.post({
+        req1({
+            method: 'post',
             url: url + '/files/1?copy=true',
             form: {
                 name: 'file1copy'
@@ -149,7 +180,8 @@ describe ('File Web Service', function () {
     });
 
     it ('should delete one file', function (done) {
-        request.del({
+        req1({
+            method: 'delete',
             url: url + '/files/3'
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
@@ -158,7 +190,8 @@ describe ('File Web Service', function () {
     });
 
     it ('should not return one file', function (done) {
-        request.get({
+        req1({
+            method: 'get',
             url: url + '/files/3'
         }, function (err, response, body) {
             response.statusCode.should.equal(404);
@@ -167,7 +200,8 @@ describe ('File Web Service', function () {
     });
 
     it ('should add a folder', function (done) {
-        request.put({
+        req1({
+            method: 'put',
             url: url + '/files',
             form: {
                 name: 'folder1',
@@ -187,7 +221,8 @@ describe ('File Web Service', function () {
     });
 
     it ('should add a file', function (done) {
-        request.put({
+        req1({
+            method: 'put',
             url: url + '/files',
             form: {
                 name: 'notAFolder',
