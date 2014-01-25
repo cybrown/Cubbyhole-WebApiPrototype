@@ -45,6 +45,16 @@ app.get('/system/reset', function (req, res) {
     res.send('');
 });
 
+// PING
+
+app.get('/ping', function (req, res) {
+    res.send('pong');
+});
+
+app.get('/authping', function (req, res) {
+    res.send('pong');
+});
+
 // FILES
 
 app.get('/files', function (req, res) {
