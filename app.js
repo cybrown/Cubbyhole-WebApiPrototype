@@ -16,6 +16,14 @@ app.use(express.json());
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 
+// auth
+var authMiddleware = express.basicAuth('user', 'pass')
+
+app.use('/files', authMiddleware);
+app.use('/accounts', authMiddleware);
+app.use('/plans', authMiddleware);
+app.use('/authping', authMiddleware);
+
 // development only
 if ('development' == app.get('env')) {
     app.use(express.errorHandler());
