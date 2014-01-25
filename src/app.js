@@ -16,6 +16,14 @@ app.use(express.json());
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 
+// auth
+var authMiddleware = express.basicAuth('user', 'pass')
+
+app.use('/files', authMiddleware);
+app.use('/accounts', authMiddleware);
+app.use('/plans', authMiddleware);
+app.use('/authping', authMiddleware);
+
 // development only
 if ('development' == app.get('env')) {
     app.use(express.errorHandler());
@@ -35,6 +43,16 @@ app.get('/system/reset', function (req, res) {
     shares.entries.length = 0;
     shares.lastId = 1;
     res.send('');
+});
+
+// PING
+
+app.get('/ping', function (req, res) {
+    res.send('pong');
+});
+
+app.get('/authping', function (req, res) {
+    res.send('pong');
 });
 
 // FILES
