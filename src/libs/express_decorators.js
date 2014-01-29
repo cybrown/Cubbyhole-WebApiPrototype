@@ -125,11 +125,24 @@ var AutoInject = function () {
     }
 };
 
+var Default = function (source, name, value) {
+    return function (req, res) {
+        if (!req[source]) {
+            res[source] = {};
+        }
+        if (!req[source].hasOwnProperty(name)) {
+            req[source][name] = value;
+        }
+        this.apply(null, arguments);
+    };
+};
+
 module.exports = {
     Converter: Converter,
     Inject: Inject,
     ParamValid: ParamValid,
     BodyValid: BodyValid,
     QueryValid: QueryValid,
-    AutoInject: AutoInject
+    AutoInject: AutoInject,
+    Default: Default
 };
