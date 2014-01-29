@@ -52,7 +52,8 @@ describe ('File Web Service', function () {
             JSON.parse(body).should.eql({
                 'id': 1,
                 'name': 'file1',
-                'parent': 0
+                'parent': 0,
+                'isFolder': false
             });
             done();
         });
@@ -71,7 +72,8 @@ describe ('File Web Service', function () {
             JSON.parse(body).should.eql({
                 'id': 2,
                 'name': 'file2',
-                'parent': 0
+                'parent': 0,
+                'isFolder': false
             });
             done();
         });
@@ -87,12 +89,14 @@ describe ('File Web Service', function () {
                 {
                     'id': 1,
                     'name': 'file1',
-                    'parent': 0
+                    'parent': 0,
+                    'isFolder': false
                 },
                 {
                     'id': 2,
                     'name': 'file2',
-                    'parent': 0
+                    'parent': 0,
+                    'isFolder': false
                 }
             ]);
             done();
@@ -108,7 +112,8 @@ describe ('File Web Service', function () {
             JSON.parse(body).should.eql({
                 'id': 1,
                 'name': 'file1',
-                'parent': 0
+                'parent': 0,
+                'isFolder': false
             });
             done();
         });
@@ -123,7 +128,8 @@ describe ('File Web Service', function () {
             JSON.parse(body).should.eql({
                 'id': 2,
                 'name': 'file2',
-                'parent': 0
+                'parent': 0,
+                'isFolder': false
             });
             done();
         });
@@ -141,7 +147,8 @@ describe ('File Web Service', function () {
             JSON.parse(body).should.eql({
                 'id': 1,
                 'name': 'newFile1',
-                'parent': 0
+                'parent': 0,
+                'isFolder': false
             });
             done();
         });
@@ -156,7 +163,8 @@ describe ('File Web Service', function () {
             JSON.parse(body).should.eql({
                 'id': 1,
                 'name': 'newFile1',
-                'parent': 0
+                'parent': 0,
+                'isFolder': false
             });
             done();
         });
