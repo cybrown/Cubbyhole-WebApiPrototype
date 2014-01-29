@@ -32,16 +32,19 @@ if ('development' == app.get('env')) {
 var accounts = require('./data/accounts');
 var files = require('./data/files');
 var shares = require('./data/shares');
+var plans = require('./data/plans');
 
 // SYSTEM
 
 app.get('/system/reset', function (req, res) {
     accounts.entries.length = 0;
-    accounts.lastId = 1;
-    files.entries.length = 0;
-    files.lastId = 1;
-    shares.entries.length = 0;
-    shares.lastId = 1;
+    accounts.lastId         = 1;
+    files.entries.length    = 0;
+    files.lastId            = 1;
+    shares.entries.length   = 0;
+    shares.lastId           = 1;
+    plans.entries.length    = 0;
+    plans.lastId            = 1;
     res.send('');
 });
 
@@ -53,6 +56,55 @@ app.get('/ping', function (req, res) {
 
 app.get('/authping', function (req, res) {
     res.send('pong');
+});
+
+// PLANS
+
+app.get('/plans', function (req, res) {
+    res.json(plans);
+});
+
+app.put('/plans', function (req, res) {
+    var plan = {};
+    var hasData = false;
+
+    if (req.body.hasOwnProperty('name')) {
+        plan.name = req.body.name;
+        hasData = true;
+    }
+
+    if (req.body.hasOwnProperty('price')) {
+        plan.price = Number(req.body.price);
+        hasData = true;
+    }
+
+    if (req.body.hasOwnProperty('bandwidthDownload')) {
+        plan.bandwidthDownload = Number(req.body.bandwidthDownload);
+        hasData = true;
+    }
+
+    if (req.body.hasOwnProperty('bandwidthUpload')) {
+        plan.bandwidthUpload = Number(req.body.bandwidthUpload);
+        hasData = true;
+    }
+
+    if (req.body.hasOwnProperty('space')) {
+        plan.space = Number(req.body.space);
+        hasData = true;
+    }
+
+    if (req.body.hasOwnProperty('shareQuota')) {
+        plan.shareQuota = Number(req.body.shareQuota);
+        hasData = true;
+    }
+
+    if (hasData) {
+        plan.id = plans.lastId++;
+        plans.entries.push(plan);
+        res.json(plan);
+    }
+
+    res.status(400).send('');
 });
 
 // FILES
