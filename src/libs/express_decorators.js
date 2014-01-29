@@ -115,6 +115,7 @@ var AutoInject = function () {
                 args.push(req.query[names[i]]);
             } else {
                 sendServerError(res, 'Parameter not found: <' + names[i] + '>');
+                return;
             }
         }
         try {
