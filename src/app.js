@@ -17,6 +17,7 @@ var ParamValid = ExpressDecorators.ParamValid;
 var BodyValid = ExpressDecorators.BodyValid;
 var QueryValid = ExpressDecorators.QueryValid;
 var AutoInject = ExpressDecorators.AutoInject;
+var Default = ExpressDecorators.Default;
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -47,7 +48,7 @@ var plans = require('./data/plans');
 // REPOSITORIES
 
 var findFile = function (id) {
-    var selectedFile = null;
+    var selectedFile;
     for (var i = 0; i < files.entries.length; i++) {
         if (files.entries[i].id == id) {
             selectedFile = files.entries[i];
@@ -55,6 +56,19 @@ var findFile = function (id) {
         }
     }
     return selectedFile;
+};
+
+var deleteFile = function (file) {
+    var index = -1;
+    for (var i = 0; i < files.entries.length; i++) {
+        if (files.entries[i].id == file.id) {
+            index = i;
+            break;
+        }
+    }
+    if (index >= 0) {
+        files.entries.splice(index, 1);
+    }
 };
 
 // SYSTEM
@@ -136,7 +150,7 @@ app.get('/files', Decorate(
     Inject())
     (function () {
         return files.entries.filter(function(file) {
-            return file.parent === 0;
+            return file.parent == 0;
         });
     })
 );
@@ -149,28 +163,21 @@ app.get('/files/:file', Decorate(
     })
 );
 
-app.put('/files', function (req, res) {
+app.put('/files', Decorate(
+    Default('body', 'isFolder', false),
+    Converter('body.isFolder', function (a) {return Boolean(JSON.parse(a));}),
+    BodyValid('parent', /^[0-9]*$/),
+    Converter('body.parent', Number),
+    AutoInject()
+)(function (name, parent, isFolder) {
     var file = {};
-    var hasData = false;
-    if (req.body.hasOwnProperty('name')) {
-        file.name = req.body.name;
-        hasData = true;
-    }
-    if (req.body.hasOwnProperty('parent')) {
-        file.parent = Number(req.body.parent);
-        hasData = true;
-    }
-    if (req.body.hasOwnProperty('isFolder')) {
-        file.isFolder = Boolean(JSON.parse(req.body.isFolder));
-        hasData = true;
-    }
-    if (hasData) {
-        file.id = files.lastId++;
-        files.entries.push(file);
-        res.json(file);
-    }
-    res.status(400).send('');
-});
+    file.name = name;
+    file.parent = parent;
+    file.isFolder = isFolder;
+    file.id = files.lastId++;
+    files.entries.push(file);
+    return file;
+}));
 
 app.post('/files/:id', function (req, res) {
     var selectedFile = null;
@@ -215,46 +222,29 @@ app.post('/files/:id', function (req, res) {
 
 });
 
-app.delete('/files/:id', function (req, res) {
-    var index = -1;
-    for (var i = 0; i < files.entries.length; i++) {
-        if (files.entries[i].id == req.params.id) {
-            index = i;
-            break;
-        }
-    }
-    if (index >= 0) {
-        files.entries.splice(index, 1);
-        res.send('');
-    } else {
-        res.status(404).send('');
-    }
-});
+app.delete('/files/:file', Decorate(
+    Converter('params.file', findFile),
+    AutoInject()
+)
+(function (file) {
+    deleteFile(file)
+}));
 
 // SHARES
 
-app.get('/files/:id/shares', function(req, res) {
+var findSharesByFileId = function (id) {
+    return shares.filter(function (share) {
+        return share.id == id;
+    });
+};
 
-    var selectedFile = null;
-
-    for (var i = 0; i < files.length; i++) {
-        if (files[i].id == req.params.id) {
-            selectedFile = files[i];
-            break;
-        }
-    }
-
-    if (selectedFile) {
-        shares.filter(function(share) {
-            if (share.id === selectedFile.id) {
-                res.send(share)
-            }
-        });
-    } else {
-        res.status(404).send('');
-    }
-
-});
+app.get('/files/:file/shares', Decorate(
+    Converter('params.file', findFile),
+    AutoInject())
+    (function (file) {
+        return findSharesByFileId(file.id);
+    })
+);
 
 app.get('/files/:id/shares/:userId', function(req, res) {
     var user            = null;
