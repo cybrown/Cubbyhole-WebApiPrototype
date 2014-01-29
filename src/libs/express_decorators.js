@@ -19,29 +19,21 @@ var Converter = function (name, convertor) {
         var data = name.split('.');
         var id = req[data[0]][data[1]];
         var obj = convertor(id);
-        if (!obj) {
+        if (obj === undefined) {
             sendNotFound(res, req[data[0]][data[1]]);
         } else if (typeof obj === 'function') {
             obj(function (err, obj) {
                 if (err) {
                     sendServerError(res, req[data[0]][data[1]]);
                 } else {
-                    if (!obj) {
-                        sendNotFound(res, req[data[0]][data[1]]);
-                    } else {
-                        req[data[0]][data[1]] = obj;
-                        _this.apply(null, argsForThis);
-                    }
-                }
-            })
-        } else if (obj.then) {
-            obj.then(function (result) {
-                if (!result) {
-                    sendNotFound(res, req[data[0]][data[1]]);
-                } else {
-                    req[data[0]][data[1]] = result;
+                    req[data[0]][data[1]] = obj;
                     _this.apply(null, argsForThis);
                 }
+            })
+        } else if (obj && obj.then) {
+            obj.then(function (result) {
+                req[data[0]][data[1]] = result;
+                _this.apply(null, argsForThis);
             }, function (err) {
                 sendServerError(res, req[data[0]][data[1]]);
             });
