@@ -8,6 +8,16 @@ var http = require('http');
 
 var app = express();
 
+var Decorate = require('./libs/decorate');
+var ExpressDecorators = require('./libs/express_decorators');
+
+var Converter = ExpressDecorators.Converter;
+var Inject = ExpressDecorators.Inject;
+var ParamValid = ExpressDecorators.ParamValid;
+var BodyValid = ExpressDecorators.BodyValid;
+var QueryValid = ExpressDecorators.QueryValid;
+var AutoInject = ExpressDecorators.AutoInject;
+
 // all environments
 app.set('port', process.env.PORT || 3000);
 app.use(express.favicon());
@@ -33,6 +43,19 @@ var accounts = require('./data/accounts');
 var files = require('./data/files');
 var shares = require('./data/shares');
 var plans = require('./data/plans');
+
+// REPOSITORIES
+
+var findFile = function (id) {
+    var selectedFile = null;
+    for (var i = 0; i < files.entries.length; i++) {
+        if (files.entries[i].id == id) {
+            selectedFile = files.entries[i];
+            break;
+        }
+    }
+    return selectedFile;
+};
 
 // SYSTEM
 
@@ -109,26 +132,22 @@ app.put('/plans', function (req, res) {
 
 // FILES
 
-app.get('/files', function (req, res) {
-    res.json(files.entries.filter(function(file) {
-        return file.parent === 0;
-    }));
-});
+app.get('/files', Decorate(
+    Inject())
+    (function () {
+        return files.entries.filter(function(file) {
+            return file.parent === 0;
+        });
+    })
+);
 
-app.get('/files/:id', function (req, res) {
-    var selectedFile = null;
-    for (var i = 0; i < files.entries.length; i++) {
-        if (files.entries[i].id == req.params.id) {
-            selectedFile = files.entries[i];
-            break;
-        }
-    }
-    if (selectedFile) {
-        res.json(selectedFile);
-    } else {
-        res.status(404).send('');
-    }
-});
+app.get('/files/:file', Decorate(
+    Converter('params.file', findFile),
+    AutoInject())
+    (function (file) {
+        return file;
+    })
+);
 
 app.put('/files', function (req, res) {
     var file = {};
