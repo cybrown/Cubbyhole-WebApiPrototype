@@ -91,7 +91,8 @@ var getArgNames = function (func) {
     var FN_ARG_SPLIT = /,/;
     var FN_ARG = /^\s*(_?)(\S+?)\1\s*$/;
     var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
-    return func.toString().replace(STRIP_COMMENTS, '').match(FN_ARGS)[1].split(FN_ARG_SPLIT).map(function (str) {return str.trim();});
+    var matches = func.toString().replace(STRIP_COMMENTS, '').match(FN_ARGS)[1];
+    return matches === '' ? [] : matches.split(FN_ARG_SPLIT).map(function (str) {return str.trim();});
 };
 
 var AutoInject = function () {
