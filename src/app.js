@@ -293,24 +293,28 @@ app.post('/files/:id/genurl', function(req, res) {
 
 // ACCOUNTS
 
-app.get('/accounts', function (req, res) {
-    res.json(accounts.entries);
-});
-
-app.get('/accounts/:id', function (req, res) {
-    var account = null;
+var findAccount = function (id) {
     for (var i = 0; i < accounts.entries.length; i++) {
-        if (accounts.entries[i].id == req.params.id) {
-            account = accounts.entries[i];
-            break;
+        if (accounts.entries[i].id == id) {
+            return accounts.entries[i];
         }
     }
-    if (account) {
-        res.json(account);
-    } else {
-        res.status(404).send('');
-    }
-});
+};
+
+app.get('/accounts', Decorate(
+    AutoInject())
+    (function () {
+        return accounts.entries;
+    })
+);
+
+app.get('/accounts/:account', Decorate(
+    Converter('params.account', findAccount),
+    AutoInject())
+    (function (account) {
+        return account;
+    })
+);
 
 app.post('/accounts/:id', function (req, res) {
     var account = null;
