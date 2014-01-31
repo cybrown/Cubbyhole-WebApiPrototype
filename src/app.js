@@ -5,6 +5,7 @@
 
 var express = require('express');
 var http = require('http');
+var path = require('path');
 
 var app = express();
 
@@ -80,6 +81,8 @@ app.get('/system/reset', function (req, res) {
     files.lastId            = 1;
     shares.entries.length   = 0;
     shares.lastId           = 1;
+    // Suppression du cache de données de mock
+    delete require.cache['C' + path.join(__dirname, 'data', 'plans.json').substring(1)];
     plans = require('./data/plans.json');
     res.send('');
 });
