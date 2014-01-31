@@ -1,14 +1,17 @@
 'use strict';
 
 var sendNotFound = function (res, message) {
+    console.log('404: ' + message);
     res.status(404).send(message);
 };
 
 var sendServerError = function (res, message) {
+    console.log('500: ' + message);
     res.status(500).send(message);
 };
 
 var sendInvalidRequest = function (res, message) {
+    console.log('400: ' + message);
     res.status(400).send(message);
 };
 
@@ -97,24 +100,25 @@ var getArgNames = function (func) {
 
 var AutoInject = function () {
     return function (req, res) {
-        var args = [];
-        var names = getArgNames(this);
-        for (var i = 0, max = names.length; i < max; i++) {
-            if (req.params.hasOwnProperty(names[i])) {
-                args.push(req.params[names[i]]);
-            } else if (req.method !== 'HEAD' && req.method !== 'GET' && req.body.hasOwnProperty(names[i])) {
-                args.push(req.body[names[i]]);
-            } else if (req.query.hasOwnProperty(names[i])) {
-                args.push(req.query[names[i]]);
-            } else {
-                sendServerError(res, 'Parameter not found: <' + names[i] + '>');
-                return;
-            }
-        }
         try {
+            var args = [];
+            var names = getArgNames(this);
+            for (var i = 0, max = names.length; i < max; i++) {
+                if (req.params.hasOwnProperty(names[i])) {
+                    args.push(req.params[names[i]]);
+                } else if (req.method !== 'HEAD' && req.method !== 'GET' && req.body.hasOwnProperty(names[i])) {
+                    args.push(req.body[names[i]]);
+                } else if (req.query.hasOwnProperty(names[i])) {
+                    args.push(req.query[names[i]]);
+                } else {
+                    sendServerError(res, 'Parameter not found: <' + names[i] + '>');
+                    return;
+                }
+            }
             res.send(this.apply(null, args));
         } catch (e) {
-            sendServerError('error');
+            console.log(e.stack);
+            sendServerError(res, e);
         }
     }
 };

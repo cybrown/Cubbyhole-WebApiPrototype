@@ -72,6 +72,44 @@ var deleteFile = function (file) {
     }
 };
 
+var findPlan = function (id) {
+    for (var i = 0; i < plans.entries.length; i++) {
+        if (plans.entries[i].id == id) {
+            return plans.entries[i];
+        }
+    }
+};
+
+var findPlan = function (id) {
+    for (var i = 0; i < plans.entries.length; i++) {
+        if (plans.entries[i].id == id) {
+            return plans.entries[i];
+        }
+    }
+};
+
+var removePlan = function (plan) {
+    for (var i = 0; i < plans.entries.length; i++) {
+        if (plans.entries[i].id == plan.id) {
+            plans.entries.splice(i, 1);
+        }
+    }
+};
+
+var findSharesByFileId = function (id) {
+    return shares.filter(function (share) {
+        return share.id == id;
+    });
+};
+
+var findAccount = function (id) {
+    for (var i = 0; i < accounts.entries.length; i++) {
+        if (accounts.entries[i].id == id) {
+            return accounts.entries[i];
+        }
+    }
+};
+
 // SYSTEM
 
 app.get('/system/reset', function (req, res) {
@@ -95,8 +133,27 @@ app.get('/authping', function (req, res) {
 // PLANS
 
 app.get('/plans', function (req, res) {
-    res.json(plans);
+    res.json(plans.entries);
 });
+
+app.get('/plans/:plan', Decorate(
+    Converter('params.plan', findPlan),
+    AutoInject()
+)(
+    function (plan) {
+        return plan;
+    }
+));
+
+app.delete('/plans/:plan', Decorate(
+    Converter('params.plan', findPlan),
+    AutoInject()
+)(
+    function (plan) {
+        removePlan(plan);
+        return null;
+    }
+));
 
 app.put('/plans', function (req, res) {
     var plan = {};
@@ -229,12 +286,6 @@ app.delete('/files/:file', Decorate(
 
 // SHARES
 
-var findSharesByFileId = function (id) {
-    return shares.filter(function (share) {
-        return share.id == id;
-    });
-};
-
 app.get('/files/:file/shares', Decorate(
     Converter('params.file', findFile),
     AutoInject())
@@ -290,14 +341,6 @@ app.post('/files/:id/genurl', function(req, res) {
 
 // ACCOUNTS
 
-var findAccount = function (id) {
-    for (var i = 0; i < accounts.entries.length; i++) {
-        if (accounts.entries[i].id == id) {
-            return accounts.entries[i];
-        }
-    }
-};
-
 app.get('/accounts', Decorate(
     AutoInject())
     (function () {
@@ -312,15 +355,6 @@ app.get('/accounts/:account', Decorate(
         return account;
     })
 );
-
-var findPlan = function (id) {
-    for (var i = 0; i < plans.entries.length; i++) {
-        console.log(plans.entries[i].id);
-        if (plans.entries[i].id == id) {
-            return plans.entries[i];
-        }
-    }
-};
 
 app.post('/accounts/:account',
 Decorate(
@@ -343,29 +377,6 @@ Decorate(
     }
     return account;
 }));
-
-app.post('/accountss/:id', function (req, res) {
-    var account = null;
-    for (var i = 0; i < accounts.entries.length; i++) {
-        if (accounts.entries[i].id == req.params.id) {
-            account = accounts.entries[i];
-            break;
-        }
-    }
-    if (!account) {
-        res.status(404).send('');
-    }
-    if (req.body.hasOwnProperty('username')) {
-        account.username = req.body.username;
-    }
-    if (req.body.hasOwnProperty('password')) {
-        account.password = req.body.password;
-    }
-    if (req.body.hasOwnProperty('plan')) {
-        account.plan = Number(req.body.plan);
-    }
-    res.json(account);
-});
 
 app.put('/accounts', function (req, res) {
     var account = {};

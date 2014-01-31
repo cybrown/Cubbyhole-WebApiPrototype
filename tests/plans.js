@@ -104,12 +104,50 @@ describe ('Plan Web Service', function () {
             url: url + '/plans'
         }, function (err, response, body) {
             response.should.have.status(200);
+            var plans = JSON.parse(body);
+            plans.length.should.eql(5);
+            done();
+        });
+    });
+
+    it ('should get a plan', function (done) {
+        req1({
+            method: 'get',
+            url: url + '/plans/4'
+        }, function (err, res, body) {
+            res.should.have.status(200);
+            var plan = JSON.parse(body);
+            plan.should.eql({
+                'id': 4,
+                'name': 'first plan',
+                'price': 10,
+                'bandwidthDownload': 100,
+                'bandwidthUpload': 100,
+                'space': 30,
+                'shareQuota': 30
+            });
             done();
         });
     });
 
     it ('should delete a plan', function (done) {
-        throw new Error('Test not implemented');
+        req1({
+            method: 'delete',
+            url: url + '/plans/4'
+        }, function (err, response, body) {
+            response.should.have.status(200);
+            done();
+        });
+    });
+
+    it ('should not get a plan', function (done) {
+        req1({
+            method: 'delete',
+            url: url + '/plans/4'
+        }, function (err, response, body) {
+            response.should.have.status(404);
+            done();
+        });
     });
 
     it ('should edit a plan', function (done) {
