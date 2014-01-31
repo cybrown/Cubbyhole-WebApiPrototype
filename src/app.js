@@ -43,7 +43,7 @@ if ('development' == app.get('env')) {
 var accounts = require('./data/accounts');
 var files = require('./data/files');
 var shares = require('./data/shares');
-var plans = require('./data/plans');
+var plans = require('./data/plans.json');
 
 // REPOSITORIES
 
