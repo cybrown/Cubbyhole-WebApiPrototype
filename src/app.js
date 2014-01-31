@@ -42,9 +42,9 @@ if ('development' == app.get('env')) {
 }
 
 var accounts = require('./data/accounts')();
-var files = require('./data/files.json');
-var shares = require('./data/shares');
-var plans = require('./data/plans.json');
+var files = require('./data/files')();
+var shares = require('./data/shares')();
+var plans = require('./data/plans')();
 
 // REPOSITORIES
 
@@ -75,16 +75,10 @@ var deleteFile = function (file) {
 // SYSTEM
 
 app.get('/system/reset', function (req, res) {
-    shares.entries.length   = 0;
-    shares.lastId           = 1;
-    // Suppression du cache de données de mock
-    delete require.cache['C' + path.join(__dirname, 'data', 'accounts').substring(1)];
-    delete require.cache['C' + path.join(__dirname, 'data', 'files.json').substring(1)];
-    //delete require.cache['C' + path.join(__dirname, 'data', 'shares.json').substring(1)];
-    delete require.cache['C' + path.join(__dirname, 'data', 'plans.json').substring(1)];
     accounts = require('./data/accounts')();
-    plans = require('./data/plans.json');
-    files = require('./data/files.json');
+    shares = require('./data/shares')();
+    plans = require('./data/plans')();
+    files = require('./data/files')();
     res.send('');
 });
 
