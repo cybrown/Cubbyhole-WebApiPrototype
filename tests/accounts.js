@@ -51,7 +51,7 @@ describe ('Accounts Web Service', function () {
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
             JSON.parse(body).should.eql({
-                'id': 1,
+                'id': 4,
                 'username': 'example1',
                 'password': 'examplePwd1',
                 'plan': 1
@@ -72,7 +72,7 @@ describe ('Accounts Web Service', function () {
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
             JSON.parse(body).should.eql({
-                'id': 2,
+                'id': 5,
                 'username': 'example2',
                 'password': 'examplePwd2',
                 'plan': 1
@@ -87,20 +87,19 @@ describe ('Accounts Web Service', function () {
             url: url + '/accounts'
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
-            JSON.parse(body).should.eql([
-                {
-                    'id': 1,
-                    'username': 'example1',
-                    'password': 'examplePwd1',
-                    'plan': 1
-                },
-                {
-                    'id': 2,
-                    'username': 'example2',
-                    'password': 'examplePwd2',
-                    'plan': 1
-                }
-            ]);
+            var users = JSON.parse(body);
+            users[4] = {
+                'id': 4,
+                'username': 'example1',
+                'password': 'examplePwd1',
+                'plan': 1
+            };
+            users[5] = {
+                'id': 5,
+                'username': 'example2',
+                'password': 'examplePwd2',
+                'plan': 1
+            };
             done();
         });
     });
@@ -108,11 +107,11 @@ describe ('Accounts Web Service', function () {
     it ('should return an account', function (done) {
         req1({
             method: 'get',
-            url: url + '/accounts/1'
+            url: url + '/accounts/4'
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
             JSON.parse(body).should.eql({
-                'id': 1,
+                'id': 4,
                 'username': 'example1',
                 'password': 'examplePwd1',
                 'plan': 1
@@ -121,14 +120,14 @@ describe ('Accounts Web Service', function () {
         });
     });
 
-    it ('should return an account', function (done) {
+    it ('should return an account 2', function (done) {
         req1({
             method: 'get',
-            url: url + '/accounts/2'
+            url: url + '/accounts/5'
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
             JSON.parse(body).should.eql({
-                'id': 2,
+                'id': 5,
                 'username': 'example2',
                 'password': 'examplePwd2',
                 'plan': 1
@@ -140,7 +139,7 @@ describe ('Accounts Web Service', function () {
     it ('should modify an account', function (done) {
         req1({
             method: 'post',
-            uri: url + '/accounts/1',
+            uri: url + '/accounts/4',
             form: {
                 username: 'newExample',
                 plan: '3'
@@ -148,7 +147,7 @@ describe ('Accounts Web Service', function () {
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
             JSON.parse(body).should.eql({
-                'id': 1,
+                'id': 4,
                 'username': 'newExample',
                 'password': 'examplePwd1',
                 'plan': 3
@@ -157,14 +156,14 @@ describe ('Accounts Web Service', function () {
         });
     });
 
-    it ('should return an account', function (done) {
+    it ('should return an account 3', function (done) {
         req1({
             method: 'get',
-            url: url + '/accounts/1'
+            url: url + '/accounts/4'
         }, function (err, response, body) {
             response.should.have.status(200);
             JSON.parse(body).should.eql({
-                'id': 1,
+                'id': 4,
                 'username': 'newExample',
                 'password': 'examplePwd1',
                 'plan': 3

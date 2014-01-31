@@ -41,7 +41,7 @@ if ('development' == app.get('env')) {
     app.use(express.errorHandler());
 }
 
-var accounts = require('./data/accounts');
+var accounts = require('./data/accounts')();
 var files = require('./data/files.json');
 var shares = require('./data/shares');
 var plans = require('./data/plans.json');
@@ -75,15 +75,14 @@ var deleteFile = function (file) {
 // SYSTEM
 
 app.get('/system/reset', function (req, res) {
-    accounts.entries.length = 0;
-    accounts.lastId         = 1;
     shares.entries.length   = 0;
     shares.lastId           = 1;
     // Suppression du cache de données de mock
-    //delete require.cache['C' + path.join(__dirname, 'data', 'accounts.json').substring(1)];
+    delete require.cache['C' + path.join(__dirname, 'data', 'accounts').substring(1)];
     delete require.cache['C' + path.join(__dirname, 'data', 'files.json').substring(1)];
     //delete require.cache['C' + path.join(__dirname, 'data', 'shares.json').substring(1)];
     delete require.cache['C' + path.join(__dirname, 'data', 'plans.json').substring(1)];
+    accounts = require('./data/accounts')();
     plans = require('./data/plans.json');
     files = require('./data/files.json');
     res.send('');
