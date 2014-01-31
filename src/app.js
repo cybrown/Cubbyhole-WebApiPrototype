@@ -110,6 +110,14 @@ var findAccount = function (id) {
     }
 };
 
+var removeAccount = function (account) {
+    for (var i = 0; i < accounts.entries.length; i++) {
+        if (accounts.entries[i].id == account.id) {
+            accounts.entries.splice(i, 1);
+        }
+    }
+};
+
 // SYSTEM
 
 app.get('/system/reset', function (req, res) {
@@ -132,9 +140,13 @@ app.get('/authping', function (req, res) {
 
 // PLANS
 
-app.get('/plans', function (req, res) {
-    res.json(plans.entries);
-});
+app.get('/plans', Decorate(
+    AutoInject()
+)(
+    function () {
+        return plans.entries;
+    }
+));
 
 app.get('/plans/:plan', Decorate(
     Converter('params.plan', findPlan),
@@ -151,7 +163,6 @@ app.delete('/plans/:plan', Decorate(
 )(
     function (plan) {
         removePlan(plan);
-        return null;
     }
 ));
 
@@ -174,48 +185,21 @@ app.post('/plans/:plan', Decorate(
     return plan;
 }));
 
-app.put('/plans', function (req, res) {
+app.put('/plans', Decorate(
+    AutoInject()
+)
+(function(name, price, bandwidthDownload, bandwidthUpload, space, shareQuota) {
     var plan = {};
-    var hasData = false;
-
-    if (req.body.hasOwnProperty('name')) {
-        plan.name = req.body.name;
-        hasData = true;
-    }
-
-    if (req.body.hasOwnProperty('price')) {
-        plan.price = Number(req.body.price);
-        hasData = true;
-    }
-
-    if (req.body.hasOwnProperty('bandwidthDownload')) {
-        plan.bandwidthDownload = Number(req.body.bandwidthDownload);
-        hasData = true;
-    }
-
-    if (req.body.hasOwnProperty('bandwidthUpload')) {
-        plan.bandwidthUpload = Number(req.body.bandwidthUpload);
-        hasData = true;
-    }
-
-    if (req.body.hasOwnProperty('space')) {
-        plan.space = Number(req.body.space);
-        hasData = true;
-    }
-
-    if (req.body.hasOwnProperty('shareQuota')) {
-        plan.shareQuota = Number(req.body.shareQuota);
-        hasData = true;
-    }
-
-    if (hasData) {
-        plan.id = plans.lastId++;
-        plans.entries.push(plan);
-        res.json(plan);
-    }
-
-    res.status(400).send('');
-});
+    plan.name = name;
+    plan.price = price;
+    plan.bandwidthDownload = bandwidthDownload;
+    plan.bandwidthUpload = bandwidthUpload;
+    plan.space = space;
+    plan.shareQuota = shareQuota;
+    plan.id = plans.lastId++;
+    plans.entries.push(plan);
+    return plan;
+}));
 
 // FILES
 
@@ -411,21 +395,14 @@ app.put('/accounts', Decorate(
     })
 );
 
-app.delete('/accounts/:id', function (req, res) {
-    var index = -1;
-    for (var i = 0; i < accounts.entries.length; i++) {
-        if (accounts.entries[i].id == req.params.id) {
-            index = i;
-            break;
-        }
+app.delete('/accounts/:account', Decorate(
+    Converter('params.account', findAccount),
+    AutoInject()
+)(
+    function (account) {
+        removeAccount(account);
     }
-    if (index >= 0) {
-        accounts.entries.splice(index, 1);
-        res.send('');
-    } else {
-        res.status(404).send('');
-    }
-});
+));
 
 http.createServer(app).listen(app.get('port'), function(){
     console.log('Express server listening on port ' + app.get('port'));
