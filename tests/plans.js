@@ -55,7 +55,7 @@ describe ('Plan Web Service', function () {
             response.statusCode.should.equal(200);
 
             JSON.parse(body).should.eql({
-                'id': 1,
+                'id': 4,
                 'name': 'first plan',
                 'price': 10,
                 'bandwidthDownload': 100,
@@ -84,7 +84,7 @@ describe ('Plan Web Service', function () {
             response.statusCode.should.equal(200);
 
             JSON.parse(body).should.eql({
-                'id': 2,
+                'id': 5,
                 'name': 'second plan',
                 'price': 100,
                 'bandwidthDownload': 1000,

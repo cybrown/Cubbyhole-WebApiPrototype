@@ -80,8 +80,7 @@ app.get('/system/reset', function (req, res) {
     files.lastId            = 1;
     shares.entries.length   = 0;
     shares.lastId           = 1;
-    plans.entries.length    = 0;
-    plans.lastId            = 1;
+    plans = require('./data/plans.json');
     res.send('');
 });
 
