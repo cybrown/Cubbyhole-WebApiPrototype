@@ -155,6 +155,25 @@ app.delete('/plans/:plan', Decorate(
     }
 ));
 
+app.post('/plans/:plan', Decorate(
+    Default('body', 'name', null),
+    Default('body', 'price', null),
+    Default('body', 'bandwidthDownload', null),
+    Default('body', 'bandwidthUpload', null),
+    Default('body', 'space', null),
+    Default('body', 'shareQuota', null),
+    Converter('params.plan', findPlan),
+    AutoInject()
+)(function (plan, name, price, bandwidthDownload, bandwidthUpload, space, shareQuota) {
+    name !== null && (plan.name = name);
+    price !== null && (plan.price = price);
+    bandwidthDownload !== null && (plan.bandwidthDownload = bandwidthDownload);
+    bandwidthUpload !== null && (plan.bandwidthUpload = bandwidthUpload);
+    space !== null && (plan.space = space);
+    shareQuota !== null && (plan.shareQuota = shareQuota);
+    return plan;
+}));
+
 app.put('/plans', function (req, res) {
     var plan = {};
     var hasData = false;
@@ -378,29 +397,19 @@ Decorate(
     return account;
 }));
 
-app.put('/accounts', function (req, res) {
-    var account = {};
-    var hasData = false;
-    if (req.body.hasOwnProperty('username')) {
-        account.username = req.body.username;
-        hasData = true;
-    }
-    if (req.body.hasOwnProperty('password')) {
-        account.password = req.body.password;
-        hasData = true;
-    }
-    if (req.body.hasOwnProperty('plan')) {
-        account.plan = Number(req.body.plan);
-        hasData = true;
-    }
-    if (hasData) {
+app.put('/accounts', Decorate(
+    Converter('body.plan', findPlan),
+    AutoInject())
+    (function (username, password, plan) {
+        var account = {};
+        account.username = username;
+        account.password = password;
+        account.plan = plan.id;
         account.id = accounts.lastId++;
         accounts.entries.push(account);
-        res.send(account);
-    } else {
-        res.send('');
-    }
-});
+        return account;
+    })
+);
 
 app.delete('/accounts/:id', function (req, res) {
     var index = -1;

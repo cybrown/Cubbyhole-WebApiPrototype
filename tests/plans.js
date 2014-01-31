@@ -151,6 +151,18 @@ describe ('Plan Web Service', function () {
     });
 
     it ('should edit a plan', function (done) {
-        throw new Error('Test not implemented');
+        req1({
+            method: 'post',
+            url: url + '/plans/3',
+            form: {
+                name: 'toto plan'
+            }
+        }, function (err, response, body) {
+            response.should.have.status(200);
+            var plan = JSON.parse(body);
+            plan.id.should.eql(3);
+            plan.name.should.eql('toto plan');
+            done();
+        });
     });
 });
