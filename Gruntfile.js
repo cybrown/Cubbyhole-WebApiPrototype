@@ -14,7 +14,7 @@ module.exports = function(grunt) {
             dev: {
                 options: {
                     file: 'index.js',
-                    watchedExtensions: ['js'],
+                    watchedExtensions: ['js', 'json'],
                     watchedFolders: ['src']
                 }
             }
