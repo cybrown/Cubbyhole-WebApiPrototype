@@ -315,7 +315,38 @@ app.get('/accounts/:account', Decorate(
     })
 );
 
-app.post('/accounts/:id', function (req, res) {
+var findPlan = function (id) {
+    for (var i = 0; i < plans.entries.length; i++) {
+        console.log(plans.entries[i].id);
+        if (plans.entries[i].id == id) {
+            return plans.entries[i];
+        }
+    }
+};
+
+app.post('/accounts/:account',
+Decorate(
+    Default('body', 'username', null),
+    Default('body', 'password', null),
+    Default('body', 'plan', null),
+    Converter('params.account', findAccount),
+    Converter('body.plan', findPlan),
+    AutoInject()
+)
+(function (account, username, password, plan) {
+    if (username !== null) {
+        account.username = username;
+    }
+    if (password !== null) {
+        account.password = password;
+    }
+    if (plan !== null) {
+        account.plan = plan.id;
+    }
+    return account;
+}));
+
+app.post('/accountss/:id', function (req, res) {
     var account = null;
     for (var i = 0; i < accounts.entries.length; i++) {
         if (accounts.entries[i].id == req.params.id) {
