@@ -4,18 +4,6 @@ var resolve = function (value, next) {
     return value.then ? value.then(next) : next(value);
 };
 
-// Obsolete, integrated in Decorate
-var ApplyObject = function () {
-    return function (object) {
-        var names = getArgNames(this);
-        var args = [];
-        for (var i = 0, max = names.length; i < max; i++) {
-            args.push(object[names[i]]);
-        }
-        return this.apply(null, args);
-    };
-};
-
 var Default = function (map, value) {
     if (value) {
         var key = map;
@@ -28,7 +16,7 @@ var Default = function (map, value) {
                 kwargs[key] = map[key];
             }
         });
-        this.apply(null, arguments);
+        return this.apply(null, arguments);
     };
 };
 
@@ -47,7 +35,6 @@ var Convert = function (map, func) {
 };
 
 module.exports = {
-    ApplyObject: ApplyObject,
     Default: Default,
     Convert: Convert
 };

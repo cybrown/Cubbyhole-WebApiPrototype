@@ -1,5 +1,7 @@
 'use strict';
 
+var Q = require('q');
+
 var getArgNames = function (func) {
     var FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m;
     var FN_ARG_SPLIT = /,/;
@@ -12,6 +14,7 @@ var getArgNames = function (func) {
 var processPromises = function (kwargs, cb) {
     var count = 0;
     var cur = 0;
+    var defer = Q.defer();
     Object.keys(kwargs).forEach(function (key) {
         if (kwargs[key] && kwargs[key].then) {
             count++;
@@ -19,13 +22,22 @@ var processPromises = function (kwargs, cb) {
                 kwargs[key] = res;
                 cur++;
                 if (count === cur) {
-                    cb();
+                    try {
+                        defer.resolve(cb());
+                    } catch (e) {
+                        defer.reject(e);
+                    }
                 }
+            }, function (e) {
+                cur++;
+                defer.reject(e);
             });
         }
     });
     if (count === 0) {
-        cb();
+        return cb();
+    } else {
+        return defer.promise;
     }
 };
 
@@ -33,7 +45,7 @@ var DecorateOne = function (decorator) {
     var decorators = arguments;
     return function (next) {
         return function () {
-            decorator.apply(next, arguments);
+            return decorator.apply(next, arguments);
         };
     };
 };
@@ -43,7 +55,7 @@ var Decorate = function () {
     var next = arguments[arguments.length - 1];
     arguments.length--;
     var prev = function (kwargs) {
-        processPromises(kwargs, function () {
+        var result = processPromises(kwargs, function () {
             var names = getArgNames(next);
             var args = [];
             for (var i = 0, max = names.length; i < max; i++) {
@@ -51,12 +63,12 @@ var Decorate = function () {
             }
             return next.apply(null, args)
         });
-        return 'PROMISE';
+        return result;
     };
     for (var key = decorators.length - 1; key >= 0; key--) {
         prev = (function (p, key) {
             return function () {
-                decorators[key].apply(p, arguments);
+                return decorators[key].apply(p, arguments);
             };
         })(prev, key)
     }
