@@ -80,14 +80,6 @@ var findPlan = function (id) {
     }
 };
 
-var findPlan = function (id) {
-    for (var i = 0; i < plans.entries.length; i++) {
-        if (plans.entries[i].id == id) {
-            return plans.entries[i];
-        }
-    }
-};
-
 var removePlan = function (plan) {
     for (var i = 0; i < plans.entries.length; i++) {
         if (plans.entries[i].id == plan.id) {
