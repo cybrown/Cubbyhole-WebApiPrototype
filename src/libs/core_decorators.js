@@ -1,7 +1,58 @@
 'use strict';
 
-var resolve = function (value, next) {
-    return value.then ? value.then(next) : next(value);
+var when = function (value, next, onErr) {
+    try {
+        return value.then ? value.then(next, onErr) : next(value);
+    } catch (e) {
+        return next(value);
+    }
+};
+
+var ExpressRequest = function (args) {
+    return function (req, res) {
+        if (!args) {
+            args = this.argNames;
+        }
+        var result = {};
+        args.forEach(function (fullKey) {
+            var obj, key, doThrow = true;
+            if (fullKey[0] === '?') {
+                doThrow = false;
+                fullKey = fullKey.substring(1);
+            }
+            if (fullKey.indexOf('.') !== -1) {
+                var tmp = fullKey.split('.');
+                obj = tmp[0];
+                key = tmp[1];
+            } else {
+                key = fullKey;
+                if (req.params.hasOwnProperty(key)) {
+                    obj = 'params';
+                } else if (req.method != 'GET' && req.method != 'HEAD' && req.body.hasOwnProperty(key)) {
+                    obj = 'body';
+                } else {
+                    obj = 'query';
+                }
+            }
+            if (doThrow && !req[obj].hasOwnProperty(key)) {
+                throw new Error();
+            }
+            result[key] = req[obj][key];
+        });
+        var onErr = function (err) {
+            var status = err.status ? err.status : 500;
+            res.status(status).send(err);
+        };
+        try {
+            when(this.call(null, result), function (toSend) {
+                if (res && res.send) {
+                    res.send(toSend);
+                }
+            }, onErr);
+        } catch (err) {
+            onErr(err);
+        }
+    };
 };
 
 var Default = function (map, value) {
@@ -36,5 +87,6 @@ var Convert = function (map, func) {
 
 module.exports = {
     Default: Default,
-    Convert: Convert
+    Convert: Convert,
+    ExpressRequest: ExpressRequest
 };

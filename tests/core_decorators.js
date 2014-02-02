@@ -1,9 +1,9 @@
 var Decorate        = require('../src/libs/decorate2');
 var CoreDecorators  = require('../src/libs/core_decorators');
 var Q               = require('q');
-var ApplyObject     = CoreDecorators.ApplyObject;
 var Default         = CoreDecorators.Default;
 var Convert         = CoreDecorators.Convert;
+var ExpressRequest  = CoreDecorators.ExpressRequest;
 
 describe ('Decorate', function () {
 
@@ -180,6 +180,247 @@ describe ('Core Decorators', function () {
                 throw new Error('should not be executed');
             }, function () {
                 done();
+            });
+        });
+    });
+
+    describe ('Request', function () {
+
+        it ('should get the parameters', function (done) {
+            Decorate(
+                ExpressRequest(['a', 'b', 'c']),
+                function (a, b, c) {
+                    a.should.eql('A');
+                    b.should.eql('2');
+                    c.should.eql('c');
+                    done();
+                }
+            )({
+                params: {a: 'A'},
+                query: {a: 'a', b: 'b', c: 'c'},
+                body: {a: '1', b: '2'}
+            });
+        });
+
+        it ('should get the parameters from function decompilation', function (done) {
+            Decorate(
+                ExpressRequest(),
+                function (a, b, c) {
+                    a.should.eql('A');
+                    b.should.eql('2');
+                    c.should.eql('c');
+                    done();
+                }
+            )({
+                params: {a: 'A'},
+                query: {a: 'a', b: 'b', c: 'c'},
+                body: {a: '1', b: '2'}
+            });
+        });
+
+        it ('should not get values from body if request is get', function (done) {
+            Decorate(
+                ExpressRequest(['a', 'b', 'c']),
+                function (a, b, c) {
+                    a.should.eql('A');
+                    b.should.eql('b');
+                    c.should.eql('c');
+                    done();
+                }
+            )({
+                params: {a: 'A'},
+                query: {a: 'a', b: 'b', c: 'c'},
+                body: {a: '1', b: '2'},
+                method: 'GET'
+            });
+        });
+
+        it ('should not get values from body if request is head', function (done) {
+            Decorate(
+                ExpressRequest(['a', 'b', 'c']),
+                function (a, b, c) {
+                    a.should.eql('A');
+                    b.should.eql('b');
+                    c.should.eql('c');
+                    done();
+                }
+            )({
+                params: {a: 'A'},
+                query: {a: 'a', b: 'b', c: 'c'},
+                body: {a: '1', b: '2'},
+                method: 'HEAD'
+            });
+        });
+
+        it ('should use the dot syntax', function (done) {
+            Decorate(
+                ExpressRequest(['query.a', 'b', 'c']),
+                function (a, b, c) {
+                    a.should.eql('a');
+                    b.should.eql('2');
+                    c.should.eql('c');
+                    done();
+                }
+            )({
+                params: {a: 'A'},
+                query: {a: 'a', b: 'b', c: 'c'},
+                body: {a: '1', b: '2'}
+            });
+        });
+
+        it ('should throw an error if parameter is not found', function () {
+            (function () {
+                Decorate(
+                    ExpressRequest(['a', 'b', 'c', 'd']),
+                    function (a, b, c, d) {
+                        a.should.eql('A');
+                        b.should.eql('2');
+                        c.should.eql('c');
+                    }
+                )({
+                    params: {a: 'A'},
+                    query: {a: 'a', b: 'b', c: 'c'},
+                    body: {a: '1', b: '2'}
+                });
+            }).should.throw();
+        });
+
+        it ('should throw an error if parameter is not found 2', function () {
+            (function () {
+                Decorate(
+                    ExpressRequest(['body.a', 'b', 'c']),
+                    function (a, b, c, d) {}
+                )({
+                    params: {a: 'A'},
+                    query: {a: 'a', b: 'b', c: 'c'},
+                    body: {b: '2'}
+                });
+            }).should.throw();
+        });
+
+        it ('should not throw an error if a parameter is missing with the ? syntax', function () {
+            Decorate(
+                ExpressRequest(['a', 'b', 'c', '?d']),
+                function (a, b, c, d) {
+                    a.should.eql('A');
+                    b.should.eql('2');
+                    c.should.eql('c');
+                    (d === undefined).should.be.ok;
+                }
+            )({
+                params: {a: 'A'},
+                query: {a: 'a', b: 'b', c: 'c'},
+                body: {a: '1', b: '2'}
+            });
+        });
+
+        it ('should not throw an error if a parameter is missing with the ? syntax 2', function (done) {
+            Decorate(
+                ExpressRequest(['?body.a', 'b', 'c']),
+                function (a, b, c) {
+                    b.should.eql('2');
+                    c.should.eql('c');
+                    (a === undefined).should.be.ok;
+                    done();
+                }
+            )({
+                params: {a: 'A'},
+                query: {a: 'a', b: 'b', c: 'c'},
+                body: {b: '2'}
+            });
+        });
+
+        it ('should send the function return value to res.send', function (done) {
+            Decorate(
+                ExpressRequest(['a', 'b', 'c']),
+                function (a, b, c) {
+                    a.should.eql('A');
+                    b.should.eql('2');
+                    c.should.eql('c');
+                    return 'toto';
+                }
+            )({
+                params: {a: 'A'},
+                query: {a: 'a', b: 'b', c: 'c'},
+                body: {a: '1', b: '2'}
+            }, {
+                send: function (data) {
+                    data.should.eql('toto');
+                    done();
+                }
+            });
+        });
+
+        it ('should send the function return value to res.send with a promise', function (done) {
+            Decorate(
+                ExpressRequest(['a', 'b', 'c']),
+                function (a, b, c) {
+                    a.should.eql('A');
+                    b.should.eql('2');
+                    c.should.eql('c');
+                    var defer = Q.defer();
+                    setTimeout(function () {
+                        defer.resolve('toto');
+                    }, 10);
+                    return defer.promise;
+                }
+            )({
+                params: {a: 'A'},
+                query: {a: 'a', b: 'b', c: 'c'},
+                body: {a: '1', b: '2'}
+            }, {
+                send: function (data) {
+                    data.should.eql('toto');
+                    done();
+                }
+            });
+        });
+
+        it ('should set a status code if an exception is thrown', function (done) {
+            Decorate(
+                ExpressRequest(['a']),
+                function (a) {
+                    throw new Error();
+                }
+            )({
+                params: {a: 'A'},
+                query: {a: 'a', b: 'b', c: 'c'},
+                body: {a: '1', b: '2'}
+            }, {
+                _status: 200,
+                status: function (value) {
+                    this._status = value;
+                    return this;
+                },
+                send: function (data) {
+                    this._status.should.eql(500);
+                    done();
+                }
+            });
+        });
+
+        it ('should set the status code if an exception has a status property', function (done) {
+            Decorate(
+                ExpressRequest(['a']),
+                function (a) {
+                    var err = new Error();
+                    err.status = 400;
+                    throw err;
+                }
+            )({
+                params: {a: 'A'},
+                query: {a: 'a', b: 'b', c: 'c'},
+                body: {a: '1', b: '2'}
+            }, {
+                _status: 200,
+                status: function (value) {
+                    this._status = value;
+                    return this;
+                },
+                send: function (data) {
+                    this._status.should.eql(400);
+                    done();
+                }
             });
         });
     });

@@ -54,23 +54,25 @@ var Decorate = function () {
     var decorators = arguments;
     var next = arguments[arguments.length - 1];
     arguments.length--;
+    var argNames = getArgNames(next);
     var prev = function (kwargs) {
         var result = processPromises(kwargs, function () {
-            var names = getArgNames(next);
             var args = [];
-            for (var i = 0, max = names.length; i < max; i++) {
-                args.push(kwargs[names[i]]);
+            for (var i = 0, max = argNames.length; i < max; i++) {
+                args.push(kwargs[argNames[i]]);
             }
             return next.apply(null, args)
         });
         return result;
     };
+    prev.argNames = argNames;
     for (var key = decorators.length - 1; key >= 0; key--) {
         prev = (function (p, key) {
             return function () {
                 return decorators[key].apply(p, arguments);
             };
-        })(prev, key)
+        })(prev, key);
+        prev.argNames = argNames;
     }
     return prev;
 };
