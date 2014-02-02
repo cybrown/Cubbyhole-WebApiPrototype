@@ -22,6 +22,10 @@ describe ('Decorate', function () {
     });
 
     it ('should process promises', function (done) {
+        var defer = Q.defer();
+        setTimeout(function () {
+            defer.resolve(3);
+        }, 10);
         Decorate(
             function (a, c, b) {
                 a.should.eql(1);
@@ -30,7 +34,7 @@ describe ('Decorate', function () {
                 done();
             })({
             a: 1,
-            b: {then: function (f) {f(3);}},
+            b: defer.promise,
             c: 5
         });
     });
@@ -72,17 +76,15 @@ describe ('Core Decorators', function () {
                     } catch (e) {
                         error = e;
                     }
-                    return {
-                        then: function (ok, fail) {
-                            setTimeout(function () {
-                                if (error) {
-                                    fail(error);
-                                } else {
-                                    ok(res);
-                                }
-                            }, 10);
+                    var defer = Q.defer();
+                    setTimeout(function () {
+                        if (error) {
+                            defer.reject();
+                        } else {
+                            defer.resolve();
                         }
-                    };
+                    }, 10);
+                    return defer.promise;
                 };
             };
 
@@ -96,7 +98,7 @@ describe ('Core Decorators', function () {
                     throw new Error();
                 })({a: 'A', c: 'C'});
             res.then(function () {
-                done();
+                throw new Error('Should not be executed');
             }, function () {
                 done();
             });
