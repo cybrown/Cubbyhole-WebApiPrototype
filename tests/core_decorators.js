@@ -1,4 +1,4 @@
-var Decorate        = require('../src/libs/decorate2');
+var Decorate        = require('../src/libs/decorate');
 var CoreDecorators  = require('../src/libs/core_decorators');
 var Q               = require('q');
 var Default         = CoreDecorators.Default;
@@ -183,6 +183,19 @@ describe ('Core Decorators', function () {
             }, function () {
                 done();
             });
+        });
+
+        it ('should throw a 404 error if the conversion function returns undefined', function () {
+            (function () {
+                Decorate(
+                    Convert('num', function () {}),
+                    function (num) {
+                        throw new Error('should not be executed');
+                    })({num: '42'}, {status: function (value) {
+                        value.should.eql(404);
+                    }
+                });
+            }).should.throw();
         });
     });
 

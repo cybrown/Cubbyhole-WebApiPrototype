@@ -1,24 +1,14 @@
+'use strict';
 
-/**
- * Module dependencies.
- */
-
-var express = require('express');
-var http = require('http');
-var path = require('path');
+var express         = require('express');
+var http            = require('http');
+var path            = require('path');
+var Decorate        = require('./libs/decorate');
+var CoreDecorators  = require('./libs/core_decorators');
+var ExpressRequest  = CoreDecorators.ExpressRequest;
+var Convert         = CoreDecorators.Convert;
 
 var app = express();
-
-var Decorate = require('./libs/decorate');
-var ExpressDecorators = require('./libs/express_decorators');
-
-var Converter = ExpressDecorators.Converter;
-var Inject = ExpressDecorators.Inject;
-var ParamValid = ExpressDecorators.ParamValid;
-var BodyValid = ExpressDecorators.BodyValid;
-var QueryValid = ExpressDecorators.QueryValid;
-var AutoInject = ExpressDecorators.AutoInject;
-var Default = ExpressDecorators.Default;
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -133,71 +123,62 @@ app.get('/authping', function (req, res) {
 // PLANS
 
 app.get('/plans', Decorate(
-    AutoInject()
-)(
+    ExpressRequest(),
     function () {
         return plans.entries;
     }
 ));
 
 app.get('/plans/:plan', Decorate(
-    Converter('params.plan', findPlan),
-    AutoInject()
-)(
+    ExpressRequest(),
+    Convert('plan', findPlan),
     function (plan) {
         return plan;
     }
 ));
 
 app.delete('/plans/:plan', Decorate(
-    Converter('params.plan', findPlan),
-    AutoInject()
-)(
+    ExpressRequest(),
+    Convert('plan', findPlan),
     function (plan) {
         removePlan(plan);
     }
 ));
 
 app.post('/plans/:plan', Decorate(
-    Default('body', 'name', null),
-    Default('body', 'price', null),
-    Default('body', 'bandwidthDownload', null),
-    Default('body', 'bandwidthUpload', null),
-    Default('body', 'space', null),
-    Default('body', 'shareQuota', null),
-    Converter('params.plan', findPlan),
-    AutoInject()
-)(function (plan, name, price, bandwidthDownload, bandwidthUpload, space, shareQuota) {
-    name !== null && (plan.name = name);
-    price !== null && (plan.price = price);
-    bandwidthDownload !== null && (plan.bandwidthDownload = bandwidthDownload);
-    bandwidthUpload !== null && (plan.bandwidthUpload = bandwidthUpload);
-    space !== null && (plan.space = space);
-    shareQuota !== null && (plan.shareQuota = shareQuota);
+    ExpressRequest(['plan', '?name', '?price', '?bandwidthDownload', '?bandwidthUpload', '?space', '?shareQuota']),
+    Convert('plan', findPlan),
+    function (plan, name, price, bandwidthDownload, bandwidthUpload, space, shareQuota) {
+        name !== undefined && (plan.name = name);
+        price !== undefined && (plan.price = price);
+        bandwidthDownload !== undefined && (plan.bandwidthDownload = bandwidthDownload);
+        bandwidthUpload !== undefined && (plan.bandwidthUpload = bandwidthUpload);
+        space !== undefined && (plan.space = space);
+        shareQuota !== undefined && (plan.shareQuota = shareQuota);
     return plan;
 }));
 
 app.put('/plans', Decorate(
-    AutoInject()
-)
-(function(name, price, bandwidthDownload, bandwidthUpload, space, shareQuota) {
-    var plan = {};
-    plan.name = name;
-    plan.price = price;
-    plan.bandwidthDownload = bandwidthDownload;
-    plan.bandwidthUpload = bandwidthUpload;
-    plan.space = space;
-    plan.shareQuota = shareQuota;
-    plan.id = plans.lastId++;
-    plans.entries.push(plan);
-    return plan;
-}));
+    ExpressRequest(),
+    function(name, price, bandwidthDownload, bandwidthUpload, space, shareQuota) {
+        var plan = {};
+        plan.name = name;
+        plan.price = price;
+        plan.bandwidthDownload = bandwidthDownload;
+        plan.bandwidthUpload = bandwidthUpload;
+        plan.space = space;
+        plan.shareQuota = shareQuota;
+        plan.id = plans.lastId++;
+        plans.entries.push(plan);
+        return plan;
+    }
+));
 
 // FILES
 
 app.get('/files', Decorate(
-    Inject())
-    (function () {
+    ExpressRequest(),
+    function () {
         return files.entries.filter(function(file) {
             return file.parent == 0;
         });
@@ -205,28 +186,28 @@ app.get('/files', Decorate(
 );
 
 app.get('/files/:file', Decorate(
-    Converter('params.file', findFile),
-    AutoInject())
-    (function (file) {
+    ExpressRequest(),
+    Convert('file', findFile),
+    function (file) {
         return file;
     })
 );
 
 app.put('/files', Decorate(
-    Default('body', 'isFolder', false),
-    Converter('body.isFolder', function (a) {return Boolean(JSON.parse(a));}),
-    BodyValid('parent', /^[0-9]*$/),
-    Converter('body.parent', Number),
-    AutoInject()
-)(function (name, parent, isFolder) {
-    var file = {};
-    file.name = name;
-    file.parent = parent;
-    file.isFolder = isFolder;
-    file.id = files.lastId++;
-    files.entries.push(file);
-    return file;
-}));
+    ExpressRequest(['name', 'parent', '?isFolder']),
+    Convert('isFolder', function (a) {return a === undefined ? false : Boolean(JSON.parse(a));}),
+    //BodyValid('parent', /^[0-9]*$/),
+    Convert('parent', Number),
+    function (name, parent, isFolder) {
+        var file = {};
+        file.name = name;
+        file.parent = parent;
+        file.isFolder = isFolder;
+        file.id = files.lastId++;
+        files.entries.push(file);
+        return file;
+    }
+));
 
 app.post('/files/:id', function (req, res) {
     var selectedFile = null;
@@ -272,19 +253,19 @@ app.post('/files/:id', function (req, res) {
 });
 
 app.delete('/files/:file', Decorate(
-    Converter('params.file', findFile),
-    AutoInject()
-)
-(function (file) {
+    ExpressRequest(),
+    Convert('file', findFile),
+    function (file) {
     deleteFile(file)
-}));
+}
+));
 
 // SHARES
 
 app.get('/files/:file/shares', Decorate(
-    Converter('params.file', findFile),
-    AutoInject())
-    (function (file) {
+    ExpressRequest(),
+    Convert('file', findFile),
+    function (file) {
         return findSharesByFileId(file.id);
     })
 );
@@ -337,46 +318,41 @@ app.post('/files/:id/genurl', function(req, res) {
 // ACCOUNTS
 
 app.get('/accounts', Decorate(
-    AutoInject())
-    (function () {
+    ExpressRequest(),
+    function () {
         return accounts.entries;
     })
 );
 
 app.get('/accounts/:account', Decorate(
-    Converter('params.account', findAccount),
-    AutoInject())
-    (function (account) {
+    ExpressRequest(),
+    Convert('account', findAccount),
+    function (account) {
         return account;
     })
 );
 
-app.post('/accounts/:account',
-Decorate(
-    Default('body', 'username', null),
-    Default('body', 'password', null),
-    Default('body', 'plan', null),
-    Converter('params.account', findAccount),
-    Converter('body.plan', findPlan),
-    AutoInject()
-)
-(function (account, username, password, plan) {
-    if (username !== null) {
-        account.username = username;
+app.post('/accounts/:account', Decorate(
+    ExpressRequest(['account', '?username', '?password', '?plan']),
+    Convert({account: findAccount, plan: findPlan}),
+    function (account, username, password, plan) {
+        if (username !== undefined) {
+            account.username = username;
+        }
+        if (password !== undefined) {
+            account.password = password;
+        }
+        if (plan !== undefined) {
+            account.plan = plan.id;
+        }
+        return account;
     }
-    if (password !== null) {
-        account.password = password;
-    }
-    if (plan !== null) {
-        account.plan = plan.id;
-    }
-    return account;
-}));
+));
 
 app.put('/accounts', Decorate(
-    Converter('body.plan', findPlan),
-    AutoInject())
-    (function (username, password, plan) {
+    ExpressRequest(),
+    Convert('plan', findPlan),
+    function (username, password, plan) {
         var account = {};
         account.username = username;
         account.password = password;
@@ -388,13 +364,12 @@ app.put('/accounts', Decorate(
 );
 
 app.delete('/accounts/:account', Decorate(
-    Converter('params.account', findAccount),
-    AutoInject()
-)(
+    ExpressRequest(),
+    Convert('account', findAccount),
     function (account) {
         removeAccount(account);
-    }
-));
+    })
+);
 
 http.createServer(app).listen(app.get('port'), function(){
     console.log('Express server listening on port ' + app.get('port'));

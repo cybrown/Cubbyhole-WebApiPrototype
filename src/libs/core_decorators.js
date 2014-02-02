@@ -80,6 +80,11 @@ var Convert = function (map, func) {
     return function (kwargs) {
         Object.keys(map).forEach(function (key) {
             kwargs[key] = map[key](kwargs[key]);
+            if (kwargs[key] === undefined) {
+                var err = new Error('Not found');
+                err.status = 404;
+                throw err;
+            }
         });
         return this.apply(null, arguments);
     };
