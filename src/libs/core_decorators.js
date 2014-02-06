@@ -131,6 +131,5 @@ module.exports = {
     Default: Default,
     Convert: Convert,
     ExpressRequest: ExpressRequest,
-    Ensure: Ensure,
-    Config: Config
+    Ensure: Ensure
 };
