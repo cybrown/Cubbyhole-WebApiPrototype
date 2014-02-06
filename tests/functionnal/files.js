@@ -59,6 +59,21 @@ describe ('File Web Service', function () {
         });
     });
 
+    it ('should not add a file, wrong isFile parameter', function (done) {
+        req1({
+            method: 'put',
+            url: url + '/files',
+            form: {
+                name: 'file1abc',
+                parent: 0,
+                isFolder: 'abc'
+            }
+        }, function (err, response, body) {
+            response.statusCode.should.equal(400);
+            done();
+        });
+    });
+
     it ('should add another file', function (done) {
         req1({
             method: 'put',

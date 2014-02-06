@@ -8,7 +8,8 @@ module.exports = function(grunt) {
                 reporter: 'spec',
                 require: ['should']
             },
-            all: ['tests/']
+            unit: ['tests/unit'],
+            func: ['tests/functionnal']
         },
         nodemon: {
             dev: {
@@ -21,6 +22,6 @@ module.exports = function(grunt) {
         }
     });
 
-    grunt.registerTask('test', ['mochacli:all']);
+    grunt.registerTask('test', ['mochacli:unit', 'mochacli:func']);
     grunt.registerTask('node', ['nodemon:dev']);
 };
