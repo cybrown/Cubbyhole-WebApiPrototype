@@ -7,6 +7,8 @@ var Decorate        = require('./libs/decorate');
 var CoreDecorators  = require('./libs/core_decorators');
 var ExpressRequest  = CoreDecorators.ExpressRequest;
 var Convert         = CoreDecorators.Convert;
+var Ensure          = CoreDecorators.Ensure;
+var Default         = CoreDecorators.Default;
 
 var app = express();
 
@@ -195,9 +197,9 @@ app.get('/files/:file', Decorate(
 
 app.put('/files', Decorate(
     ExpressRequest(['name', 'parent', '?isFolder']),
-    Convert('isFolder', function (a) {return a === undefined ? false : Boolean(JSON.parse(a));}),
-    //BodyValid('parent', /^[0-9]*$/),
-    Convert('parent', Number),
+    Default('isFolder', false),
+    Ensure('isFolder', 'boolean'),
+    //Ensure('parent', 'number'),
     function (name, parent, isFolder) {
         var file = {};
         file.name = name;

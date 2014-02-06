@@ -56,14 +56,14 @@ var ExpressRequest = function (args) {
 };
 
 var Default = function (map, value) {
-    if (value) {
+    if (value !== undefined) {
         var key = map;
         map = {};
         map[key] = value;
     }
     return function (kwargs) {
         Object.keys(map).forEach(function(key) {
-            if (!kwargs.hasOwnProperty(key)) {
+            if (!kwargs.hasOwnProperty(key) || kwargs[key] === undefined) {
                 kwargs[key] = map[key];
             }
         });
@@ -79,10 +79,47 @@ var Convert = function (map, func) {
     }
     return function (kwargs) {
         Object.keys(map).forEach(function (key) {
-            kwargs[key] = map[key](kwargs[key]);
-            if (kwargs[key] === undefined) {
-                var err = new Error('Not found');
+            try {
+                kwargs[key] = map[key](kwargs[key]);
+                if (kwargs[key] === undefined) {
+                    var err = new Error('Not found');
+                    err.status = 404;
+                    throw err;
+                }
+            } catch (err) {
                 err.status = 404;
+                throw err;
+            }
+        });
+        return this.apply(null, arguments);
+    };
+};
+
+var Ensure = function (map, func) {
+    if (func) {
+        var key = map;
+        map = {};
+        map[key] = func;
+    }
+    return function (kwargs) {
+        Object.keys(map).forEach(function (key) {
+            try {
+                switch (map[key]) {
+                    case 'boolean':
+                        if (typeof kwargs[key] !== 'boolean') {
+                            kwargs[key] = Boolean(JSON.parse(kwargs[key]));
+                        }
+                        break;
+                    case 'number':
+                        kwargs[key] = Number(kwargs[key]);
+                        break;
+                    default:
+                        var err = new Error();
+                        err.status = 500;
+                        break;
+                }
+            } catch (err) {
+                err.status = err.status || 400;
                 throw err;
             }
         });
@@ -93,5 +130,7 @@ var Convert = function (map, func) {
 module.exports = {
     Default: Default,
     Convert: Convert,
-    ExpressRequest: ExpressRequest
+    ExpressRequest: ExpressRequest,
+    Ensure: Ensure,
+    Config: Config
 };
