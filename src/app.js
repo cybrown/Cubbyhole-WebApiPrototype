@@ -1,5 +1,7 @@
 'use strict';
 
+//<editor-fold desc="Requires">
+
 var express         = require('express');
 var http            = require('http');
 var path            = require('path');
@@ -10,14 +12,18 @@ var Convert         = CoreDecorators.Convert;
 var Ensure          = CoreDecorators.Ensure;
 var Default         = CoreDecorators.Default;
 
+//</editor-fold>
+
 var app = express();
+
+//<editor-fold desc="Configuration">
 
 // all environments
 app.set('port', process.env.PORT || 3000);
 app.use(express.favicon());
 app.use(express.logger('dev'));
 app.use(express.json());
-app.use(express.bodyParser());
+app.use(express.urlencoded());
 app.use(express.methodOverride());
 
 // auth
@@ -38,7 +44,9 @@ var files = require('./data/files')();
 var shares = require('./data/shares')();
 var plans = require('./data/plans')();
 
-// REPOSITORIES
+//</editor-fold>
+
+// <editor-fold desc="Repositories">
 
 var findFile = function (id) {
     var selectedFile;
@@ -102,7 +110,9 @@ var removeAccount = function (account) {
     }
 };
 
-// SYSTEM
+//</editor-fold>
+
+//<editor-fold desc="System">
 
 app.get('/system/reset', function (req, res) {
     accounts = require('./data/accounts')();
@@ -112,8 +122,6 @@ app.get('/system/reset', function (req, res) {
     res.send('');
 });
 
-// PING
-
 app.get('/ping', function (req, res) {
     res.send('pong');
 });
@@ -122,8 +130,9 @@ app.get('/authping', function (req, res) {
     res.send('pong');
 });
 
-// PLANS
+//</editor-fold>
 
+//<editor-fold desc="Plans">
 app.get('/plans', Decorate(
     ExpressRequest(),
     function () {
@@ -176,8 +185,9 @@ app.put('/plans', Decorate(
     }
 ));
 
-// FILES
+//</editor-fold>
 
+//<editor-fold desc="Files">
 app.get('/files', Decorate(
     ExpressRequest(),
     function () {
@@ -262,8 +272,9 @@ app.delete('/files/:file', Decorate(
 }
 ));
 
-// SHARES
+//</editor-fold>
 
+//<editor-fold desc="Shares">
 app.get('/files/:file/shares', Decorate(
     ExpressRequest(),
     Convert('file', findFile),
@@ -317,7 +328,9 @@ app.post('/files/:id/genurl', function(req, res) {
 
 });
 
-// ACCOUNTS
+//</editor-fold>
+
+//<editor-fold desc="Accounts">
 
 app.get('/accounts', Decorate(
     ExpressRequest(),
@@ -372,6 +385,8 @@ app.delete('/accounts/:account', Decorate(
         removeAccount(account);
     })
 );
+
+//</editor-fold>
 
 http.createServer(app).listen(app.get('port'), function(){
     console.log('Express server listening on port ' + app.get('port'));
