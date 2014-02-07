@@ -369,6 +369,23 @@ describe ('Core Decorators', function () {
             });
         });
 
+        it ('should throw an error if a parameter is missing after an optional parameter', function () {
+            (function () {
+                Decorate(
+                    ExpressRequest(['a', '?b', 'c']),
+                    function (a, b, c) {
+                        b.should.eql('2');
+                        c.should.eql('c');
+                        (a === undefined).should.be.ok;
+                    }
+                )({
+                    params: {a: 'A'},
+                    query: {a: 'a', b: 'b'},
+                    body: {b: '2'}
+                });
+            }).should.throw();
+        });
+
         it ('should send the function return value to res.send', function (done) {
             Decorate(
                 ExpressRequest(['a', 'b', 'c']),
