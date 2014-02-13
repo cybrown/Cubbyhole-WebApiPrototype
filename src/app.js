@@ -4,6 +4,7 @@
 
 var express         = require('express');
 var http            = require('http');
+var cors            = require('cors');
 var path            = require('path');
 var Decorate        = require('./libs/decorate');
 var CoreDecorators  = require('./libs/core_decorators');
@@ -25,6 +26,7 @@ app.use(express.logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded());
 app.use(express.methodOverride());
+app.use(cors());
 
 // auth
 var authMiddleware = express.basicAuth('user', 'pass')
