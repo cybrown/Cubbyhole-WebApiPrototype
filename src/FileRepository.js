@@ -1,5 +1,3 @@
-var SqlHelper = require('./libs/SqlHelper');
-
 var FileRepository = module.exports = function () {
     this.sql = null;
 };
