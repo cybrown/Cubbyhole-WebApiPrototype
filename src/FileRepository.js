@@ -1,29 +1,8 @@
 var SqlHelper = require('./libs/SqlHelper');
 
 var FileRepository = module.exports = function () {
-    this.sql = new SqlHelper();
-    this.sql.PK_NAME = 'id';
-    this.sql.TABLE_NAME = 'files';
-    this.sql.TABLE_FIELDS = [
-        'name',
-        'parent_id',
-        'isFolder',
-        'owner_id',
-        'size',
-        'url',
-        'cdate',
-        'mdate'
-    ];
+    this.sql = null;
 };
-
-Object.defineProperty(FileRepository.prototype, 'connection', {
-    get: function () {
-        return this.sql.connection;
-    },
-    set: function (value) {
-        this.sql.connection = value;
-    }
-});
 
 FileRepository.objectToHash = function (file) {
     return {

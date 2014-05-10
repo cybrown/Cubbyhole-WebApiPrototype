@@ -1,19 +1,35 @@
 var FileRepository = require('../../src/FileRepository');
+var SqlHelper = require('../../src/libs/SqlHelper');
 var mysql = require('mysql');
 
 describe ('FileRepository', function () {
 
     var files = new FileRepository();
 
-    var connection = mysql.createConnection({
+    var mysqlConnection = mysql.createConnection({
         host: 'localhost',
         user: 'cubbyhole',
         password: 'cubbyhole',
         database: 'cubbyhole_proto'
     });
-    connection.connect();
+    mysqlConnection.connect();
 
-    files.connection = connection;
+    var fileSqlHelper = new SqlHelper();
+    fileSqlHelper.PK_NAME = 'id';
+    fileSqlHelper.TABLE_NAME = 'files';
+    fileSqlHelper.TABLE_FIELDS = [
+        'name',
+        'parent_id',
+        'isFolder',
+        'owner_id',
+        'size',
+        'url',
+        'cdate',
+        'mdate'
+    ];
+    fileSqlHelper.connection = mysqlConnection;
+
+    files.sql = fileSqlHelper;
 
     it ('should clean file database', function (done) {
         files.clean().then(function () {
