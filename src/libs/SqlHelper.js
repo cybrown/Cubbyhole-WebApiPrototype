@@ -11,11 +11,21 @@ var SqlHelper = module.exports = function () {
 
 SqlHelper.QUERY_INSERT = 'INSERT INTO ?? SET ?';
 SqlHelper.QUERY_UPDATE = 'UPDATE ?? SET ? WHERE ?? = ?';
+SqlHelper.QUERY_SELECT_ALL = 'SELECT ??, ?? FROM ??';
 SqlHelper.QUERY_SELECT_BY = 'SELECT ??, ?? FROM ?? WHERE ?? = ?';
 SqlHelper.QUERY_DELETE_BY = 'DELETE FROM ?? WHERE ?? = ?';
 SqlHelper.QUERY_TRUNCATE = 'TRUNCATE ??';
 
 // Sql query wrappers
+
+SqlHelper.prototype.querySelectAll = function () {
+    var _this = this;
+    return Q.promise(function (resolve, reject) {
+        _this.connection.query(SqlHelper.QUERY_SELECT_ALL, [_this.PK_NAME, _this.TABLE_FIELDS, _this.TABLE_NAME], function (err, result) {
+            err ? reject(err) : resolve(result);
+        });
+    });
+};
 
 SqlHelper.prototype.querySelectBy = function (foreignKey, id) {
     var _this = this;
