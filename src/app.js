@@ -13,7 +13,7 @@ var SqlHelper = require('./libs/SqlHelper');
 
 var plug = new Plugme();
 
-plug.set('app', function () {
+plug.set('app', ['fileExpressApp', 'accountExpressApp', 'planExpressApp', 'systemExpressApp'], function (fileExpressApp, accountExpressApp, planExpressApp, systemExpressApp) {
     var app = express();
 
     // all environments
@@ -38,6 +38,12 @@ plug.set('app', function () {
     if ('development' == app.get('env')) {
         app.use(express.errorHandler());
     }
+
+    app.use('/', systemExpressApp);
+    app.use('/files', fileExpressApp);
+    app.use('/accounts', accountExpressApp);
+    app.use('/plans', planExpressApp);
+
     return app;
 });
 
@@ -115,25 +121,11 @@ plug.set('planExpressApp', ['planRepository'], function (planRepository) {
     return require('./apps/planApp')(planRepository);
 });
 
-plug.set('start', ['app', 'loadMockData', 'fileExpressApp', 'accountExpressApp', 'planExpressApp'], function (app, loadMockData, fileExpressApp, accountExpressApp, planExpressApp) {
-    app.get('/system/reset', function (req, res) {
-        return loadMockData().then(function () {
-            res.send('');
-        });
-    });
+plug.set('systemExpressApp', ['loadMockData'], function (loadMockData) {
+    return require('./apps/systemApp')(loadMockData);
+});
 
-    app.get('/ping', function (req, res) {
-        res.send('pong');
-    });
-
-    app.get('/authping', function (req, res) {
-        res.send('pong');
-    });
-
-    app.use('/files', fileExpressApp);
-    app.use('/accounts', accountExpressApp);
-    app.use('/plans', planExpressApp);
-
+plug.set('start', ['app'], function (app) {
     app.get('/files/:file/shares', function (req, res) {
 
     });
