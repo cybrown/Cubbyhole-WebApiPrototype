@@ -1,4 +1,5 @@
 var express = require('express');
+var Q = require('q');
 var Decorate = require('../libs/decorate');
 var CoreDecorators = require('../libs/core_decorators');
 var ExpressRequest = CoreDecorators.ExpressRequest;
@@ -41,38 +42,37 @@ module.exports = function (fileRepository) {
     ));
 
     fileApp.post('/:id', function (req, res) {
-        var selectedFile = fileRepository.find(req.params.id);
+        Q.when(fileRepository.find(req.params.id), function (selectedFile) {
+            if (selectedFile) {
+                var fileToModify = selectedFile;
+                if (req.query.hasOwnProperty('copy') && req.query.copy == 'true') {
+                    fileToModify = {};
+                    fileToModify.name = selectedFile.name,
+                        fileToModify.parent = selectedFile.parent,
+                        fileToModify.isFolder = selectedFile.isFolder,
+                        fileToModify.cdate = new Date(),
+                        fileToModify.mdate = new Date(),
+                        fileToModify.owner = selectedFile.owner,
+                        fileToModify.size = selectedFile.size,
+                        fileToModify.url = selectedFile.url
+                }
 
-        if (selectedFile) {
-            var fileToModify = selectedFile;
-            if (req.query.hasOwnProperty('copy') && req.query.copy == 'true') {
-                fileToModify = {};
-                fileToModify.name = selectedFile.name,
-                    fileToModify.parent = selectedFile.parent,
-                    fileToModify.isFolder = selectedFile.isFolder,
-                    fileToModify.cdate = new Date(),
-                    fileToModify.mdate = new Date(),
-                    fileToModify.owner = selectedFile.owner,
-                    fileToModify.size = selectedFile.size,
-                    fileToModify.url = selectedFile.url
+                if (req.body.hasOwnProperty('file')) {
+                    fileToModify.parent = Number(req.body.parent);
+                }
+                if (req.body.hasOwnProperty('name')) {
+                    fileToModify.name = req.body.name;
+                }
+
+                if (selectedFile != fileToModify) {
+                    fileRepository.save(fileToModify);
+                }
+
+                res.json(fileToModify);
+            } else {
+                res.status(404).send('');
             }
-
-            if (req.body.hasOwnProperty('file')) {
-                fileToModify.parent = Number(req.body.parent);
-            }
-            if (req.body.hasOwnProperty('name')) {
-                fileToModify.name = req.body.name;
-            }
-
-            if (selectedFile != fileToModify) {
-                fileRepository.save(fileToModify);
-            }
-
-            res.json(fileToModify);
-        } else {
-            res.status(404).send('');
-        }
-
+        });
     });
 
     fileApp.delete('/:file', Decorate(

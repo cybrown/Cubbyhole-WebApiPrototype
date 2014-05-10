@@ -120,6 +120,16 @@ describe ('Accounts Web Service', function () {
         });
     });
 
+    it ('should not return an account', function (done) {
+        req1({
+            method: 'get',
+            url: url + '/accounts/42'
+        }, function (err, response, body) {
+            response.statusCode.should.equal(404);
+            done();
+        });
+    });
+
     it ('should return an account 2', function (done) {
         req1({
             method: 'get',

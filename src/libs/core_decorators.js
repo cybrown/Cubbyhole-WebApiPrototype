@@ -1,12 +1,6 @@
 'use strict';
 
-var when = function (value, next, onErr) {
-    try {
-        return value.then ? value.then(next, onErr) : next(value);
-    } catch (e) {
-        return next(value);
-    }
-};
+var Q = require('q');
 
 var ExpressRequest = function (args) {
     return function (req, res) {
@@ -44,7 +38,7 @@ var ExpressRequest = function (args) {
             res.status(status).send(err);
         };
         try {
-            when(this.call(null, result), function (toSend) {
+            Q.when(this.call(null, result), function (toSend) {
                 if (res && res.send) {
                     res.send(toSend);
                 }
@@ -78,20 +72,36 @@ var Convert = function (map, func) {
         map[key] = func;
     }
     return function (kwargs) {
+
+        var _this = this;
+        var _arguments = arguments;
+        return Q.all(Object.keys(map).map(function (key) {
+            return Q(map[key](kwargs[key])).then(function (value) {
+                kwargs[key] = value;
+            }).catch (function (err) {
+                err.status = 404;
+                throw err;
+            });
+        })).then(function () {
+            return _this.apply(null, _arguments);
+        });
+
+
+        /*
         Object.keys(map).forEach(function (key) {
+            map[key](kwargs[key]).then(function (value) {
+                kwargs[key] = value;
+            });
+
             try {
                 kwargs[key] = map[key](kwargs[key]);
-                if (kwargs[key] === undefined) {
-                    var err = new Error('Not found');
-                    err.status = 404;
-                    throw err;
-                }
             } catch (err) {
                 err.status = 404;
                 throw err;
             }
         });
         return this.apply(null, arguments);
+        */
     };
 };
 

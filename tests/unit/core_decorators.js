@@ -209,17 +209,24 @@ describe ('Core Decorators', function () {
             });
         });
 
-        it ('should throw a 404 error if the conversion function returns undefined', function () {
-            (function () {
-                Decorate(
-                    Convert('num', function () {}),
-                    function (num) {
-                        throw new Error('should not be executed');
-                    })({num: '42'}, {status: function (value) {
-                        value.should.eql(404);
-                    }
-                });
-            }).should.throw();
+        it ('should throw a 404 error if the conversion function returns undefined', function (done) {
+            Decorate(
+                Convert('num', function () {
+                    return Q.promise(function (resolve) {
+                        throw new Error('not found');
+                    });
+                }),
+                function (num) {
+                    throw new Error('should not be executed');
+                })({num: '42'}, {status: function (value) {
+                    value.should.eql(404);
+                }
+            }).then(function (value) {
+                throw new Error('should not be called');
+            }).catch(function (err) {
+                err.status.should.eql(404);
+                done();
+            });
         });
     });
 
