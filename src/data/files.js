@@ -3,7 +3,6 @@ module.exports = function () {
         "lastId": 4,
         "entries": [
             {
-                "id": 1,
                 "name": "file1",
                 "parent": 0,
                 "isFolder": false,
@@ -14,7 +13,6 @@ module.exports = function () {
                 "url": "AFBA34A2A11AB13EEBA"
             },
             {
-                "id": 2,
                 "name": "file2",
                 "parent": 1,
                 "isFolder": false,
@@ -25,7 +23,6 @@ module.exports = function () {
                 "url": "AFBA34A2A11AB13EEBA"
             },
             {
-                "id": 3,
                 "name": "file3",
                 "parent": 1,
                 "isFolder": false,

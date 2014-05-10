@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/cybrown/Cubbyhole-WebApiPrototype",
   "dependencies": {
+    "mysql": "^2.2.0",
     "express": "~3.4.7",
     "should": "~2.1.1",
     "request": "~2.29.0",

@@ -36,8 +36,9 @@ module.exports = function (fileRepository) {
             file.name = name;
             file.parent = parent;
             file.isFolder = isFolder;
-            fileRepository.save(file);
-            return file;
+            return fileRepository.save(file).then(function () {
+                return file;
+            });
         }
     ));
 
@@ -63,12 +64,9 @@ module.exports = function (fileRepository) {
                 if (req.body.hasOwnProperty('name')) {
                     fileToModify.name = req.body.name;
                 }
-
-                if (selectedFile != fileToModify) {
-                    fileRepository.save(fileToModify);
-                }
-
-                res.json(fileToModify);
+                fileRepository.save(fileToModify).then(function () {
+                    res.json(fileToModify);
+                });
             } else {
                 res.status(404).send('');
             }

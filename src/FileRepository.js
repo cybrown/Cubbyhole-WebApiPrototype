@@ -1,54 +1,88 @@
-var Q = require('q');
+var SqlHelper = require('./libs/SqlHelper');
 
 var FileRepository = module.exports = function () {
-    this.entries = [];
+    this.sql = new SqlHelper();
+    this.sql.PK_NAME = 'id';
+    this.sql.TABLE_NAME = 'files';
+    this.sql.TABLE_FIELDS = [
+        'name',
+        'parent_id',
+        'isFolder',
+        'owner_id',
+        'size',
+        'url',
+        'cdate',
+        'mdate'
+    ];
+};
+
+Object.defineProperty(FileRepository.prototype, 'connection', {
+    get: function () {
+        return this.sql.connection;
+    },
+    set: function (value) {
+        this.sql.connection = value;
+    }
+});
+
+FileRepository.objectToHash = function (file) {
+    return {
+        id: file.id,
+        name: file.name,
+        parent_id: file.parent,
+        isFolder: file.isFolder,
+        owner_id: file.owner,
+        size: file.size,
+        url: file.url,
+        cdate: file.cdate,
+        mdate: file.mdate
+    };
+};
+
+FileRepository.hashToObject = function (hash) {
+    return {
+        id: hash.id,
+        name: hash.name,
+        parent: hash.parent_id,
+        isFolder: Boolean(hash.isFolder),
+        owner: hash.owner_id,
+        size: hash.size,
+        url: hash.url,
+        cdate: hash.cdate,
+        mdate: hash.mdate
+    };
 };
 
 FileRepository.prototype.find = function (id) {
-    var _this = this;
-    return Q.promise(function (resolve) {
-        for (var i = 0; i < _this.entries.length; i++) {
-            if (_this.entries[i].id == id) {
-                resolve(_this.entries[i]);
-                return;
-            }
+    return this.sql.querySelectById(id).then(function (result) {
+        if (!result.length) {
+            throw new Error('File not found');
+        } else {
+            return FileRepository.hashToObject(result[0]);
         }
-        throw new Error('File not found');
     });
 };
 
 FileRepository.prototype.findByParentId = function (parentId) {
-    var _this = this;
-    return Q.promise(function (resolve) {
-        resolve(_this.entries.filter(function (file) {
-            return file.parent == parentId;
-        }));
+    return this.sql.querySelectBy('parent_id', parentId).then(function (result) {
+        return result.map(FileRepository.hashToObject);
     });
 };
 
 FileRepository.prototype.remove = function (file) {
-    var _this = this;
-    return Q.promise(function (resolve) {
-        var index = -1;
-        for (var i = 0; i < _this.entries.length; i++) {
-            if (_this.entries[i].id == file.id) {
-                index = i;
-                break;
-            }
-        }
-        if (index >= 0) {
-            _this.entries.splice(index, 1);
-        }
-        resolve();
-    });
+    return this.sql.queryDeleteById(file.id);
+};
+
+FileRepository.prototype.clean = function () {
+    return this.sql.queryTruncate();
 };
 
 FileRepository.prototype.save = function (file) {
-    var _this = this;
-    return Q.promise(function (resolve) {
-        if (!file.id) {
-            file.id = _this.lastId++;
-        }
-        _this.entries.push(file);
-    });
+    if (file.id) {
+        return this.sql.queryUpdateById(file.id, FileRepository.objectToHash(file));
+    } else {
+        return this.sql.queryInsert(FileRepository.objectToHash(file)).then(function (result) {
+            file.id = result.insertId;
+        });
+    }
 };

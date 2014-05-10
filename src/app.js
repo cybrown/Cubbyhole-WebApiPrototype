@@ -3,6 +3,7 @@
 var express         = require('express');
 var http            = require('http');
 var cors            = require('cors');
+var mysql = require('mysql');
 
 var FileRepository = require('./FileRepository');
 var PlanRepository = require('./PlanRepository');
@@ -35,9 +36,6 @@ if ('development' == app.get('env')) {
 
 function loadMockData () {
     var filesData = require('./data/files')();
-    fileRepository.entries = filesData.entries;
-    fileRepository.lastId = filesData.lastId;
-
     var accountsData = require('./data/accounts')();
     accountRepository.lastId = accountsData.lastId;
     accountRepository.entries = accountsData.entries;
@@ -45,15 +43,32 @@ function loadMockData () {
     var plansData = require('./data/plans')();
     planRepository.lastId = plansData.lastId;
     planRepository.entries = plansData.entries;
-}
+
+    return fileRepository.clean().then(function () {
+        return filesData.entries.map(function (file) {
+            return fileRepository.save(file);
+        });
+    });
+};
+
+// MYSQL
+var connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'cubbyhole',
+    password: 'cubbyhole',
+    database: 'cubbyhole_proto'
+});
+connection.connect();
 
 var fileRepository = new FileRepository();
+fileRepository.connection = connection;
 var planRepository = new PlanRepository();
 var accountRepository = new AccountRepository();
 
 app.get('/system/reset', function (req, res) {
-    loadMockData();
-    res.send('');
+    return loadMockData().then(function () {
+        res.send('');
+    });
 });
 
 app.get('/ping', function (req, res) {
