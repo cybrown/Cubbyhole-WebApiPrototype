@@ -42,7 +42,9 @@ module.exports = function (planRepository) {
             bandwidthUpload !== undefined && (plan.bandwidthUpload = bandwidthUpload);
             space !== undefined && (plan.space = space);
             shareQuota !== undefined && (plan.shareQuota = shareQuota);
-            return plan;
+            return planRepository.save(plan).then(function () {
+                return plan;
+            });
         }
     ));
 
@@ -56,8 +58,9 @@ module.exports = function (planRepository) {
             plan.bandwidthUpload = bandwidthUpload;
             plan.space = space;
             plan.shareQuota = shareQuota;
-            planRepository.save(plan);
-            return plan;
+            return planRepository.save(plan).then(function () {
+                return plan;
+            });
         }
     ));
 

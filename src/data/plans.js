@@ -1,9 +1,7 @@
 module.exports = function () {
     return {
-        "lastId": 4,
         "entries": [
             {
-                "id": 1,
                 "name": "First plan",
                 "price": 10,
                 "bandwidthDownload": 100,
@@ -12,7 +10,6 @@ module.exports = function () {
                 "shareQuota": 30
             },
             {
-                "id": 2,
                 "name": "Second plan",
                 "price": 100,
                 "bandwidthDownload": 200,
@@ -21,7 +18,6 @@ module.exports = function () {
                 "shareQuota": 60
             },
             {
-                "id": 3,
                 "name": "Thirst plan",
                 "price": 500,
                 "bandwidthDownload": 300,

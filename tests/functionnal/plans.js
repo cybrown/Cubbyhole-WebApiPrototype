@@ -117,15 +117,13 @@ describe ('Plan Web Service', function () {
         }, function (err, res, body) {
             res.should.have.status(200);
             var plan = JSON.parse(body);
-            plan.should.eql({
-                'id': 4,
-                'name': 'first plan',
-                'price': 10,
-                'bandwidthDownload': 100,
-                'bandwidthUpload': 100,
-                'space': 30,
-                'shareQuota': 30
-            });
+            plan.should.have.property('id', 4);
+            plan.should.have.property('name', 'first plan');
+            plan.should.have.property('price', 10);
+            plan.should.have.property('bandwidthDownload', 100);
+            plan.should.have.property('bandwidthUpload', 100);
+            plan.should.have.property('space', 30);
+            plan.should.have.property('shareQuota',30 );
             done();
         });
     });
