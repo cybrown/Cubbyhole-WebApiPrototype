@@ -1,6 +1,5 @@
 module.exports = function () {
     return {
-        "lastId": 4,
         "entries": [
             {
                 "name": "file1",
