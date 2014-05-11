@@ -30,7 +30,7 @@ module.exports = function (fileRepository) {
         ExpressRequest(['name', 'parent', '?isFolder']),
         Default('isFolder', false),
         Ensure('isFolder', 'boolean'),
-        //Ensure('parent', 'number'),
+        Ensure('parent', 'number'),
         function (name, parent, isFolder) {
             var file = {};
             file.name = name;
@@ -49,13 +49,13 @@ module.exports = function (fileRepository) {
                 if (req.query.hasOwnProperty('copy') && req.query.copy == 'true') {
                     fileToModify = {};
                     fileToModify.name = selectedFile.name,
-                        fileToModify.parent = selectedFile.parent,
-                        fileToModify.isFolder = selectedFile.isFolder,
-                        fileToModify.cdate = new Date(),
-                        fileToModify.mdate = new Date(),
-                        fileToModify.owner = selectedFile.owner,
-                        fileToModify.size = selectedFile.size,
-                        fileToModify.url = selectedFile.url
+                    fileToModify.parent = selectedFile.parent,
+                    fileToModify.isFolder = selectedFile.isFolder,
+                    fileToModify.cdate = new Date(),
+                    fileToModify.mdate = new Date(),
+                    fileToModify.owner = selectedFile.owner,
+                    fileToModify.size = selectedFile.size,
+                    fileToModify.url = selectedFile.url
                 }
 
                 if (req.body.hasOwnProperty('file')) {

@@ -6,8 +6,8 @@
         "cdate": 0,
         "mdate": 0,
         "owner": 1,
-        "size": 500,
-        "url": "AFBA34A2A11AB13EEBA"
+        "size": null,
+        "url": ""
     },
     {
         "name": "file2",
@@ -16,8 +16,8 @@
         "cdate": 0,
         "mdate": 0,
         "owner": 1,
-        "size": 500,
-        "url": "AFBA34A2A11AB13EEBA"
+        "size": null,
+        "url": ""
     },
     {
         "name": "file3",
@@ -26,7 +26,7 @@
         "cdate": 0,
         "mdate": 0,
         "owner": 1,
-        "size": 500,
-        "url": "AFBA34A2A11AB13EEBA"
+        "size": null,
+        "url": ""
     }
 ]

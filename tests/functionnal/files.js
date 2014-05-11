@@ -49,12 +49,11 @@ describe ('File Web Service', function () {
             }
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
-            JSON.parse(body).should.eql({
-                'id': 4,
-                'name': 'file1',
-                'parent': 0,
-                'isFolder': false
-            });
+            var file = JSON.parse(body);
+            file.should.have.property('id', 4);
+            file.should.have.property('name', 'file1');
+            file.should.have.property('parent', 0);
+            file.should.have.property('isFolder', false);
             done();
         });
     });
@@ -84,12 +83,11 @@ describe ('File Web Service', function () {
             }
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
-            JSON.parse(body).should.eql({
-                'id': 5,
-                'name': 'file2',
-                'parent': 0,
-                'isFolder': false
-            });
+            var file = JSON.parse(body);
+            file.should.have.property('id', 5);
+            file.should.have.property('name', 'file2');
+            file.should.have.property('parent', 0);
+            file.should.have.property('isFolder', false);
             done();
         });
     });
@@ -224,12 +222,11 @@ describe ('File Web Service', function () {
             }
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
-            JSON.parse(body).should.eql({
-                'id': 7,
-                'name': 'folder1',
-                'parent': 0,
-                'isFolder': true
-            });
+            var file = JSON.parse(body);
+            file.should.have.property('id', 7);
+            file.should.have.property('name', 'folder1');
+            file.should.have.property('parent', 0);
+            file.should.have.property('isFolder', true);
             done();
         });
     });
@@ -245,12 +242,11 @@ describe ('File Web Service', function () {
             }
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
-            JSON.parse(body).should.eql({
-                'id': 8,
-                'name': 'notAFolder',
-                'parent': 0,
-                'isFolder': false
-            });
+            var file = JSON.parse(body);
+            file.should.have.property('id', 8);
+            file.should.have.property('name', 'notAFolder');
+            file.should.have.property('parent', 0);
+            file.should.have.property('isFolder', false);
             done();
         });
     });
