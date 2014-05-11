@@ -7,9 +7,9 @@ var Plugme = require('plugme').Plugme;
 var mysql = require('mysql');
 var Q = require('q');
 
-var FileRepository = require('./FileRepository');
-var PlanRepository = require('./PlanRepository');
-var AccountRepository = require('./AccountRepository');
+var FileRepository = require('./repositories/FileRepository');
+var PlanRepository = require('./repositories/PlanRepository');
+var AccountRepository = require('./repositories/AccountRepository');
 var SqlHelper = require('./libs/SqlHelper');
 
 var plug = new Plugme();
