@@ -18,8 +18,14 @@ AccountRepository.prototype.find = function (id) {
     });
 };
 
+AccountRepository.prototype.clean = function () {
+    this.lastId = 0;
+    this.entries.length = 0;
+    return Q(true);
+};
+
 AccountRepository.prototype.findAll = function () {
-    return this.entries;
+    return Q(this.entries);
 };
 
 AccountRepository.prototype.remove = function (account) {
@@ -28,11 +34,13 @@ AccountRepository.prototype.remove = function (account) {
             this.entries.splice(i, 1);
         }
     }
+    return Q(true);
 };
 
 AccountRepository.prototype.save = function (account) {
     if (!account.id) {
-        account.id = this.lastId++;
+        account.id = ++this.lastId;
     }
     this.entries.push(account);
+    return Q(true);
 };

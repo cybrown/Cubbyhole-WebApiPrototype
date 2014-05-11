@@ -49,8 +49,9 @@ module.exports = function (accountRepository, planRepository) {
             account.username = username;
             account.password = password;
             account.plan = plan.id;
-            accountRepository.save(account);
-            return account;
+            return accountRepository.save(account).then(function () {
+                return account;
+            });
         })
     );
 

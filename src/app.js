@@ -53,8 +53,12 @@ plug.set('loadMockData', ['fileRepository', 'planRepository', 'accountRepository
         var filesData = require('./data/files')();
         var plansData = require('./data/plans')();
         var accountsData = require('./data/accounts')();
-        accountRepository.lastId = accountsData.lastId;
-        accountRepository.entries = accountsData.entries;
+
+        var accountPromise = accountRepository.clean().then(function () {
+            return Q.all(accountsData.entries.map(function (account) {
+                return accountRepository.save(account);
+            }));
+        });
 
         var planPromise = planRepository.clean().then(function () {
             return Q.all(plansData.entries.map(function (plan) {
