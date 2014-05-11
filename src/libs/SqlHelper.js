@@ -16,6 +16,7 @@ SqlHelper.QUERY_INSERT = 'INSERT INTO ?? SET ?';
 SqlHelper.QUERY_UPDATE = 'UPDATE ?? SET ? WHERE ?? = ?';
 SqlHelper.QUERY_SELECT_ALL = 'SELECT ??, ?? FROM ??';
 SqlHelper.QUERY_SELECT_BY = 'SELECT ??, ?? FROM ?? WHERE ?? = ?';
+SqlHelper.QUERY_SELECT_BY_2 = 'SELECT ??, ?? FROM ?? WHERE ?? = ? AND ?? = ?';
 SqlHelper.QUERY_DELETE_BY = 'DELETE FROM ?? WHERE ?? = ?';
 SqlHelper.QUERY_TRUNCATE = 'TRUNCATE ??';
 
@@ -31,10 +32,20 @@ SqlHelper.prototype.querySelectAll = function () {
     });
 };
 
-SqlHelper.prototype.querySelectBy = function (foreignKey, id) {
+SqlHelper.prototype.querySelectBy = function (col_name, col_value) {
     var _this = this;
     return Q.promise(function (resolve, reject) {
-        _this.connection.query(SqlHelper.QUERY_SELECT_BY, [_this.PK_NAME, _this.TABLE_FIELDS, _this.TABLE_NAME, foreignKey, id], function (err, result) {
+        _this.connection.query(SqlHelper.QUERY_SELECT_BY, [_this.PK_NAME, _this.TABLE_FIELDS, _this.TABLE_NAME, col_name, col_value], function (err, result) {
+            _this.log(this.sql);
+            err ? reject(err) : resolve(result);
+        });
+    });
+};
+
+SqlHelper.prototype.querySelectBy2 = function (col1_name, col1_value, col2_name, col2_value) {
+    var _this = this;
+    return Q.promise(function (resolve, reject) {
+        _this.connection.query(SqlHelper.QUERY_SELECT_BY, [_this.PK_NAME, _this.TABLE_FIELDS, _this.TABLE_NAME, col1_name, col1_value, col2_name, col2_value], function (err, result) {
             _this.log(this.sql);
             err ? reject(err) : resolve(result);
         });
