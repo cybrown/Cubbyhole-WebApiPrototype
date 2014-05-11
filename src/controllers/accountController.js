@@ -37,7 +37,9 @@ module.exports = function (accountRepository, planRepository) {
             if (plan !== undefined) {
                 account.plan = plan.id;
             }
-            return account;
+            return accountRepository.save(account).then(function () {
+                return account;
+            });
         }
     ));
 

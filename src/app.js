@@ -128,6 +128,19 @@ plug.set('planSqlHelper', ['mysqlConnection'], function (mysqlConnection) {
     return planSqlHelper;
 });
 
+plug.set('accountSqlHelper', ['mysqlConnection'], function (mysqlConnection) {
+    var accountSqlHelper = new SqlHelper();
+    accountSqlHelper.PK_NAME = 'id';
+    accountSqlHelper.TABLE_NAME = 'accounts';
+    accountSqlHelper.TABLE_FIELDS = [
+        'username',
+        'password',
+        'plan_id'
+    ];
+    accountSqlHelper.connection = mysqlConnection;
+    return accountSqlHelper;
+});
+
 plug.set('fileRepository', ['fileSqlHelper'], function (fileSqlHelper) {
     var fileRepository = new FileRepository();
     fileRepository.sql = fileSqlHelper;
@@ -140,8 +153,10 @@ plug.set('planRepository', ['planSqlHelper'], function (planSqlHelper) {
     return planRepository;
 });
 
-plug.set('accountRepository', function () {
-    return new AccountRepository();
+plug.set('accountRepository', ['accountSqlHelper'], function (accountSqlHelper) {
+    var accountRepository = new AccountRepository();
+    accountRepository.sql = accountSqlHelper;
+    return accountRepository;
 });
 
 plug.set('fileController', ['fileRepository'], function (fileRepository) {
@@ -184,6 +199,10 @@ plug.set('start', ['app'], function (app) {
     http.createServer(app).listen(app.get('port'), function(){
         console.log('Express server listening on port ' + app.get('port'));
     });
+});
+
+plug.onError(function (err) {
+    console.trace(err);
 });
 
 plug.start();

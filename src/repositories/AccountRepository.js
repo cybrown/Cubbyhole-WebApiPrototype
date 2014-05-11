@@ -1,46 +1,54 @@
-var Q = require('q');
-
 var AccountRepository = module.exports = function () {
-    this.entries = [];
-    this.lastId = 0;
+    this.sql = null;
+};
+
+AccountRepository.objectToHash = function (object) {
+    return {
+        id: object.id,
+        username: object.username,
+        password: object.password,
+        plan_id: object.plan
+    };
+};
+
+AccountRepository.hashToObject = function (hash) {
+    return {
+        id: hash.id,
+        username: hash.username,
+        password: hash.password,
+        plan: hash.plan_id
+    };
 };
 
 AccountRepository.prototype.find = function (id) {
-    var _this = this;
-    return Q.promise(function (resolve) {
-        for (var i = 0; i < _this.entries.length; i++) {
-            if (_this.entries[i].id == id) {
-                resolve (_this.entries[i]);
-                return;
-            }
+    return this.sql.querySelectById(id).then(function (result) {
+        if (!result.length) {
+            throw new Error('Account not found');
         }
-        throw new Error('Account not found');
+        return AccountRepository.hashToObject(result[0]);
     });
 };
 
 AccountRepository.prototype.clean = function () {
-    this.lastId = 0;
-    this.entries.length = 0;
-    return Q(true);
+    return this.sql.queryTruncate();
 };
 
 AccountRepository.prototype.findAll = function () {
-    return Q(this.entries);
+    return this.sql.querySelectAll().then(function (result) {
+        return result.map(AccountRepository.hashToObject);
+    });
 };
 
 AccountRepository.prototype.remove = function (account) {
-    for (var i = 0; i < this.entries.length; i++) {
-        if (this.entries[i].id == account.id) {
-            this.entries.splice(i, 1);
-        }
-    }
-    return Q(true);
+    return this.sql.queryDeleteById(account.id);
 };
 
 AccountRepository.prototype.save = function (account) {
-    if (!account.id) {
-        account.id = ++this.lastId;
+    if (account.id) {
+        return this.sql.queryUpdateById(account.id, AccountRepository.objectToHash(account));
+    } else {
+        return this.sql.queryInsert(AccountRepository.objectToHash(account)).then(function (result) {
+            account.id = result.insertId;
+        });
     }
-    this.entries.push(account);
-    return Q(true);
 };
