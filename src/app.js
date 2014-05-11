@@ -68,9 +68,7 @@ plug.set('loadMockData', ['fileRepository', 'planRepository', 'accountRepository
             }));
         });
 
-        return filePromise.then(function () {
-            return planPromise;
-        });
+        return Q.all([filePromise, planPromise]);
     };
 });
 
