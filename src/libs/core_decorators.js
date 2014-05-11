@@ -126,9 +126,26 @@ var Ensure = function (map, func) {
     };
 };
 
+var MinLevel = function (minLevel) {
+    return function (kwargs) {
+        if (!kwargs.$req.account) {
+            var err = new Error('Account must be authenticated');
+            err.status = 401;
+            throw err;
+        }
+        if (kwargs.$req.account.level < minLevel) {
+            var err = new Error('Account must be authorized');
+            err.status = 401;
+            throw err;
+        }
+        return this.apply(null, arguments);
+    };
+};
+
 module.exports = {
     Default: Default,
     Convert: Convert,
     ExpressRequest: ExpressRequest,
-    Ensure: Ensure
+    Ensure: Ensure,
+    MinLevel: MinLevel
 };

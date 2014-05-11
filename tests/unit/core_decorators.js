@@ -5,6 +5,7 @@ var Default         = CoreDecorators.Default;
 var Convert         = CoreDecorators.Convert;
 var Ensure          = CoreDecorators.Ensure;
 var ExpressRequest  = CoreDecorators.ExpressRequest;
+var MinLevel        = CoreDecorators.MinLevel;
 
 describe ('Decorate', function () {
 
@@ -226,6 +227,84 @@ describe ('Core Decorators', function () {
             }).catch(function (err) {
                 err.status.should.eql(404);
                 done();
+            });
+        });
+    });
+
+    describe ('MinLevel', function () {
+
+        it ('should pass if account is defined and level is sufficient', function (done) {
+            Decorate(
+                ExpressRequest(['a', 'b', 'c']),
+                MinLevel(2),
+                function (a, b, c) {
+                    a.should.eql('A');
+                    b.should.eql('2');
+                    c.should.eql('c');
+                    done();
+                }
+            )({
+                params: {a: 'A'},
+                query: {a: 'a', b: 'b', c: 'c'},
+                body: {a: '1', b: '2'},
+                account: {
+                    level: 3
+                }
+            });
+        });
+
+        it ('should throw if account is not defined', function (done) {
+            Decorate(
+                ExpressRequest(['a', 'b', 'c']),
+                MinLevel(2),
+                function (a, b, c) {
+                    a.should.eql('A');
+                    b.should.eql('2');
+                    c.should.eql('c');
+                }
+            )({
+                params: {a: 'A'},
+                query: {a: 'a', b: 'b', c: 'c'},
+                body: {a: '1', b: '2'}
+            }, {
+                status: function (statusCode) {
+                    return {
+                        send: function (err) {
+                            statusCode.should.eql(401);
+                            err.status.should.eql(401);
+                            done();
+                        }
+                    }
+                }
+            });
+        });
+
+        it ('should throw if level is not sufficient', function (done) {
+            Decorate(
+                ExpressRequest(['a', 'b', 'c']),
+                MinLevel(2),
+                function (a, b, c) {
+                    a.should.eql('A');
+                    b.should.eql('2');
+                    c.should.eql('c');
+                }
+            )({
+                params: {a: 'A'},
+                query: {a: 'a', b: 'b', c: 'c'},
+                body: {a: '1', b: '2'},
+                account: {
+                    level: 1
+                }
+            }, {
+                status: function (statusCode) {
+                    return {
+                        send: function (err) {
+                            statusCode.should.eql(401);
+                            err.status.should.eql(401);
+                            done();
+                        }
+                    }
+                }
             });
         });
     });
