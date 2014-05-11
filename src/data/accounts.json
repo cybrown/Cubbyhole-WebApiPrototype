@@ -2,16 +2,19 @@
     {
         "username": "toto1",
         "password": "totomdp",
-        "plan": 1
+        "plan": 1,
+        "level": 1
     },
     {
         "username": "toto2",
         "password": "totomdp",
-        "plan": 1
+        "plan": 1,
+        "level": 1
     },
     {
         "username": "toto3",
         "password": "totomdp",
-        "plan": 2
+        "plan": 2,
+        "level": 1
     }
 ]

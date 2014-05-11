@@ -62,7 +62,8 @@ describe ('Accounts Web Service', function () {
             form: {
                 username: 'example1',
                 password: 'examplePwd1',
-                plan: 1
+                plan: 1,
+                level: 1
             }
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
@@ -70,7 +71,8 @@ describe ('Accounts Web Service', function () {
                 'id': 4,
                 'username': 'example1',
                 'password': 'examplePwd1',
-                'plan': 1
+                'plan': 1,
+                'level': 1
             });
             done();
         });
@@ -97,7 +99,8 @@ describe ('Accounts Web Service', function () {
             form: {
                 username: 'example2',
                 password: 'examplePwd2',
-                plan: 1
+                plan: 1,
+                level: 1
             }
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
@@ -105,7 +108,8 @@ describe ('Accounts Web Service', function () {
                 'id': 5,
                 'username': 'example2',
                 'password': 'examplePwd2',
-                'plan': 1
+                'plan': 1,
+                level: 1
             });
             done();
         });
@@ -122,13 +126,15 @@ describe ('Accounts Web Service', function () {
                 'id': 4,
                 'username': 'example1',
                 'password': 'examplePwd1',
-                'plan': 1
+                'plan': 1,
+                level: 1
             };
             users[5] = {
                 'id': 5,
                 'username': 'example2',
                 'password': 'examplePwd2',
-                'plan': 1
+                'plan': 1,
+                level: 1
             };
             done();
         });
@@ -144,7 +150,8 @@ describe ('Accounts Web Service', function () {
                 'id': 4,
                 'username': 'example1',
                 'password': 'examplePwd1',
-                'plan': 1
+                'plan': 1,
+                level: 1
             });
             done();
         });
@@ -170,7 +177,8 @@ describe ('Accounts Web Service', function () {
                 'id': 5,
                 'username': 'example2',
                 'password': 'examplePwd2',
-                'plan': 1
+                'plan': 1,
+                level: 1
             });
             done();
         });
@@ -190,7 +198,8 @@ describe ('Accounts Web Service', function () {
                 'id': 4,
                 'username': 'newExample',
                 'password': 'examplePwd1',
-                'plan': 3
+                'plan': 3,
+                level: 1
             });
             done();
         });
@@ -206,7 +215,8 @@ describe ('Accounts Web Service', function () {
                 'id': 4,
                 'username': 'newExample',
                 'password': 'examplePwd1',
-                'plan': 3
+                'plan': 3,
+                level: 1
             });
             done();
         });

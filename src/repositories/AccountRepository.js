@@ -10,7 +10,8 @@ AccountRepository.prototype.objectToHash = function (object) {
         id: object.id,
         username: object.username,
         password: object.password,
-        plan_id: object.plan
+        plan_id: object.plan,
+        level: object.level
     };
 };
 
@@ -19,7 +20,8 @@ AccountRepository.prototype.hashToObject = function (hash) {
         id: hash.id,
         username: hash.username,
         password: hash.password,
-        plan: hash.plan_id
+        plan: hash.plan_id,
+        level: hash.level
     };
 };
 

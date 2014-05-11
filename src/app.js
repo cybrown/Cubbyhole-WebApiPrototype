@@ -146,7 +146,8 @@ plug.set('accountSqlHelper', ['mysqlConnection'], function (mysqlConnection) {
     accountSqlHelper.TABLE_FIELDS = [
         'username',
         'password',
-        'plan_id'
+        'plan_id',
+        'level'
     ];
     accountSqlHelper.connection = mysqlConnection;
     return accountSqlHelper;

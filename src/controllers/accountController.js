@@ -25,9 +25,9 @@ module.exports = function (accountRepository, planRepository) {
     );
 
     accountController.post('/:account', Decorate(
-        ExpressRequest(['account', '?username', '?password', '?plan']),
+        ExpressRequest(['account', '?username', '?password', '?plan', '?level']),
         Convert({account: accountRepository.find.bind(accountRepository), plan: planRepository.find.bind(planRepository)}),
-        function (account, username, password, plan) {
+        function (account, username, password, plan, level) {
             if (username !== undefined) {
                 account.username = username;
             }
@@ -36,6 +36,9 @@ module.exports = function (accountRepository, planRepository) {
             }
             if (plan !== undefined) {
                 account.plan = plan.id;
+            }
+            if (level !== undefined) {
+                account.level = level;
             }
             return accountRepository.save(account).then(function () {
                 return account;
@@ -46,11 +49,12 @@ module.exports = function (accountRepository, planRepository) {
     accountController.put('/', Decorate(
         ExpressRequest(),
         Convert('plan', planRepository.find.bind(planRepository)),
-        function (username, password, plan) {
+        function (username, password, plan, level) {
             var account = {};
             account.username = username;
             account.password = password;
             account.plan = plan.id;
+            account.level = level;
             return accountRepository.save(account).then(function () {
                 return account;
             });
