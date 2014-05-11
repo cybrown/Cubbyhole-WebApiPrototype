@@ -1,4 +1,4 @@
-var FileRepository = require('../../src/FileRepository');
+var FileRepository = require('../../src/repositories/FileRepository');
 var SqlHelper = require('../../src/libs/SqlHelper');
 var mysql = require('mysql');
 
