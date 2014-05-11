@@ -35,7 +35,9 @@ var ExpressRequest = function (args) {
                 }
             }
             if (doThrow && !req[obj].hasOwnProperty(key)) {
-                throw new Error("Missing key: " + key);
+                var error = new Error("Missing key: " + key);
+                error.status = 400;
+                throw error;
             }
             kwargs[key] = req[obj][key];
         });
