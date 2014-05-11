@@ -3,8 +3,6 @@
         "name": "file1",
         "parent": 0,
         "isFolder": false,
-        "cdate": 0,
-        "mdate": 0,
         "owner": 1,
         "size": null,
         "url": ""
@@ -13,8 +11,6 @@
         "name": "file2",
         "parent": 1,
         "isFolder": false,
-        "cdate": 0,
-        "mdate": 0,
         "owner": 1,
         "size": null,
         "url": ""
@@ -23,8 +19,6 @@
         "name": "file3",
         "parent": 1,
         "isFolder": false,
-        "cdate": 0,
-        "mdate": 0,
         "owner": 1,
         "size": null,
         "url": ""

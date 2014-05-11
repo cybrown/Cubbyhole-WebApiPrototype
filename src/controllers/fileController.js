@@ -52,7 +52,6 @@ module.exports = function (fileRepository) {
                     fileToModify.parent = selectedFile.parent,
                     fileToModify.isFolder = selectedFile.isFolder,
                     fileToModify.cdate = new Date(),
-                    fileToModify.mdate = new Date(),
                     fileToModify.owner = selectedFile.owner,
                     fileToModify.size = selectedFile.size,
                     fileToModify.url = selectedFile.url
