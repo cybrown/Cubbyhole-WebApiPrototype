@@ -39,6 +39,22 @@ describe ('Accounts Web Service', function () {
         });
     });
 
+    it ('should return 401 with an unexisting account', function (done) {
+        request({
+            method: 'GET',
+            url: url + '/files',
+            options: {
+                auth: {
+                    user: 'example1',
+                    pass: 'examplePwd1'
+                }
+            }
+        }, function (err, response, body) {
+            response.should.have.status(401);
+            done();
+        });
+    });
+
     it ('should add an account', function (done) {
         req1({
             method: 'put',
@@ -56,6 +72,20 @@ describe ('Accounts Web Service', function () {
                 'password': 'examplePwd1',
                 'plan': 1
             });
+            done();
+        });
+    });
+
+    it ('should return 200 with an existing account', function (done) {
+        request({
+            method: 'GET',
+            url: url + '/files',
+            auth: {
+                user: 'example1',
+                pass: 'examplePwd1'
+            }
+        }, function (err, response, body) {
+            response.should.have.status(200);
             done();
         });
     });

@@ -14,7 +14,7 @@ var SqlHelper = require('./libs/SqlHelper');
 
 var plug = new Plugme();
 
-plug.set('app', ['fileController', 'accountController', 'planController', 'systemController'], function (fileController, accountController, planController, systemController) {
+plug.set('app', ['fileController', 'accountController', 'planController', 'systemController', 'authMiddleware'], function (fileController, accountController, planController, systemController, authMiddleware) {
     var app = express();
 
     // all environments
@@ -26,9 +26,6 @@ plug.set('app', ['fileController', 'accountController', 'planController', 'syste
     app.use(express.multipart());
     app.use(express.methodOverride());
     app.use(cors());
-
-    // auth
-    var authMiddleware = express.basicAuth('user', 'pass')
 
     app.use('/files', authMiddleware);
     app.use('/accounts', authMiddleware);
@@ -46,6 +43,20 @@ plug.set('app', ['fileController', 'accountController', 'planController', 'syste
     app.use('/plans', planController);
 
     return app;
+});
+
+plug.set('authMiddleware', ['accountRepository'], function (accountRepository) {
+    return express.basicAuth(function (username, password, done) {
+        if (username === 'user' && password === 'pass') {
+            done(null, true);
+        } else {
+            accountRepository.findByUsernameAndPassword(username, password).then(function (account) {
+                done(null, true);
+            }).catch(function (err) {
+                done(err);
+            });
+        }
+    });
 });
 
 plug.set('loadMockData', ['fileRepository', 'planRepository', 'accountRepository'], function (fileRepository, planRepository, accountRepository) {
