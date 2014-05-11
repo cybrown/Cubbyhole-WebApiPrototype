@@ -1,21 +1,21 @@
 var express = require('express');
 
 module.exports = function (loadMockData) {
-    var systemApp = express();
+    var systemController = express();
 
-    systemApp.get('/system/reset', function (req, res) {
+    systemController.get('/system/reset', function (req, res) {
         return loadMockData().then(function () {
             res.send('');
         });
     });
 
-    systemApp.get('/ping', function (req, res) {
+    systemController.get('/ping', function (req, res) {
         res.send('pong');
     });
 
-    systemApp.get('/authping', function (req, res) {
+    systemController.get('/authping', function (req, res) {
         res.send('pong');
     });
 
-    return systemApp;
+    return systemController;
 };

@@ -7,16 +7,16 @@ var Ensure = CoreDecorators.Ensure;
 var Default = CoreDecorators.Default;
 
 module.exports = function (planRepository) {
-    var planApp = express();
+    var planController = express();
 
-    planApp.get('/', Decorate(
+    planController.get('/', Decorate(
         ExpressRequest(),
         function () {
             return planRepository.findAll();
         }
     ));
 
-    planApp.get('/:plan', Decorate(
+    planController.get('/:plan', Decorate(
         ExpressRequest(),
         Convert('plan', planRepository.find.bind(planRepository)),
         function (plan) {
@@ -24,7 +24,7 @@ module.exports = function (planRepository) {
         }
     ));
 
-    planApp.delete('/:plan', Decorate(
+    planController.delete('/:plan', Decorate(
         ExpressRequest(),
         Convert('plan', planRepository.find.bind(planRepository)),
         function (plan) {
@@ -32,7 +32,7 @@ module.exports = function (planRepository) {
         }
     ));
 
-    planApp.post('/:plan', Decorate(
+    planController.post('/:plan', Decorate(
         ExpressRequest(['plan', '?name', '?price', '?bandwidthDownload', '?bandwidthUpload', '?space', '?shareQuota']),
         Convert('plan', planRepository.find.bind(planRepository)),
         function (plan, name, price, bandwidthDownload, bandwidthUpload, space, shareQuota) {
@@ -48,7 +48,7 @@ module.exports = function (planRepository) {
         }
     ));
 
-    planApp.put('/', Decorate(
+    planController.put('/', Decorate(
         ExpressRequest(),
         function(name, price, bandwidthDownload, bandwidthUpload, space, shareQuota) {
             var plan = {};
@@ -64,5 +64,5 @@ module.exports = function (planRepository) {
         }
     ));
 
-    return planApp;
+    return planController;
 };

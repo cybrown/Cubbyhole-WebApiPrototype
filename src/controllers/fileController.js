@@ -9,16 +9,16 @@ var Default = CoreDecorators.Default;
 
 module.exports = function (fileRepository) {
 
-    var fileApp = express();
+    var fileController = express();
 
-    fileApp.get('/', Decorate(
+    fileController.get('/', Decorate(
             ExpressRequest(),
             function () {
                 return fileRepository.findByParentId(0);
             })
     );
 
-    fileApp.get('/:file', Decorate(
+    fileController.get('/:file', Decorate(
             ExpressRequest(),
             Convert('file', fileRepository.find.bind(fileRepository)),
             function (file) {
@@ -26,7 +26,7 @@ module.exports = function (fileRepository) {
             })
     );
 
-    fileApp.put('/', Decorate(
+    fileController.put('/', Decorate(
         ExpressRequest(['name', 'parent', '?isFolder']),
         Default('isFolder', false),
         Ensure('isFolder', 'boolean'),
@@ -42,7 +42,7 @@ module.exports = function (fileRepository) {
         }
     ));
 
-    fileApp.post('/:id', function (req, res) {
+    fileController.post('/:id', function (req, res) {
         Q.when(fileRepository.find(req.params.id), function (selectedFile) {
             if (selectedFile) {
                 var fileToModify = selectedFile;
@@ -73,7 +73,7 @@ module.exports = function (fileRepository) {
         });
     });
 
-    fileApp.delete('/:file', Decorate(
+    fileController.delete('/:file', Decorate(
             ExpressRequest(),
             Convert('file', fileRepository.find.bind(fileRepository)),
             function (file) {
@@ -81,5 +81,5 @@ module.exports = function (fileRepository) {
             })
     );
 
-    return fileApp;
+    return fileController;
 };

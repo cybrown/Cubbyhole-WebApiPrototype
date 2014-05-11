@@ -7,16 +7,16 @@ var Ensure = CoreDecorators.Ensure;
 var Default = CoreDecorators.Default;
 
 module.exports = function (accountRepository, planRepository) {
-    var accountApp = express();
+    var accountController = express();
 
-    accountApp.get('/', Decorate(
+    accountController.get('/', Decorate(
         ExpressRequest(),
         function () {
             return accountRepository.findAll();
         })
     );
 
-    accountApp.get('/:account', Decorate(
+    accountController.get('/:account', Decorate(
         ExpressRequest(),
         Convert('account', accountRepository.find.bind(accountRepository)),
         function (account) {
@@ -24,7 +24,7 @@ module.exports = function (accountRepository, planRepository) {
         })
     );
 
-    accountApp.post('/:account', Decorate(
+    accountController.post('/:account', Decorate(
         ExpressRequest(['account', '?username', '?password', '?plan']),
         Convert({account: accountRepository.find.bind(accountRepository), plan: planRepository.find.bind(planRepository)}),
         function (account, username, password, plan) {
@@ -41,7 +41,7 @@ module.exports = function (accountRepository, planRepository) {
         }
     ));
 
-    accountApp.put('/', Decorate(
+    accountController.put('/', Decorate(
         ExpressRequest(),
         Convert('plan', planRepository.find.bind(planRepository)),
         function (username, password, plan) {
@@ -55,7 +55,7 @@ module.exports = function (accountRepository, planRepository) {
         })
     );
 
-    accountApp.delete('/:account', Decorate(
+    accountController.delete('/:account', Decorate(
         ExpressRequest(),
         Convert('account', accountRepository.find.bind(accountRepository)),
         function (account) {
@@ -63,5 +63,5 @@ module.exports = function (accountRepository, planRepository) {
         })
     );
 
-    return accountApp;
+    return accountController;
 };

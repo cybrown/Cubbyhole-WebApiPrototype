@@ -14,7 +14,7 @@ var SqlHelper = require('./libs/SqlHelper');
 
 var plug = new Plugme();
 
-plug.set('app', ['fileExpressApp', 'accountExpressApp', 'planExpressApp', 'systemExpressApp'], function (fileExpressApp, accountExpressApp, planExpressApp, systemExpressApp) {
+plug.set('app', ['fileController', 'accountController', 'planController', 'systemController'], function (fileController, accountController, planController, systemController) {
     var app = express();
 
     // all environments
@@ -40,10 +40,10 @@ plug.set('app', ['fileExpressApp', 'accountExpressApp', 'planExpressApp', 'syste
         app.use(express.errorHandler());
     }
 
-    app.use('/', systemExpressApp);
-    app.use('/files', fileExpressApp);
-    app.use('/accounts', accountExpressApp);
-    app.use('/plans', planExpressApp);
+    app.use('/', systemController);
+    app.use('/files', fileController);
+    app.use('/accounts', accountController);
+    app.use('/plans', planController);
 
     return app;
 });
@@ -144,20 +144,20 @@ plug.set('accountRepository', function () {
     return new AccountRepository();
 });
 
-plug.set('fileExpressApp', ['fileRepository'], function (fileRepository) {
-    return require('./apps/fileApp')(fileRepository);
+plug.set('fileController', ['fileRepository'], function (fileRepository) {
+    return require('./controllers/fileController')(fileRepository);
 });
 
-plug.set('accountExpressApp', ['accountRepository', 'planRepository'], function (accountRepository, planRepository) {
-    return require('./apps/accountApp')(accountRepository, planRepository);
+plug.set('accountController', ['accountRepository', 'planRepository'], function (accountRepository, planRepository) {
+    return require('./controllers/accountController')(accountRepository, planRepository);
 });
 
-plug.set('planExpressApp', ['planRepository'], function (planRepository) {
-    return require('./apps/planApp')(planRepository);
+plug.set('planController', ['planRepository'], function (planRepository) {
+    return require('./controllers/planController')(planRepository);
 });
 
-plug.set('systemExpressApp', ['loadMockData'], function (loadMockData) {
-    return require('./apps/systemApp')(loadMockData);
+plug.set('systemController', ['loadMockData'], function (loadMockData) {
+    return require('./controllers/systemController')(loadMockData);
 });
 
 plug.set('start', ['app'], function (app) {
