@@ -1,8 +1,11 @@
-var PlanRepository = module.exports = function () {
-    this.sql = null;
-};
+var GenericRepository = require('./GenericRepository');
 
-PlanRepository.objectToHash = function (plan) {
+var PlanRepository = module.exports = function () {
+    GenericRepository.call(this);
+};
+PlanRepository.prototype = Object.create(GenericRepository.prototype);
+
+PlanRepository.prototype.objectToHash = function (plan) {
     return {
         id: plan.id,
         name: plan.name,
@@ -14,7 +17,7 @@ PlanRepository.objectToHash = function (plan) {
     };
 };
 
-PlanRepository.hashToObject = function (hash) {
+PlanRepository.prototype.hashToObject = function (hash) {
     return {
         id: hash.id,
         name: hash.name,
@@ -24,40 +27,4 @@ PlanRepository.hashToObject = function (hash) {
         space: hash.space,
         shareQuota: hash.shareQuota
     };
-};
-
-PlanRepository.prototype.find = function (id) {
-    return this.sql.querySelectById(id).then(function (result) {
-        if (!result.length) {
-            throw new Error('Plan not found');
-        } else {
-            return PlanRepository.hashToObject(result[0]);
-        }
-    });
-};
-
-PlanRepository.prototype.findAll = function () {
-    return this.sql.querySelectAll().then(function (result) {
-        return result.map(PlanRepository.hashToObject);
-    });
-};
-
-PlanRepository.prototype.remove = function (plan) {
-    return this.sql.queryDeleteById(plan.id);
-};
-
-PlanRepository.prototype.clean = function () {
-    return this.sql.queryTruncate();
-};
-
-PlanRepository.prototype.save = function (plan) {
-    if (plan.id) {
-        return this.sql.queryUpdateById(plan.id, PlanRepository.objectToHash(plan));
-    } else {
-        return this.sql.queryInsert(PlanRepository.objectToHash(plan)).then(function (result) {
-            plan.id = result.insertId;
-        }).catch(function (err) {
-            console.log(err);
-        });
-    }
 };

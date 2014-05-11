@@ -1,8 +1,11 @@
-var FileRepository = module.exports = function () {
-    this.sql = null;
-};
+var GenericRepository = require('./GenericRepository');
 
-FileRepository.objectToHash = function (file) {
+var FileRepository = module.exports = function () {
+    GenericRepository.call(this);
+};
+FileRepository.prototype = Object.create(GenericRepository.prototype);
+
+FileRepository.prototype.objectToHash = function (file) {
     return {
         id: file.id,
         name: file.name,
@@ -16,7 +19,7 @@ FileRepository.objectToHash = function (file) {
     };
 };
 
-FileRepository.hashToObject = function (hash) {
+FileRepository.prototype.hashToObject = function (hash) {
     return {
         id: hash.id,
         name: hash.name,
@@ -30,36 +33,9 @@ FileRepository.hashToObject = function (hash) {
     };
 };
 
-FileRepository.prototype.find = function (id) {
-    return this.sql.querySelectById(id).then(function (result) {
-        if (!result.length) {
-            throw new Error('File not found');
-        } else {
-            return FileRepository.hashToObject(result[0]);
-        }
-    });
-};
-
 FileRepository.prototype.findByParentId = function (parentId) {
+    var _this = this;
     return this.sql.querySelectBy('parent_id', parentId).then(function (result) {
-        return result.map(FileRepository.hashToObject);
+        return result.map(_this.hashToObject);
     });
-};
-
-FileRepository.prototype.remove = function (file) {
-    return this.sql.queryDeleteById(file.id);
-};
-
-FileRepository.prototype.clean = function () {
-    return this.sql.queryTruncate();
-};
-
-FileRepository.prototype.save = function (file) {
-    if (file.id) {
-        return this.sql.queryUpdateById(file.id, FileRepository.objectToHash(file));
-    } else {
-        return this.sql.queryInsert(FileRepository.objectToHash(file)).then(function (result) {
-            file.id = result.insertId;
-        });
-    }
 };
