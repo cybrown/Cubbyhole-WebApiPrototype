@@ -3,14 +3,14 @@ var Decorate = require('../libs/decorate');
 var CoreDecorators = require('../libs/core_decorators');
 var ExpressRequest = CoreDecorators.ExpressRequest;
 var Convert = CoreDecorators.Convert;
-var Ensure = CoreDecorators.Ensure;
-var Default = CoreDecorators.Default;
+var MinLevel = CoreDecorators.MinLevel;
 
 module.exports = function (planRepository) {
     var planController = express();
 
     planController.get('/', Decorate(
         ExpressRequest(),
+        MinLevel(30),
         function () {
             return planRepository.findAll();
         }
@@ -18,6 +18,7 @@ module.exports = function (planRepository) {
 
     planController.get('/:plan', Decorate(
         ExpressRequest(),
+        MinLevel(30),
         Convert('plan', planRepository.find.bind(planRepository)),
         function (plan) {
             return plan;
@@ -26,6 +27,7 @@ module.exports = function (planRepository) {
 
     planController.delete('/:plan', Decorate(
         ExpressRequest(),
+        MinLevel(30),
         Convert('plan', planRepository.find.bind(planRepository)),
         function (plan) {
             planRepository.remove(plan);
@@ -34,6 +36,7 @@ module.exports = function (planRepository) {
 
     planController.post('/:plan', Decorate(
         ExpressRequest(['plan', '?name', '?price', '?bandwidthDownload', '?bandwidthUpload', '?space', '?shareQuota']),
+        MinLevel(30),
         Convert('plan', planRepository.find.bind(planRepository)),
         function (plan, name, price, bandwidthDownload, bandwidthUpload, space, shareQuota) {
             name !== undefined && (plan.name = name);
@@ -50,6 +53,7 @@ module.exports = function (planRepository) {
 
     planController.put('/', Decorate(
         ExpressRequest(),
+        MinLevel(30),
         function(name, price, bandwidthDownload, bandwidthUpload, space, shareQuota) {
             var plan = {};
             plan.name = name;

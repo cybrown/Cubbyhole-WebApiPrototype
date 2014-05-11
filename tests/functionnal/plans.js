@@ -39,6 +39,42 @@ describe ('Plan Web Service', function () {
         });
     });
 
+    it ('should not reads plans if user is not level 30', function (done) {
+        request({
+            method: 'get',
+            url: url + '/plans',
+            auth: {
+                user: 'user.level10',
+                pass: 'pass'
+            }
+        }, function (err, response, body) {
+            response.statusCode.should.eql(403);
+            done();
+        });
+    });
+
+    it ('should not add a plan if user is not level 30', function (done) {
+        request({
+            method: 'put',
+            url: url + '/plans',
+            form: {
+                name: 'first plan',
+                price: 10,
+                bandwidthDownload: 100,
+                bandwidthUpload: 100,
+                space: 30,
+                shareQuota: 30
+            },
+            auth: {
+                user: 'user.level10',
+                pass: 'pass'
+            }
+        }, function (err, response, body) {
+            response.statusCode.should.eql(403);
+            done();
+        });
+    });
+
     it ('should add a plan', function (done) {
         req1({
             method: 'put',
