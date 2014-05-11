@@ -52,3 +52,11 @@ AccountRepository.prototype.save = function (account) {
         });
     }
 };
+
+AccountRepository.prototype.findByUsernameAndPassword = function (username, password) {
+    return this.sql.querySelectBy2('username', username, 'password', password).then(function (result) {
+        if (!result.length) {
+            throw new Error('Account not found');
+        }
+    });
+};
