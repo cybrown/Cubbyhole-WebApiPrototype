@@ -50,29 +50,36 @@ plug.set('app', ['fileExpressApp', 'accountExpressApp', 'planExpressApp', 'syste
 
 plug.set('loadMockData', ['fileRepository', 'planRepository', 'accountRepository'], function (fileRepository, planRepository, accountRepository) {
     return function () {
-        var filesData = require('./data/files')();
-        var plansData = require('./data/plans')();
-        var accountsData = require('./data/accounts')();
+        var filesData = require('./data/files.json');
+        var plansData = require('./data/plans.json');
+        var accountsData = require('./data/accounts.json');
+
+        var clone = function (obj) {
+            return Object.keys(obj).reduce(function (prev, key) {
+                prev[key] = obj[key];
+                return prev;
+            }, {});
+        };
 
         var accountPromise = accountRepository.clean().then(function () {
-            return Q.all(accountsData.entries.map(function (account) {
-                return accountRepository.save(account);
+            return Q.all(accountsData.map(function (account) {
+                return accountRepository.save(clone(account));
             }));
         });
 
         var planPromise = planRepository.clean().then(function () {
-            return Q.all(plansData.entries.map(function (plan) {
-                return planRepository.save(plan);
+            return Q.all(plansData.map(function (plan) {
+                return planRepository.save(clone(plan));
             }));
         });
 
         var filePromise = fileRepository.clean().then(function () {
-            return Q.all(filesData.entries.map(function (file) {
-                return fileRepository.save(file);
+            return Q.all(filesData.map(function (file) {
+                return fileRepository.save(clone(file));
             }));
         });
 
-        return Q.all([filePromise, planPromise]);
+        return Q.all([accountPromise, filePromise, planPromise]);
     };
 });
 
