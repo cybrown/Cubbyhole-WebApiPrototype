@@ -128,14 +128,14 @@ var Ensure = function (map, func) {
 
 var MinLevel = function (minLevel) {
     return function (kwargs) {
-        if (!kwargs.$req.account) {
+        if (!kwargs.$req.user) {
             var err = new Error('Account must be authenticated');
             err.status = 401;
             throw err;
         }
-        if (kwargs.$req.account.level < minLevel) {
+        if (kwargs.$req.user.level < minLevel) {
             var err = new Error('Account must be authorized');
-            err.status = 401;
+            err.status = 403;
             throw err;
         }
         return this.apply(null, arguments);

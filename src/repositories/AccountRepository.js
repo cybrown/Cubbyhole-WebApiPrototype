@@ -26,9 +26,11 @@ AccountRepository.prototype.hashToObject = function (hash) {
 };
 
 AccountRepository.prototype.findByUsernameAndPassword = function (username, password) {
+    var _this = this;
     return this.sql.querySelectBy2('username', username, 'password', password).then(function (result) {
         if (!result.length) {
             throw new Error('Account not found');
         }
+        return _this.hashToObject(result[0]);
     });
 };

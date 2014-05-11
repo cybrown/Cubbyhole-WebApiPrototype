@@ -48,10 +48,22 @@ plug.set('app', ['fileController', 'accountController', 'planController', 'syste
 plug.set('authMiddleware', ['accountRepository'], function (accountRepository) {
     return express.basicAuth(function (username, password, done) {
         if (username === 'user' && password === 'pass') {
-            done(null, true);
+            done(null, {
+                username: 'user',
+                password: 'pass',
+                level: 100,
+                plan: 0
+            });
+        } else if (username === 'user.level10' && password === 'pass') {
+            done(null, {
+                username: 'user.level10',
+                password: 'pass',
+                level: 10,
+                plan: 0
+            });
         } else {
             accountRepository.findByUsernameAndPassword(username, password).then(function (account) {
-                done(null, true);
+                done(null, account);
             }).catch(function (err) {
                 done(err);
             });

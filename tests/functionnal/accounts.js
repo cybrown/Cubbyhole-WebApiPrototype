@@ -22,7 +22,7 @@ describe ('Accounts Web Service', function () {
     it ('should return 401 status code without http basic', function (done) {
         request({
             method: 'get',
-            url: url + '/files'
+            url: url + '/accounts'
         }, function (err, response, body) {
             response.statusCode.should.eql(401);
             done();
@@ -42,15 +42,27 @@ describe ('Accounts Web Service', function () {
     it ('should return 401 with an unexisting account', function (done) {
         request({
             method: 'GET',
-            url: url + '/files',
-            options: {
-                auth: {
-                    user: 'example1',
-                    pass: 'examplePwd1'
-                }
+            url: url + '/accounts',
+            auth: {
+                user: 'example1',
+                pass: 'examplePwd1'
             }
         }, function (err, response, body) {
             response.should.have.status(401);
+            done();
+        });
+    });
+
+    it ('should return 403 with a user level (10) account', function (done) {
+        request({
+            method: 'GET',
+            url: url + '/accounts',
+            auth: {
+                user: 'user.level10',
+                pass: 'pass'
+            }
+        }, function (err, response, body) {
+            response.should.have.status(403);
             done();
         });
     });
@@ -63,7 +75,7 @@ describe ('Accounts Web Service', function () {
                 username: 'example1',
                 password: 'examplePwd1',
                 plan: 1,
-                level: 1
+                level: 10
             }
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
@@ -72,7 +84,7 @@ describe ('Accounts Web Service', function () {
                 'username': 'example1',
                 'password': 'examplePwd1',
                 'plan': 1,
-                'level': 1
+                'level': 10
             });
             done();
         });
@@ -81,7 +93,7 @@ describe ('Accounts Web Service', function () {
     it ('should return 200 with an existing account', function (done) {
         request({
             method: 'GET',
-            url: url + '/files',
+            url: url + '/authping',
             auth: {
                 user: 'example1',
                 pass: 'examplePwd1'
@@ -151,7 +163,7 @@ describe ('Accounts Web Service', function () {
                 'username': 'example1',
                 'password': 'examplePwd1',
                 'plan': 1,
-                level: 1
+                level: 10
             });
             done();
         });
@@ -199,7 +211,7 @@ describe ('Accounts Web Service', function () {
                 'username': 'newExample',
                 'password': 'examplePwd1',
                 'plan': 3,
-                level: 1
+                level: 10
             });
             done();
         });
@@ -216,7 +228,7 @@ describe ('Accounts Web Service', function () {
                 'username': 'newExample',
                 'password': 'examplePwd1',
                 'plan': 3,
-                level: 1
+                level: 10
             });
             done();
         });

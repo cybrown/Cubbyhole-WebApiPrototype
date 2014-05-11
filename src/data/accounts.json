@@ -3,18 +3,18 @@
         "username": "toto1",
         "password": "totomdp",
         "plan": 1,
-        "level": 1
+        "level": 10
     },
     {
         "username": "toto2",
         "password": "totomdp",
         "plan": 1,
-        "level": 1
+        "level": 10
     },
     {
         "username": "toto3",
         "password": "totomdp",
         "plan": 2,
-        "level": 1
+        "level": 10
     }
 ]

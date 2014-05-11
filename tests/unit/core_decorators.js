@@ -247,7 +247,7 @@ describe ('Core Decorators', function () {
                 params: {a: 'A'},
                 query: {a: 'a', b: 'b', c: 'c'},
                 body: {a: '1', b: '2'},
-                account: {
+                user: {
                     level: 3
                 }
             });
@@ -292,15 +292,15 @@ describe ('Core Decorators', function () {
                 params: {a: 'A'},
                 query: {a: 'a', b: 'b', c: 'c'},
                 body: {a: '1', b: '2'},
-                account: {
+                user: {
                     level: 1
                 }
             }, {
                 status: function (statusCode) {
                     return {
                         send: function (err) {
-                            statusCode.should.eql(401);
-                            err.status.should.eql(401);
+                            statusCode.should.eql(403);
+                            err.status.should.eql(403);
                             done();
                         }
                     }
