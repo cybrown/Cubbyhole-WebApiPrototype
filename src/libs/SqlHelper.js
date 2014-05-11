@@ -5,6 +5,9 @@ var SqlHelper = module.exports = function () {
     this.PK_NAME = '';
     this.TABLE_NAME = '';
     this.TABLE_FIELDS = [];
+    this.log = function (str) {
+        console.log('[SqlHepler]', str);
+    };
 };
 
 // Raw sql queries
@@ -22,6 +25,7 @@ SqlHelper.prototype.querySelectAll = function () {
     var _this = this;
     return Q.promise(function (resolve, reject) {
         _this.connection.query(SqlHelper.QUERY_SELECT_ALL, [_this.PK_NAME, _this.TABLE_FIELDS, _this.TABLE_NAME], function (err, result) {
+            _this.log(this.sql);
             err ? reject(err) : resolve(result);
         });
     });
@@ -31,6 +35,7 @@ SqlHelper.prototype.querySelectBy = function (foreignKey, id) {
     var _this = this;
     return Q.promise(function (resolve, reject) {
         _this.connection.query(SqlHelper.QUERY_SELECT_BY, [_this.PK_NAME, _this.TABLE_FIELDS, _this.TABLE_NAME, foreignKey, id], function (err, result) {
+            _this.log(this.sql);
             err ? reject(err) : resolve(result);
         });
     });
@@ -40,6 +45,7 @@ SqlHelper.prototype.queryInsert = function (hash) {
     var _this = this;
     return Q.promise(function (resolve, reject) {
         _this.connection.query(SqlHelper.QUERY_INSERT, [_this.TABLE_NAME, hash], function (err, result) {
+            _this.log(this.sql);
             err ? reject(err) : resolve(result);
         });
     });
@@ -49,6 +55,7 @@ SqlHelper.prototype.queryUpdateBy = function (col_name, col_value, hash) {
     var _this = this;
     return Q.promise(function (resolve, reject) {
         _this.connection.query(SqlHelper.QUERY_UPDATE, [_this.TABLE_NAME, hash, col_name, col_value], function (err, result) {
+            _this.log(this.sql);
             err ? reject(err) : resolve(result);
         });
     });
@@ -58,6 +65,7 @@ SqlHelper.prototype.queryDeleteBy = function (col_name, col_value) {
     var _this = this;
     return Q.promise(function (resolve) {
         _this.connection.query(SqlHelper.QUERY_DELETE_BY, [_this.TABLE_NAME, col_name, col_value], function (err, result) {
+            _this.log(this.sql);
             err ? reject(err) : resolve(result);
         });
     });
@@ -67,6 +75,7 @@ SqlHelper.prototype.queryTruncate = function () {
     var _this = this;
     return Q.promise(function (resolve, reject) {
         _this.connection.query(SqlHelper.QUERY_TRUNCATE, [_this.TABLE_NAME], function (err, result) {
+            _this.log(this.sql);
             err ? reject(err) : resolve(result);
         });
     });
