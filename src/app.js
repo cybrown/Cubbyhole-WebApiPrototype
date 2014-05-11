@@ -25,7 +25,14 @@ plug.set('app', ['fileController', 'accountController', 'planController', 'syste
     app.use(express.urlencoded());
     app.use(express.multipart());
     app.use(express.methodOverride());
-    app.use(cors());
+
+    app.use(function (req, res, next) {
+        if (req.url.indexOf('raw') === -1) {
+            cors()(req, res, next);
+        } else {
+            next();
+        }
+    });
 
     app.use('/files', authMiddleware);
     app.use('/accounts', authMiddleware);
