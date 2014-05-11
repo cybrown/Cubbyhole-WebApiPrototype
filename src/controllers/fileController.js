@@ -80,5 +80,51 @@ module.exports = function (fileRepository) {
             })
     );
 
+    fileController.get('/:file/raw', function (req, res) {
+        fileRepository.find(req.params.file).done(function (file) {
+            var fs = require('fs');
+
+            if (file.url) {
+                fs.exists('files/' + file.url, function (exists) {
+                    if (exists) {
+                        fs.createReadStream('files/' + file.url).pipe(res);
+                    } else {
+                        res.status(404);
+                        res.send('');
+                    }
+                });
+            } else {
+                res.status(404);
+                res.send('');
+            }
+        });
+    });
+
+    fileController.put('/:file/raw', function (req, res) {
+        fileRepository.find(req.params.file).done(function (file) {
+            var fs = require('fs');
+            var crypto = require('crypto');
+            var stream = require('stream');
+
+            var shasum = crypto.createHash('sha1');
+            var filename = crypto.randomBytes(4).readUInt32LE(0);
+            var output = fs.createWriteStream('files/' + filename);
+            var shasumStream = new stream.Transform();
+            shasumStream._transform = function (chunk, encoding, callback) {
+                shasum.update(chunk);
+                callback(null, chunk);
+            };
+            req.on('end', function () {
+                var sha1 = shasum.digest('hex');
+                file.url = sha1;
+                fileRepository.save(file);
+                fs.rename('files/' + filename, 'files/' + sha1, function (err) {
+                    res.send('');
+                });
+            });
+            req.pipe(shasumStream).pipe(output);
+        });
+    });
+
     return fileController;
 };
