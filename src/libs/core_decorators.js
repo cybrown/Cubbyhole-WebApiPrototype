@@ -7,9 +7,15 @@ var ExpressRequest = function (args) {
         if (!args) {
             args = this.argNames;
         }
-        var result = {};
+        var kwargs = {
+            $req: req,
+            $res: res
+        };
         args.forEach(function (fullKey) {
             var obj, key, doThrow = true;
+            if (fullKey[0] === '$') {
+                return;
+            }
             if (fullKey[0] === '?') {
                 doThrow = false;
                 fullKey = fullKey.substring(1);
@@ -31,7 +37,7 @@ var ExpressRequest = function (args) {
             if (doThrow && !req[obj].hasOwnProperty(key)) {
                 throw new Error("Missing key: " + key);
             }
-            result[key] = req[obj][key];
+            kwargs[key] = req[obj][key];
         });
         var onErr = function (err) {
             var status = err.status ? err.status : 500;
@@ -39,7 +45,7 @@ var ExpressRequest = function (args) {
             res.status(status).send(err);
         };
         try {
-            Q.when(this.call(null, result), function (toSend) {
+            Q.when(this.call(this, kwargs), function (toSend) {
                 if (res && res.send) {
                     res.send(toSend);
                 }
@@ -73,7 +79,6 @@ var Convert = function (map, func) {
         map[key] = func;
     }
     return function (kwargs) {
-
         var _this = this;
         var _arguments = arguments;
         return Q.all(Object.keys(map).map(function (key) {
@@ -86,23 +91,6 @@ var Convert = function (map, func) {
         })).then(function () {
             return _this.apply(null, _arguments);
         });
-
-
-        /*
-        Object.keys(map).forEach(function (key) {
-            map[key](kwargs[key]).then(function (value) {
-                kwargs[key] = value;
-            });
-
-            try {
-                kwargs[key] = map[key](kwargs[key]);
-            } catch (err) {
-                err.status = 404;
-                throw err;
-            }
-        });
-        return this.apply(null, arguments);
-        */
     };
 };
 

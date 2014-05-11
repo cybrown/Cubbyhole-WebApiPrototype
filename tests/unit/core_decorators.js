@@ -360,6 +360,22 @@ describe ('Core Decorators', function () {
             });
         });
 
+        it ('should ignore a parameter begining by $ with function decompilation', function () {
+            Decorate(
+                ExpressRequest(),
+                function (a, b, c, $d) {
+                    a.should.eql('A');
+                    b.should.eql('2');
+                    c.should.eql('c');
+                    ($d === undefined).should.be.ok;
+                }
+            )({
+                params: {a: 'A'},
+                query: {a: 'a', b: 'b', c: 'c'},
+                body: {a: '1', b: '2'}
+            });
+        });
+
         it ('should not throw an error if a parameter is missing with the ? syntax 2', function (done) {
             Decorate(
                 ExpressRequest(['?body.a', 'b', 'c']),
