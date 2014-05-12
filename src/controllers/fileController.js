@@ -105,25 +105,24 @@ module.exports = function (fileRepository) {
         fileRepository.find(req.params.file).done(function (file) {
             var fs = require('fs');
             var crypto = require('crypto');
-            var stream = require('stream');
+            var Sha1Stream = require('../util/Sha1Stream');
 
-            var shasum = crypto.createHash('sha1');
             var filename = crypto.randomBytes(4).readUInt32LE(0);
             var output = fs.createWriteStream('files/' + filename);
-            var shasumStream = new stream.Transform();
-            shasumStream._transform = function (chunk, encoding, callback) {
-                shasum.update(chunk);
-                callback(null, chunk);
-            };
+            var sha1Stream = new Sha1Stream();
+
             req.on('end', function () {
-                var sha1 = shasum.digest('hex');
+                var sha1 = sha1Stream.digest('hex');
                 file.url = sha1;
-                fileRepository.save(file);
+                fileRepository.save(file).done();
                 fs.rename('files/' + filename, 'files/' + sha1, function (err) {
+                    if (err) {
+                        res.status(500).send('');
+                    }
                     res.send('');
                 });
             });
-            req.pipe(shasumStream).pipe(output);
+            req.pipe(sha1Stream).pipe(output);
         }, function (err) {
             res.status(404).send('');
         });
