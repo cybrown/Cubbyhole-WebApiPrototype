@@ -49,7 +49,11 @@ var ExpressRequest = function (args) {
         try {
             Q.when(this.call(this, kwargs), function (toSend) {
                 if (res && res.send) {
-                    res.send(toSend);
+                    if (toSend && (typeof toSend.pipe === 'function')) {
+                        toSend.pipe(res);
+                    } else {
+                        res.send(toSend);
+                    }
                 }
             }, onErr);
         } catch (err) {
