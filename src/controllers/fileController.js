@@ -106,8 +106,10 @@ module.exports = function (fileRepository) {
         }
     ));
 
-    fileController.put('/:file/raw', function (req, res) {
-        fileRepository.find(req.params.file).done(function (file) {
+    fileController.put('/:file/raw', Decorate(
+        ExpressRequest(),
+        Convert('file', fileRepository.find.bind(fileRepository)),
+        function (file, $req) {
             var fs = require('fs');
             var crypto = require('crypto');
             var Sha1Stream = require('../util/Sha1Stream');
@@ -116,22 +118,20 @@ module.exports = function (fileRepository) {
             var output = fs.createWriteStream('files/' + filename);
             var sha1Stream = new Sha1Stream();
 
-            req.on('end', function () {
+            $req.on('end', function () {
                 var sha1 = sha1Stream.digest('hex');
                 file.url = sha1;
                 fileRepository.save(file).done();
                 fs.rename('files/' + filename, 'files/' + sha1, function (err) {
                     if (err) {
-                        res.status(500).send('');
+                        // TODO Throw error correctly
+                        throw err;
                     }
-                    res.send('');
                 });
             });
-            req.pipe(sha1Stream).pipe(output);
-        }, function (err) {
-            res.status(404).send('');
-        });
-    });
+            $req.pipe(sha1Stream).pipe(output);
+        }
+    ));
 
     return fileController;
 };
