@@ -80,26 +80,31 @@ module.exports = function (fileRepository) {
             })
     );
 
-    fileController.get('/:file/raw', function (req, res) {
-        fileRepository.find(req.params.file).done(function (file) {
-            var fs = require('fs');
-
-            if (file.url) {
-                fs.exists('files/' + file.url, function (exists) {
-                    if (exists) {
-                        fs.createReadStream('files/' + file.url).pipe(res);
-                    } else {
-                        res.status(404).send('');
-                    }
-                });
-            } else {
-                res.status(404);
-                res.send('');
-            }
-        }, function () {
-            res.status(404).send('');
-        });
-    });
+    fileController.get('/:file/raw', Decorate(
+        ExpressRequest(),
+        Convert('file', fileRepository.find.bind(fileRepository)),
+        function (file) {
+            return Q.promise(function (resolve, reject) {
+                var fs = require('fs');
+                if (file.url) {
+                    fs.exists('files/' + file.url, function (exists) {
+                        if (exists) {
+                            resolve(fs.createReadStream('files/' + file.url));
+                            return;
+                        } else {
+                            var err = new Error();
+                            err.status = 404;
+                            throw err;
+                        }
+                    });
+                } else {
+                    var err = new Error();
+                    err.status = 404;
+                    throw err;
+                }
+            });
+        }
+    ));
 
     fileController.put('/:file/raw', function (req, res) {
         fileRepository.find(req.params.file).done(function (file) {
