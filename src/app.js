@@ -114,12 +114,8 @@ plug.set('loadMockData', ['fileRepository', 'planRepository', 'accountRepository
 });
 
 plug.set('mysqlConnection', function () {
-    var connection = mysql.createConnection({
-        host: 'localhost',
-        user: 'cubbyhole',
-        password: 'cubbyhole',
-        database: 'cubbyhole_proto'
-    });
+    var dbConf = require('./conf/db.json');
+    var connection = mysql.createConnection(dbConf);
     connection.connect();
     return connection;
 });
