@@ -89,14 +89,15 @@ module.exports = function (fileRepository) {
                     if (exists) {
                         fs.createReadStream('files/' + file.url).pipe(res);
                     } else {
-                        res.status(404);
-                        res.send('');
+                        res.status(404).send('');
                     }
                 });
             } else {
                 res.status(404);
                 res.send('');
             }
+        }, function () {
+            res.status(404).send('');
         });
     });
 
@@ -123,6 +124,8 @@ module.exports = function (fileRepository) {
                 });
             });
             req.pipe(shasumStream).pipe(output);
+        }, function (err) {
+            res.status(404).send('');
         });
     });
 

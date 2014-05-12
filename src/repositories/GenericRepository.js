@@ -6,7 +6,7 @@ GenericRepository.prototype.find = function (id) {
     var _this = this;
     return this.sql.querySelectById(id).then(function (result) {
         if (!result.length) {
-            throw new Error('Account not found');
+            throw new Error('Object not found: ' + id);
         }
         return _this.hashToObject(result[0]);
     });

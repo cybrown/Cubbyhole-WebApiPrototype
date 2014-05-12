@@ -250,4 +250,57 @@ describe ('File Web Service', function () {
             done();
         });
     });
+
+    it ('should upload file data', function (done) {
+        req1({
+            method: 'put',
+            url: url + '/files/2/raw',
+            body: 'test content'
+        }, function (err, response, body) {
+            response.should.have.status(200);
+            done();
+        });
+    });
+
+    it ('should download file data', function (done) {
+        req1({
+            method: 'get',
+            url: url + '/files/2/raw'
+        }, function (err, response, body) {
+            response.should.have.status(200);
+            body.should.eql('test content');
+            done();
+        });
+    });
+
+    it ('should not upload file data to an unexisting file', function (done) {
+        req1({
+            method: 'put',
+            url: url + '/files/42/raw',
+            body: 'test content'
+        }, function (err, response, body) {
+            response.should.have.status(404);
+            done();
+        });
+    });
+
+    it ('should not get file data from an unexisting file', function (done) {
+        req1({
+            method: 'get',
+            url: url + '/files/42/raw'
+        }, function (err, response, body) {
+            response.should.have.status(404);
+            done();
+        });
+    });
+
+    it ('should not get file data from a file without data', function (done) {
+        req1({
+            method: 'get',
+            url: url + '/files/1/raw'
+        }, function (err, response, body) {
+            response.should.have.status(404);
+            done();
+        });
+    });
 });
