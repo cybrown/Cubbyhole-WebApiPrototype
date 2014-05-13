@@ -79,13 +79,12 @@ describe ('Accounts Web Service', function () {
             }
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
-            JSON.parse(body).should.eql({
-                'id': 4,
-                'username': 'example1',
-                'password': 'examplePwd1',
-                'plan': 1,
-                'level': 10
-            });
+            var account = JSON.parse(body);
+            account.should.have.property('id', 4);
+            account.should.have.property('username', 'example1');
+            account.should.have.property('password', 'examplePwd1');
+            account.should.have.property('plan', 1);
+            account.should.have.property('level', 10);
             done();
         });
     });

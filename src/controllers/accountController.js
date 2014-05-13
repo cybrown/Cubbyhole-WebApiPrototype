@@ -3,6 +3,7 @@ var Decorate = require('../libs/decorate');
 var CoreDecorators = require('../libs/core_decorators');
 var ExpressRequest = CoreDecorators.ExpressRequest;
 var Convert = CoreDecorators.Convert;
+var Ensure = CoreDecorators.Ensure;
 var MinLevel = CoreDecorators.MinLevel;
 
 module.exports = function (accountRepository, planRepository) {
@@ -51,6 +52,7 @@ module.exports = function (accountRepository, planRepository) {
     accountController.put('/', Decorate(
         ExpressRequest(),
         MinLevel(20),
+        Ensure('level', 'number'),
         Convert('plan', planRepository.find.bind(planRepository)),
         function (username, password, plan, level) {
             var account = {};
