@@ -2,7 +2,7 @@
     {
         "name": "file1",
         "parent": 0,
-        "isFolder": false,
+        "isFolder": true,
         "owner": 1,
         "size": null,
         "url": ""

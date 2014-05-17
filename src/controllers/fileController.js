@@ -33,6 +33,20 @@ module.exports = function (fileRepository) {
             })
     );
 
+    fileController.get('/:file/list', Decorate(
+        ExpressRequest(),
+        MinLevel(10),
+        Convert('file', fileRepository.find.bind(fileRepository)),
+        function (file) {
+            if (!file.isFolder) {
+                var err = new Error('Not a folder');
+                err.status = 400;
+                throw err;
+            }
+            return fileRepository.findByParentId(file.id);
+        }
+    ));
+
     fileController.put('/', Decorate(
         ExpressRequest(['name', 'parent', '?isFolder']),
         Default('isFolder', false),

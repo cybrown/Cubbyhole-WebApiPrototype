@@ -111,6 +111,35 @@ describe ('File Web Service', function () {
         });
     });
 
+    it ('should list the content of a folder', function (done) {
+        req1({
+            method: 'get',
+            url: url + '/files/1/list'
+        }, function (err, response, body) {
+            response.should.have.status(200);
+            var files = JSON.parse(body);
+            files[0].should.have.property('id', 2);
+            files[0].should.have.property('name', 'file2');
+            files[0].should.have.property('parent', 1);
+            files[0].should.have.property('isFolder', false);
+            files[1].should.have.property('id', 3);
+            files[1].should.have.property('name', 'file3');
+            files[1].should.have.property('parent', 1);
+            files[1].should.have.property('isFolder', false);
+            done();
+        });
+    });
+    
+    it ('should return an error if list not on a folder', function (done) {
+        req1({
+            method: 'get',
+            url: url + '/files/2/list'
+        }, function (err, response, body) {
+            response.should.have.status(400);
+            done();
+        });
+    });
+
     it ('should return one file', function (done) {
         req1({
             method: 'get',
