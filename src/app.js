@@ -56,6 +56,7 @@ plug.set('authMiddleware', ['accountRepository'], function (accountRepository) {
     return express.basicAuth(function (username, password, done) {
         if (username === 'user' && password === 'pass') {
             done(null, {
+                id: 1,
                 username: 'user',
                 password: 'pass',
                 level: 100,
@@ -63,6 +64,7 @@ plug.set('authMiddleware', ['accountRepository'], function (accountRepository) {
             });
         } else if (username === 'user.level10' && password === 'pass') {
             done(null, {
+                id: 1,
                 username: 'user.level10',
                 password: 'pass',
                 level: 10,
