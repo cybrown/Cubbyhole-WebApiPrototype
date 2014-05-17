@@ -5,6 +5,7 @@ var CoreDecorators = require('../libs/core_decorators');
 var ExpressRequest = CoreDecorators.ExpressRequest;
 var Convert = CoreDecorators.Convert;
 var Ensure = CoreDecorators.Ensure;
+var MinLevel = CoreDecorators.MinLevel;
 var Default = CoreDecorators.Default;
 
 module.exports = function (fileRepository) {
@@ -20,8 +21,14 @@ module.exports = function (fileRepository) {
 
     fileController.get('/:file', Decorate(
             ExpressRequest(),
+            MinLevel(10),
             Convert('file', fileRepository.find.bind(fileRepository)),
-            function (file) {
+            function (file, $req) {
+                if (file.owner !== $req.user.id) {
+                    var err = new Error('Not ahtorized');
+                    err.status = 403;
+                    throw err;
+                }
                 return file;
             })
     );
@@ -31,11 +38,12 @@ module.exports = function (fileRepository) {
         Default('isFolder', false),
         Ensure('isFolder', 'boolean'),
         Ensure('parent', 'number'),
-        function (name, parent, isFolder) {
+        function (name, parent, isFolder, $req) {
             var file = {};
             file.name = name;
             file.parent = parent;
             file.isFolder = isFolder;
+            file.owner = $req.user.id;
             return fileRepository.save(file).then(function () {
                 return file;
             });
@@ -73,17 +81,22 @@ module.exports = function (fileRepository) {
     });
 
     fileController.delete('/:file', Decorate(
-            ExpressRequest(),
-            Convert('file', fileRepository.find.bind(fileRepository)),
-            function (file) {
-                fileRepository.remove(file);
-            })
+        ExpressRequest(),
+        Convert('file', fileRepository.find.bind(fileRepository)),
+        function (file) {
+            fileRepository.remove(file);
+        })
     );
 
     fileController.get('/:file/raw', Decorate(
         ExpressRequest(),
         Convert('file', fileRepository.find.bind(fileRepository)),
-        function (file) {
+        function (file, $req) {
+            if (file.owner !== $req.user.id) {
+                var err = new Error('Not ahtorized');
+                err.status = 403;
+                throw err;
+            }
             return Q.promise(function (resolve, reject) {
                 var fs = require('fs');
                 if (file.url) {
