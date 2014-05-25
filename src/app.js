@@ -126,6 +126,9 @@ plug.set('fileSqlHelper', ['mysqlConnection'], function (mysqlConnection) {
     var fileSqlHelper = new SqlHelper();
     fileSqlHelper.PK_NAME = 'id';
     fileSqlHelper.TABLE_NAME = 'files';
+    fileSqlHelper.COLUMN_CDATE = 'cdate';
+    fileSqlHelper.COLUMN_MDATE = 'mdate';
+    fileSqlHelper.setMdateOnUpdate = false;
     fileSqlHelper.TABLE_FIELDS = [
         'name',
         'parent_id',
@@ -144,6 +147,7 @@ plug.set('planSqlHelper', ['mysqlConnection'], function (mysqlConnection) {
     var planSqlHelper = new SqlHelper();
     planSqlHelper.PK_NAME = 'id';
     planSqlHelper.TABLE_NAME = 'plans';
+    planSqlHelper.COLUMN_CDATE = 'cdate';
     planSqlHelper.TABLE_FIELDS = [
         'name',
         'price',
@@ -160,6 +164,7 @@ plug.set('accountSqlHelper', ['mysqlConnection'], function (mysqlConnection) {
     var accountSqlHelper = new SqlHelper();
     accountSqlHelper.PK_NAME = 'id';
     accountSqlHelper.TABLE_NAME = 'accounts';
+    accountSqlHelper.COLUMN_CDATE = 'cdate';
     accountSqlHelper.TABLE_FIELDS = [
         'username',
         'password',

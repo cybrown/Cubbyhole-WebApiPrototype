@@ -8,8 +8,11 @@ var SqlHelper = module.exports = function () {
     this.log = function (str) {
         console.log('[SqlHepler]', str);
     };
-    this.COLUMN_CDATE = 'cdate';
-    this.COLUMN_MDATE = false;
+    this.COLUMN_CDATE = null;
+    this.COLUMN_MDATE = null;
+    this.setMdateOnUpdate = true;
+    this.setMdateOnInsert = true;
+    this.setCdateOnInsert = true;
 };
 
 // Raw sql queries
@@ -57,8 +60,11 @@ SqlHelper.prototype.querySelectBy2 = function (col1_name, col1_value, col2_name,
 SqlHelper.prototype.queryInsert = function (hash) {
     var _this = this;
     return Q.promise(function (resolve, reject) {
-        if (_this.COLUMN_CDATE) {
+        if (_this.COLUMN_CDATE && _this.setCdateOnInsert) {
             hash[_this.COLUMN_CDATE] = new Date();
+        }
+        if (_this.COLUMN_MDATE && _this.setMdateOnInsert) {
+            hash[_this.COLUMN_MDATE] = new Date();
         }
         _this.connection.query(SqlHelper.QUERY_INSERT, [_this.TABLE_NAME, hash], function (err, result) {
             _this.log(this.sql);
@@ -70,7 +76,7 @@ SqlHelper.prototype.queryInsert = function (hash) {
 SqlHelper.prototype.queryUpdateBy = function (col_name, col_value, hash) {
     var _this = this;
     return Q.promise(function (resolve, reject) {
-        if (_this.COLUMN_MDATE) {
+        if (_this.COLUMN_MDATE && _this.setMdateOnUpdate) {
             hash[_this.COLUMN_MDATE] = new Date();
         }
         _this.connection.query(SqlHelper.QUERY_UPDATE, [_this.TABLE_NAME, hash, col_name, col_value], function (err, result) {

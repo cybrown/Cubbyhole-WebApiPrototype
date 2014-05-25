@@ -73,7 +73,6 @@ module.exports = function (fileRepository) {
                     fileToModify.name = selectedFile.name,
                     fileToModify.parent = selectedFile.parent,
                     fileToModify.isFolder = selectedFile.isFolder,
-                    fileToModify.cdate = new Date(),
                     fileToModify.owner = selectedFile.owner,
                     fileToModify.size = selectedFile.size,
                     fileToModify.url = selectedFile.url
@@ -148,6 +147,7 @@ module.exports = function (fileRepository) {
             $req.on('end', function () {
                 var sha1 = sha1Stream.digest('hex');
                 file.url = sha1;
+                file.mdate = new Date();
                 fileRepository.save(file).done();
                 fs.rename('files/' + filename, 'files/' + sha1, function (err) {
                     if (err) {
