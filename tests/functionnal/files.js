@@ -332,4 +332,75 @@ describe ('File Web Service', function () {
             done();
         });
     });
+
+    it ('should create one folder for recursive deletion', function (done) {
+        req1({
+            method: 'put',
+            url: url + '/files/',
+            form: {
+                name: 'toDeleteRec',
+                parent: 0,
+                isFolder: true
+            }
+        }, function (err, response, body) {
+            response.should.have.status(200);
+            var file = JSON.parse(body);
+            file.should.have.property('id', 9);
+            file.should.have.property('name', 'toDeleteRec');
+            file.should.have.property('parent', 0);
+            file.should.have.property('isFolder', true);
+            done();
+        });
+    });
+
+    it ('should create one file in previous folder', function (done) {
+        req1({
+            method: 'put',
+            url: url + '/files/',
+            form: {
+                name: 'fileToDeleteRec',
+                parent: 9,
+                isFolder: false
+            }
+        }, function (err, response, body) {
+            response.should.have.status(200);
+            var file = JSON.parse(body);
+            file.should.have.property('id', 10);
+            file.should.have.property('name', 'fileToDeleteRec');
+            file.should.have.property('parent', 9);
+            file.should.have.property('isFolder', false);
+            done();
+        });
+    });
+
+    it ('should delete folder recursively', function (done) {
+        req1({
+            method: 'delete',
+            url: url + '/files/9'
+        }, function (err, response, body) {
+            response.should.have.status(200);
+            body.should.eql('');
+            done();
+        });
+    });
+
+    it ('should have deleted folder', function (done) {
+        req1({
+            method: 'get',
+            url: url + '/files/9'
+        }, function (err, response, body) {
+            response.should.have.status(404);
+            done();
+        });
+    });
+
+    it ('should have deleted file in folder', function (done) {
+        req1({
+            method: 'get',
+            url: url + '/files/10'
+        }, function (err, response, body) {
+            response.should.have.status(404);
+            done();
+        });
+    });
 });

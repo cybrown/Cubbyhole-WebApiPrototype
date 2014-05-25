@@ -97,7 +97,7 @@ module.exports = function (fileRepository) {
         ExpressRequest(),
         Convert('file', fileRepository.find.bind(fileRepository)),
         function (file) {
-            fileRepository.remove(file);
+            return fileRepository.removeRec(file).then(function () {});
         })
     );
 
