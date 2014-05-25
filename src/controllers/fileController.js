@@ -138,7 +138,7 @@ module.exports = function (fileRepository) {
         function (file, $req) {
             var fs = require('fs');
             var crypto = require('crypto');
-            var Sha1Stream = require('../util/Sha1Stream');
+            var Sha1Stream = require('../libs/Sha1Stream');
 
             var filename = crypto.randomBytes(4).readUInt32LE(0);
             var output = fs.createWriteStream('files/' + filename);
