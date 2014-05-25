@@ -17,5 +17,12 @@ module.exports = function (loadMockData) {
         res.send('pong');
     });
 
+    systemController.get('/crash', function (res, res) {
+        setTimeout(function () {
+            throw new Error('User crash');
+        }, 500);
+        res.send('crash in 500ms');
+    });
+
     return systemController;
 };
