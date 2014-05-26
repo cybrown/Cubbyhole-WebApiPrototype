@@ -59,13 +59,17 @@ module.exports = function (accountRepository, planRepository, fileRepository) {
             var home = {};
             home.name = 'home-' + username;
             home.parent = 0;
+            home.isFolder = true;
             return fileRepository.save(home).then(function () {
                 account.username = username;
                 account.password = password;
                 account.plan = plan.id;
                 account.level = level;
                 account.home = home.id;
+                home.owner = account.id;
                 return accountRepository.save(account);
+            }).then(function () {
+                return fileRepository.save(home);
             }).then(function () {
                 return account;
             });
