@@ -66,9 +66,9 @@ module.exports = function (accountRepository, planRepository, fileRepository) {
                 account.plan = plan.id;
                 account.level = level;
                 account.home = home.id;
-                home.owner = account.id;
                 return accountRepository.save(account);
             }).then(function () {
+                home.owner = account.id;
                 return fileRepository.save(home);
             }).then(function () {
                 return account;
