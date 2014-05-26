@@ -169,6 +169,7 @@ plug.set('accountSqlHelper', ['mysqlConnection'], function (mysqlConnection) {
         'username',
         'password',
         'plan_id',
+        'home_id',
         'level'
     ];
     accountSqlHelper.connection = mysqlConnection;
@@ -197,8 +198,8 @@ plug.set('fileController', ['fileRepository'], function (fileRepository) {
     return require('./controllers/fileController')(fileRepository);
 });
 
-plug.set('accountController', ['accountRepository', 'planRepository'], function (accountRepository, planRepository) {
-    return require('./controllers/accountController')(accountRepository, planRepository);
+plug.set('accountController', ['accountRepository', 'planRepository', 'fileRepository'], function (accountRepository, planRepository, fileRepository) {
+    return require('./controllers/accountController')(accountRepository, planRepository, fileRepository);
 });
 
 plug.set('planController', ['planRepository'], function (planRepository) {

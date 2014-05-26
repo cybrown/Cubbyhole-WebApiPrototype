@@ -120,6 +120,7 @@ describe ('Accounts Web Service', function () {
                 'username': 'example2',
                 'password': 'examplePwd2',
                 'plan': 1,
+                'home': 5,
                 level: 1
             });
             done();
@@ -133,20 +134,22 @@ describe ('Accounts Web Service', function () {
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
             var users = JSON.parse(body);
-            users[4] = {
+            users[3].should.eql({
                 'id': 4,
                 'username': 'example1',
                 'password': 'examplePwd1',
                 'plan': 1,
-                level: 1
-            };
-            users[5] = {
+                level: 10,
+                home: 4
+            });
+            users[4].should.eql({
                 'id': 5,
                 'username': 'example2',
                 'password': 'examplePwd2',
                 'plan': 1,
-                level: 1
-            };
+                level: 1,
+                home: 5
+            });
             done();
         });
     });
@@ -162,7 +165,8 @@ describe ('Accounts Web Service', function () {
                 'username': 'example1',
                 'password': 'examplePwd1',
                 'plan': 1,
-                level: 10
+                level: 10,
+                'home': 4
             });
             done();
         });
@@ -189,7 +193,8 @@ describe ('Accounts Web Service', function () {
                 'username': 'example2',
                 'password': 'examplePwd2',
                 'plan': 1,
-                level: 1
+                level: 1,
+                home: 5
             });
             done();
         });
@@ -210,7 +215,8 @@ describe ('Accounts Web Service', function () {
                 'username': 'newExample',
                 'password': 'examplePwd1',
                 'plan': 3,
-                level: 10
+                level: 10,
+                home: 4
             });
             done();
         });
@@ -227,7 +233,8 @@ describe ('Accounts Web Service', function () {
                 'username': 'newExample',
                 'password': 'examplePwd1',
                 'plan': 3,
-                level: 10
+                level: 10,
+                home: 4
             });
             done();
         });

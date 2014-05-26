@@ -6,7 +6,7 @@ var Convert = CoreDecorators.Convert;
 var Ensure = CoreDecorators.Ensure;
 var MinLevel = CoreDecorators.MinLevel;
 
-module.exports = function (accountRepository, planRepository) {
+module.exports = function (accountRepository, planRepository, fileRepository) {
     var accountController = express();
 
     accountController.get('/', Decorate(
@@ -56,11 +56,17 @@ module.exports = function (accountRepository, planRepository) {
         Convert('plan', planRepository.find.bind(planRepository)),
         function (username, password, plan, level) {
             var account = {};
-            account.username = username;
-            account.password = password;
-            account.plan = plan.id;
-            account.level = level;
-            return accountRepository.save(account).then(function () {
+            var home = {};
+            home.name = 'home-' + username;
+            home.parent = 0;
+            return fileRepository.save(home).then(function () {
+                account.username = username;
+                account.password = password;
+                account.plan = plan.id;
+                account.level = level;
+                account.home = home.id;
+                return accountRepository.save(account);
+            }).then(function () {
                 return account;
             });
         })
