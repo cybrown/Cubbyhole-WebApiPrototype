@@ -33,6 +33,7 @@ GenericRepository.prototype.save = function (object) {
     } else {
         return this.sql.queryInsert(this.objectToHash(object)).then(function (result) {
             object.id = result.insertId;
+            return object;
         });
     }
 };

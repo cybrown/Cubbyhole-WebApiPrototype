@@ -120,7 +120,7 @@ describe ('Accounts Web Service', function () {
                 'username': 'example2',
                 'password': 'examplePwd2',
                 'plan': 1,
-                'home': 5,
+                'home': 10,
                 level: 1
             });
             done();
@@ -140,7 +140,7 @@ describe ('Accounts Web Service', function () {
                 'password': 'examplePwd1',
                 'plan': 1,
                 level: 10,
-                home: 4
+                home: 9
             });
             users[6].should.eql({
                 'id': 7,
@@ -148,7 +148,7 @@ describe ('Accounts Web Service', function () {
                 'password': 'examplePwd2',
                 'plan': 1,
                 level: 1,
-                home: 5
+                home: 10
             });
             done();
         });
@@ -166,7 +166,7 @@ describe ('Accounts Web Service', function () {
                 'password': 'examplePwd1',
                 'plan': 1,
                 level: 10,
-                'home': 4
+                'home': 9
             });
             done();
         });
@@ -194,7 +194,7 @@ describe ('Accounts Web Service', function () {
                 'password': 'examplePwd2',
                 'plan': 1,
                 level: 1,
-                home: 5
+                home: 10
             });
             done();
         });
@@ -216,7 +216,7 @@ describe ('Accounts Web Service', function () {
                 'password': 'examplePwd1',
                 'plan': 3,
                 level: 10,
-                home: 4
+                home: 9
             });
             done();
         });
@@ -234,7 +234,7 @@ describe ('Accounts Web Service', function () {
                 'password': 'examplePwd1',
                 'plan': 3,
                 level: 10,
-                home: 4
+                home: 9
             });
             done();
         });

@@ -50,9 +50,9 @@ describe ('File Web Service', function () {
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
             var file = JSON.parse(body);
-            file.should.have.property('id', 4);
+            file.should.have.property('id', 9);
             file.should.have.property('name', 'file1');
-            file.should.have.property('parent', 0);
+            file.should.have.property('parent', 7);
             file.should.have.property('isFolder', false);
             done();
         });
@@ -84,9 +84,9 @@ describe ('File Web Service', function () {
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
             var file = JSON.parse(body);
-            file.should.have.property('id', 5);
+            file.should.have.property('id', 10);
             file.should.have.property('name', 'file2');
-            file.should.have.property('parent', 0);
+            file.should.have.property('parent', 7);
             file.should.have.property('isFolder', false);
             done();
         });
@@ -99,14 +99,14 @@ describe ('File Web Service', function () {
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
             var files = JSON.parse(body);
-            files[1].should.have.property('id', 4);
-            files[1].should.have.property('name', 'file1');
-            files[1].should.have.property('parent', 0);
+            files[0].should.have.property('id', 9);
+            files[0].should.have.property('name', 'file1');
+            files[0].should.have.property('parent', 7);
+            files[0].should.have.property('isFolder', false);
+            files[1].should.have.property('id', 10);
+            files[1].should.have.property('name', 'file2');
+            files[1].should.have.property('parent', 7);
             files[1].should.have.property('isFolder', false);
-            files[2].should.have.property('id', 5);
-            files[2].should.have.property('name', 'file2');
-            files[2].should.have.property('parent', 0);
-            files[2].should.have.property('isFolder', false);
             done();
         });
     });
@@ -118,11 +118,11 @@ describe ('File Web Service', function () {
         }, function (err, response, body) {
             response.should.have.status(200);
             var files = JSON.parse(body);
-            files[0].should.have.property('id', 2);
+            files[0].should.have.property('id', 5);
             files[0].should.have.property('name', 'file2');
             files[0].should.have.property('parent', 1);
             files[0].should.have.property('isFolder', false);
-            files[1].should.have.property('id', 3);
+            files[1].should.have.property('id', 6);
             files[1].should.have.property('name', 'file3');
             files[1].should.have.property('parent', 1);
             files[1].should.have.property('isFolder', false);
@@ -133,7 +133,7 @@ describe ('File Web Service', function () {
     it ('should return an error if list not on a folder', function (done) {
         req1({
             method: 'get',
-            url: url + '/files/2/list'
+            url: url + '/files/5/list'
         }, function (err, response, body) {
             response.should.have.status(400);
             done();
@@ -150,7 +150,7 @@ describe ('File Web Service', function () {
             file.should.have.property('id', 4);
             file.should.have.property('name', 'file1');
             file.should.have.property('parent', 0);
-            file.should.have.property('isFolder', false);
+            file.should.have.property('isFolder', true);
             done();
         });
     });
@@ -164,7 +164,7 @@ describe ('File Web Service', function () {
             var file = JSON.parse(body);
             file.should.have.property('id', 5);
             file.should.have.property('name', 'file2');
-            file.should.have.property('parent', 0);
+            file.should.have.property('parent', 1);
             file.should.have.property('isFolder', false);
             done();
         });
@@ -183,7 +183,7 @@ describe ('File Web Service', function () {
             file.should.have.property('id', 4);
             file.should.have.property('name', 'newFile1');
             file.should.have.property('parent', 0);
-            file.should.have.property('isFolder', false);
+            file.should.have.property('isFolder', true);
             done();
         });
     });
@@ -198,7 +198,7 @@ describe ('File Web Service', function () {
             file.should.have.property('id', 4);
             file.should.have.property('name', 'newFile1');
             file.should.have.property('parent', 0);
-            file.should.have.property('isFolder', false);
+            file.should.have.property('isFolder', true);
             done();
         });
     });
@@ -213,7 +213,7 @@ describe ('File Web Service', function () {
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
             var resp = JSON.parse(body);
-            resp.id.should.eql(6);
+            resp.id.should.eql(11);
             resp.name.should.eql('file1copy');
             resp.parent.should.eql(0);
             done();
@@ -252,9 +252,9 @@ describe ('File Web Service', function () {
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
             var file = JSON.parse(body);
-            file.should.have.property('id', 7);
+            file.should.have.property('id', 12);
             file.should.have.property('name', 'folder1');
-            file.should.have.property('parent', 0);
+            file.should.have.property('parent', 7);
             file.should.have.property('isFolder', true);
             done();
         });
@@ -272,9 +272,9 @@ describe ('File Web Service', function () {
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
             var file = JSON.parse(body);
-            file.should.have.property('id', 8);
+            file.should.have.property('id', 13);
             file.should.have.property('name', 'notAFolder');
-            file.should.have.property('parent', 0);
+            file.should.have.property('parent', 7);
             file.should.have.property('isFolder', false);
             done();
         });
@@ -283,7 +283,7 @@ describe ('File Web Service', function () {
     it ('should upload file data', function (done) {
         req1({
             method: 'put',
-            url: url + '/files/2/raw',
+            url: url + '/files/5/raw',
             body: 'test content'
         }, function (err, response, body) {
             response.should.have.status(200);
@@ -294,7 +294,7 @@ describe ('File Web Service', function () {
     it ('should download file data', function (done) {
         req1({
             method: 'get',
-            url: url + '/files/2/raw'
+            url: url + '/files/5/raw'
         }, function (err, response, body) {
             response.should.have.status(200);
             body.should.eql('test content');
@@ -326,7 +326,7 @@ describe ('File Web Service', function () {
     it ('should not get file data from a file without data', function (done) {
         req1({
             method: 'get',
-            url: url + '/files/1/raw'
+            url: url + '/files/4/raw'
         }, function (err, response, body) {
             response.should.have.status(404);
             done();
@@ -345,9 +345,9 @@ describe ('File Web Service', function () {
         }, function (err, response, body) {
             response.should.have.status(200);
             var file = JSON.parse(body);
-            file.should.have.property('id', 9);
+            file.should.have.property('id', 14);
             file.should.have.property('name', 'toDeleteRec');
-            file.should.have.property('parent', 0);
+            file.should.have.property('parent', 7);
             file.should.have.property('isFolder', true);
             done();
         });
@@ -359,15 +359,15 @@ describe ('File Web Service', function () {
             url: url + '/files/',
             form: {
                 name: 'fileToDeleteRec',
-                parent: 9,
+                parent: 14,
                 isFolder: false
             }
         }, function (err, response, body) {
             response.should.have.status(200);
             var file = JSON.parse(body);
-            file.should.have.property('id', 10);
+            file.should.have.property('id', 15);
             file.should.have.property('name', 'fileToDeleteRec');
-            file.should.have.property('parent', 9);
+            file.should.have.property('parent', 14);
             file.should.have.property('isFolder', false);
             done();
         });
@@ -376,7 +376,7 @@ describe ('File Web Service', function () {
     it ('should delete folder recursively', function (done) {
         req1({
             method: 'delete',
-            url: url + '/files/9'
+            url: url + '/files/14'
         }, function (err, response, body) {
             response.should.have.status(200);
             body.should.eql('');
@@ -387,7 +387,7 @@ describe ('File Web Service', function () {
     it ('should have deleted folder', function (done) {
         req1({
             method: 'get',
-            url: url + '/files/9'
+            url: url + '/files/14'
         }, function (err, response, body) {
             response.should.have.status(404);
             done();
@@ -397,7 +397,7 @@ describe ('File Web Service', function () {
     it ('should have deleted file in folder', function (done) {
         req1({
             method: 'get',
-            url: url + '/files/10'
+            url: url + '/files/15'
         }, function (err, response, body) {
             response.should.have.status(404);
             done();

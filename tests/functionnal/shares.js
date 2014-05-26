@@ -100,9 +100,9 @@ describe ('Shares', function () {
         }, function (err, response, body) {
             response.should.have.status(200);
             var file = JSON.parse(body);
-            file.should.have.property('id', 6);
+            file.should.have.property('id', 11);
             file.should.have.property('name', 'sharedfile');
-            file.should.have.property('parent', 0);
+            file.should.have.property('parent', 9);
             done();
         });
     });
@@ -110,7 +110,7 @@ describe ('Shares', function () {
     it ('should add content to file', function (done) {
         req_user_a({
             method: 'put',
-            url: url + '/files/6/raw',
+            url: url + '/files/11/raw',
             body: 'user_a file'
         }, function (err, response, body) {
             response.should.have.status(200);
@@ -121,7 +121,7 @@ describe ('Shares', function () {
     it ('should have added content to file', function (done) {
         req_user_a({
             method: 'get',
-            url: url + '/files/6/raw'
+            url: url + '/files/11/raw'
         }, function (err, response, body) {
             response.should.have.status(200);
             body.should.eql('user_a file');
@@ -132,7 +132,7 @@ describe ('Shares', function () {
     it ('should not be possible to access file from another user', function (done) {
         req_user_b({
             method: 'get',
-            url: url + '/files/6'
+            url: url + '/files/11'
         }, function (err, response, body) {
             response.should.have.status(403);
             done();
@@ -142,7 +142,7 @@ describe ('Shares', function () {
     it ('should not be possible to access file content from another user', function (done) {
         req_user_b({
             method: 'get',
-            url: url + '/files/6/raw'
+            url: url + '/files/11/raw'
         }, function (err, response, body) {
             response.should.have.status(403);
             done();
@@ -152,7 +152,7 @@ describe ('Shares', function () {
     it ('should add a read only share on a file', function (done) {
         req_user_a({
             method: 'put',
-            url: url + '/files/6/shares',
+            url: url + '/files/11/shares',
             form: {
                 account: 7
             }

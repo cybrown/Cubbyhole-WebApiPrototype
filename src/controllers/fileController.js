@@ -14,8 +14,8 @@ module.exports = function (fileRepository) {
 
     fileController.get('/', Decorate(
             ExpressRequest(),
-            function () {
-                return fileRepository.findByParentId(0);
+            function ($req) {
+                return fileRepository.findByParentId($req.user.home);
             })
     );
 
@@ -55,7 +55,7 @@ module.exports = function (fileRepository) {
         function (name, parent, isFolder, $req) {
             var file = {};
             file.name = name;
-            file.parent = parent;
+            file.parent = parent || $req.user.home;
             file.isFolder = isFolder;
             file.owner = $req.user.id;
             return fileRepository.save(file).then(function () {

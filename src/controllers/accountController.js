@@ -56,21 +56,11 @@ module.exports = function (accountRepository, planRepository, fileRepository) {
         Convert('plan', planRepository.find.bind(planRepository)),
         function (username, password, plan, level) {
             var account = {};
-            var home = {};
-            home.name = 'home-' + username;
-            home.parent = 0;
-            home.isFolder = true;
-            return fileRepository.save(home).then(function () {
-                account.username = username;
-                account.password = password;
-                account.plan = plan.id;
-                account.level = level;
-                account.home = home.id;
-                return accountRepository.save(account);
-            }).then(function () {
-                home.owner = account.id;
-                return fileRepository.save(home);
-            }).then(function () {
+            account.username = username;
+            account.password = password;
+            account.plan = plan.id;
+            account.level = level;
+            return accountRepository.save(account).then(function () {
                 return account;
             });
         })

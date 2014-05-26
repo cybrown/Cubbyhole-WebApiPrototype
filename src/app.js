@@ -170,8 +170,9 @@ plug.set('planRepository', ['planSqlHelper'], function (planSqlHelper) {
     return planRepository;
 });
 
-plug.set('accountRepository', ['accountSqlHelper'], function (accountSqlHelper) {
+plug.set('accountRepository', ['accountSqlHelper', 'fileRepository'], function (accountSqlHelper, fileRepository) {
     var accountRepository = new AccountRepository();
+    accountRepository.fileRepository = fileRepository;
     accountRepository.sql = accountSqlHelper;
     return accountRepository;
 });
