@@ -3,7 +3,7 @@
         "name": "file1",
         "parent": 0,
         "isFolder": true,
-        "owner": 1,
+        "owner": 4,
         "size": null,
         "url": ""
     },
@@ -11,7 +11,7 @@
         "name": "file2",
         "parent": 1,
         "isFolder": false,
-        "owner": 1,
+        "owner": 4,
         "size": null,
         "url": ""
     },
@@ -19,7 +19,7 @@
         "name": "file3",
         "parent": 1,
         "isFolder": false,
-        "owner": 1,
+        "owner": 4,
         "size": null,
         "url": ""
     }

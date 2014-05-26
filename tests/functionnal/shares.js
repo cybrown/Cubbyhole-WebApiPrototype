@@ -58,6 +58,7 @@ describe ('Shares', function () {
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
             var account = JSON.parse(body);
+            account.should.have.property('id', 6);
             account.should.have.property('username', 'user_a');
             account.should.have.property('password', 'pass_a');
             account.should.have.property('plan', 1);
@@ -79,7 +80,7 @@ describe ('Shares', function () {
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
             var account = JSON.parse(body);
-            account.should.have.property('id', 5);
+            account.should.have.property('id', 7);
             account.should.have.property('username', 'user_b');
             account.should.have.property('password', 'pass_b');
             account.should.have.property('plan', 1);
@@ -153,7 +154,7 @@ describe ('Shares', function () {
             method: 'put',
             url: url + '/files/6/shares',
             form: {
-                account: 5
+                account: 7
             }
         }, function (err, response, body) {
             response.should.have.status(200);

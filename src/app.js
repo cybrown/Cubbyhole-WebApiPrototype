@@ -54,29 +54,11 @@ plug.set('app', ['fileController', 'accountController', 'planController', 'syste
 
 plug.set('authMiddleware', ['accountRepository'], function (accountRepository) {
     return express.basicAuth(function (username, password, done) {
-        if (username === 'user' && password === 'pass') {
-            done(null, {
-                id: 1,
-                username: 'user',
-                password: 'pass',
-                level: 100,
-                plan: 0
-            });
-        } else if (username === 'user.level10' && password === 'pass') {
-            done(null, {
-                id: 1,
-                username: 'user.level10',
-                password: 'pass',
-                level: 10,
-                plan: 0
-            });
-        } else {
-            accountRepository.findByUsernameAndPassword(username, password).then(function (account) {
-                done(null, account);
-            }).catch(function (err) {
-                done(err);
-            });
-        }
+        accountRepository.findByUsernameAndPassword(username, password).then(function (account) {
+            done(null, account);
+        }).catch(function (err) {
+            done(err);
+        });
     });
 });
 
@@ -206,8 +188,8 @@ plug.set('planController', ['planRepository'], function (planRepository) {
     return require('./controllers/planController')(planRepository);
 });
 
-plug.set('systemController', ['loadMockData'], function (loadMockData) {
-    return require('./controllers/systemController')(loadMockData);
+plug.set('systemController', ['loadMockData', 'accountRepository'], function (loadMockData, accountRepository) {
+    return require('./controllers/systemController')(loadMockData, accountRepository);
 });
 
 plug.set('start', ['app'], function (app) {

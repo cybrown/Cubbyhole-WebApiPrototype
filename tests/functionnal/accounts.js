@@ -30,7 +30,7 @@ describe ('Accounts Web Service', function () {
     });
 
     it ('should reset data', function (done) {
-        req1({
+        request({
             method: 'get',
             url: url + '/system/reset'
         }, function (err, response, body) {
@@ -80,7 +80,7 @@ describe ('Accounts Web Service', function () {
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
             var account = JSON.parse(body);
-            account.should.have.property('id', 4);
+            account.should.have.property('id', 6);
             account.should.have.property('username', 'example1');
             account.should.have.property('password', 'examplePwd1');
             account.should.have.property('plan', 1);
@@ -116,7 +116,7 @@ describe ('Accounts Web Service', function () {
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
             JSON.parse(body).should.eql({
-                'id': 5,
+                'id': 7,
                 'username': 'example2',
                 'password': 'examplePwd2',
                 'plan': 1,
@@ -134,16 +134,16 @@ describe ('Accounts Web Service', function () {
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
             var users = JSON.parse(body);
-            users[3].should.eql({
-                'id': 4,
+            users[5].should.eql({
+                'id': 6,
                 'username': 'example1',
                 'password': 'examplePwd1',
                 'plan': 1,
                 level: 10,
                 home: 4
             });
-            users[4].should.eql({
-                'id': 5,
+            users[6].should.eql({
+                'id': 7,
                 'username': 'example2',
                 'password': 'examplePwd2',
                 'plan': 1,
@@ -157,11 +157,11 @@ describe ('Accounts Web Service', function () {
     it ('should return an account', function (done) {
         req1({
             method: 'get',
-            url: url + '/accounts/4'
+            url: url + '/accounts/6'
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
             JSON.parse(body).should.eql({
-                'id': 4,
+                'id': 6,
                 'username': 'example1',
                 'password': 'examplePwd1',
                 'plan': 1,
@@ -185,11 +185,11 @@ describe ('Accounts Web Service', function () {
     it ('should return an account 2', function (done) {
         req1({
             method: 'get',
-            url: url + '/accounts/5'
+            url: url + '/accounts/7'
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
             JSON.parse(body).should.eql({
-                'id': 5,
+                'id': 7,
                 'username': 'example2',
                 'password': 'examplePwd2',
                 'plan': 1,
@@ -203,7 +203,7 @@ describe ('Accounts Web Service', function () {
     it ('should modify an account', function (done) {
         req1({
             method: 'post',
-            uri: url + '/accounts/4',
+            uri: url + '/accounts/6',
             form: {
                 username: 'newExample',
                 plan: '3'
@@ -211,7 +211,7 @@ describe ('Accounts Web Service', function () {
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
             JSON.parse(body).should.eql({
-                'id': 4,
+                'id': 6,
                 'username': 'newExample',
                 'password': 'examplePwd1',
                 'plan': 3,
@@ -225,11 +225,11 @@ describe ('Accounts Web Service', function () {
     it ('should return an account 3', function (done) {
         req1({
             method: 'get',
-            url: url + '/accounts/4'
+            url: url + '/accounts/6'
         }, function (err, response, body) {
             response.should.have.status(200);
             JSON.parse(body).should.eql({
-                'id': 4,
+                'id': 6,
                 'username': 'newExample',
                 'password': 'examplePwd1',
                 'plan': 3,
