@@ -78,7 +78,7 @@ module.exports = function (fileRepository) {
                     fileToModify.url = selectedFile.url
                 }
 
-                if (req.body.hasOwnProperty('file')) {
+                if (req.body.hasOwnProperty('parent')) {
                     fileToModify.parent = Number(req.body.parent);
                 }
                 if (req.body.hasOwnProperty('name')) {

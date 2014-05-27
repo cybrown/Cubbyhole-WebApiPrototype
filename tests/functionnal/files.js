@@ -426,4 +426,18 @@ describe ('File Web Service', function () {
             body.should.eql(gen_url);
     	});
     });
+
+    it ('should move a file', function () {
+        req1({
+            method: 'post',
+            url: url + '/files/5',
+            form: {
+                parent: 3
+            }
+        }, function (err, response, body) {
+            response.should.have.status(200);
+            var file = JSON.parse(body);
+            file.should.have.property('parent', 3);
+        });
+    });
 });
