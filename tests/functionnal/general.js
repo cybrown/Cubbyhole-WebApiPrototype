@@ -45,4 +45,33 @@ describe ('General app tests', function () {
             done();
         });
     });
+
+    it ('should register', function (done) {
+        request({
+            method: 'post',
+            url: url + '/register',
+            form: {
+                username: 'toto',
+                password: 'titi'
+            }
+        }, function (err, response, body) {
+            response.should.have.status(200);
+            done();
+        });
+    });
+
+    it ('should be registered', function (done) {
+        request({
+            method: 'get',
+            url: url + '/authping',
+            auth: {
+                user: 'toto',
+                pass: 'titi'
+            }
+        }, function (err, response, body) {
+            response.statusCode.should.eql(200);
+            body.should.eql('pong');
+            done();
+        });
+    });
 });
