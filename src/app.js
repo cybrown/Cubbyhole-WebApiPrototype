@@ -119,7 +119,8 @@ plug.set('fileSqlHelper', ['mysqlConnection'], function (mysqlConnection) {
         'size',
         'url',
         'cdate',
-        'mdate'
+        'mdate',
+        'permalink'
     ];
     fileSqlHelper.connection = mysqlConnection;
     return fileSqlHelper;
@@ -189,8 +190,8 @@ plug.set('planController', ['planRepository'], function (planRepository) {
     return require('./controllers/planController')(planRepository);
 });
 
-plug.set('systemController', ['loadMockData', 'accountRepository'], function (loadMockData, accountRepository) {
-    return require('./controllers/systemController')(loadMockData, accountRepository);
+plug.set('systemController', ['loadMockData', 'accountRepository', 'fileRepository'], function (loadMockData, accountRepository, fileRepository) {
+    return require('./controllers/systemController')(loadMockData, accountRepository, fileRepository);
 });
 
 plug.set('start', ['app'], function (app) {

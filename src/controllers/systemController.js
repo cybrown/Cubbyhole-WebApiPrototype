@@ -1,9 +1,12 @@
 var express = require('express');
+var Q = require('q');
 var Decorate = require('../libs/decorate');
 var CoreDecorators = require('../libs/core_decorators');
+var HttpResponse = require('../libs/HttpResponse');
+var Convert = CoreDecorators.Convert;
 var ExpressRequest = CoreDecorators.ExpressRequest;
 
-module.exports = function (loadMockData, accountRepository) {
+module.exports = function (loadMockData, accountRepository, fileRepository) {
     var systemController = express();
 
     systemController.post('/register', Decorate(
@@ -56,6 +59,36 @@ module.exports = function (loadMockData, accountRepository) {
         }, 500);
         res.send('crash in 500ms');
     });
+
+    systemController.get('/f/:file', Decorate(
+        ExpressRequest(),
+        Convert('file', fileRepository.findByPermalink.bind(fileRepository)),
+        function (file) {
+            return Q.promise(function (resolve, reject) {
+                var fs = require('fs');
+                if (file.url) {
+                    fs.exists('files/' + file.url, function (exists) {
+                        if (exists) {
+                            var response = new HttpResponse(fs.createReadStream('files/' + file.url));
+                            response.headers = {
+                                'Content-Disposition':  'attachment; filename='+file.name
+                            };
+                            resolve(response);
+                            return;
+                        } else {
+                            var err = new Error();
+                            err.status = 404;
+                            reject(err);
+                        }
+                    });
+                } else {
+                    var err = new Error();
+                    err.status = 404;
+                    reject(err);
+                }
+            });
+        }
+    ));
 
     return systemController;
 };

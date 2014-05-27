@@ -17,7 +17,8 @@ FileRepository.prototype.objectToHash = function (file) {
         size: file.size,
         url: file.url,
         cdate: file.cdate,
-        mdate: file.mdate
+        mdate: file.mdate,
+        permalink: file.permalink
     };
 };
 
@@ -31,7 +32,8 @@ FileRepository.prototype.hashToObject = function (hash) {
         size: hash.size,
         url: hash.url,
         cdate: hash.cdate,
-        mdate: hash.mdate
+        mdate: hash.mdate,
+        permalink: hash.permalink
     };
 };
 
@@ -39,6 +41,16 @@ FileRepository.prototype.findByParentId = function (parentId) {
     var _this = this;
     return this.sql.querySelectBy('parent_id', parentId).then(function (result) {
         return result.map(_this.hashToObject);
+    });
+};
+
+FileRepository.prototype.findByPermalink = function (permalink) {
+    var _this = this;
+    return this.sql.querySelectBy('permalink', permalink).then(function (result) {
+        if (!result.length) {
+            throw new Error('Object not found: ' + permalink);
+        }
+        return _this.hashToObject(result[0]);
     });
 };
 

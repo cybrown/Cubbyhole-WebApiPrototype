@@ -409,22 +409,56 @@ describe ('File Web Service', function () {
     it ('should generate a public url', function (done) {
     	req1({
     		method: 'get',
-    		url: url + '/files/5/genurl'
+    		url: url + '/files/5/link'
     	}, function (err, response, body) {
             response.should.have.status(200);
             gen_url = body;
             body.length.should.eql(10);
+            done();
     	});
     });
 
     it ('should get the same public url', function (done) {
-    	req1({
-    		method: 'get',
-    		url: url + '/files/5/genurl'
-    	}, function (err, response, body) {
+        req1({
+            method: 'get',
+            url: url + '/files/5/link'
+        }, function (err, response, body) {
             response.should.have.status(200);
             body.should.eql(gen_url);
-    	});
+            done();
+        });
+    });
+
+    it ('should not get a public url for a file from another account', function (done) {
+        req1({
+            method: 'get',
+            url: url + '/files/2/link'
+        }, function (err, response, body) {
+            response.should.have.status(403);
+            done();
+        });
+    });
+
+    it ('should put content in file', function (done) {
+        req1({
+            method: 'put',
+            url: url + '/files/5/raw',
+            body: 'Hello, data !'
+        }, function (err, response, body) {
+            response.should.have.status(200);
+            done();
+        });
+    });
+
+    it ('should get file content with permalink', function (done) {
+        request({
+            method: 'get',
+            url: url + '/f/' + gen_url
+        }, function (err, response, body) {
+            response.should.have.status(200);
+            body.should.eql('Hello, data !');
+            done();
+        });
     });
 
     it ('should move a file', function () {

@@ -1,5 +1,6 @@
 var express = require('express');
 var Q = require('q');
+var readableRandom = require('readable-random');
 var Decorate = require('../libs/decorate');
 var CoreDecorators = require('../libs/core_decorators');
 var ExpressRequest = CoreDecorators.ExpressRequest;
@@ -157,6 +158,26 @@ module.exports = function (fileRepository) {
                 });
             });
             $req.pipe(sha1Stream).pipe(output);
+        }
+    ));
+
+    fileController.get('/:file/link', Decorate(
+        ExpressRequest(),
+        Convert('file', fileRepository.find.bind(fileRepository)),
+        function (file, $req) {
+            if (file.owner !== $req.user.id) {
+                var err = new Error('Not authorized');
+                err.status = 403;
+                throw err;
+            }
+            if (file.permalink) {
+                return file.permalink;
+            } else {
+                file.permalink = readableRandom.getString(10);
+                return fileRepository.save(file).then(function () {
+                    return file.permalink;
+                });
+            }
         }
     ));
 

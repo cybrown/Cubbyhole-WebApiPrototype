@@ -1,6 +1,7 @@
 'use strict';
 
 var Q = require('q');
+var HttpResponse = require('./HttpResponse');
 
 var ExpressRequest = function (args) {
     return function (req, res) {
@@ -49,6 +50,10 @@ var ExpressRequest = function (args) {
         try {
             Q.when(this.call(this, kwargs), function (toSend) {
                 if (res && res.send) {
+                    if (toSend instanceof HttpResponse) {
+                        res.set(toSend.headers);
+                        toSend = toSend.body;
+                    }
                     if (toSend && (typeof toSend.pipe === 'function')) {
                         toSend.pipe(res);
                     } else {
