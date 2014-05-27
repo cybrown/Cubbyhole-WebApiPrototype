@@ -170,6 +170,11 @@ module.exports = function (fileRepository) {
                 err.status = 403;
                 throw err;
             }
+            if (file.isFolder) {
+                var err = new Error('Not applicable to folders');
+                err.status = 400;
+                throw err;
+            }
             if (file.permalink) {
                 return file.permalink;
             } else {

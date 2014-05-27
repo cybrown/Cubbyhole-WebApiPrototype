@@ -439,6 +439,16 @@ describe ('File Web Service', function () {
         });
     });
 
+    it ('should not get a public url for a folder', function (done) {
+        req1({
+            method: 'get',
+            url: url + '/files/4/link'
+        }, function (err, response, body) {
+            response.should.have.status(400);
+            done();
+        });
+    });
+
     it ('should put content in file', function (done) {
         req1({
             method: 'put',
