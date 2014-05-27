@@ -403,4 +403,27 @@ describe ('File Web Service', function () {
             done();
         });
     });
+
+    var gen_url = '';
+
+    it ('should generate a public url', function (done) {
+    	req1({
+    		method: 'get',
+    		url: url + '/files/5/genurl'
+    	}, function (err, response, body) {
+            response.should.have.status(200);
+            gen_url = body;
+            body.length.should.eql(10);
+    	});
+    });
+
+    it ('should get the same public url', function (done) {
+    	req1({
+    		method: 'get',
+    		url: url + '/files/5/genurl'
+    	}, function (err, response, body) {
+            response.should.have.status(200);
+            body.should.eql(gen_url);
+    	});
+    });
 });
