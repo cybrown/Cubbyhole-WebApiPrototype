@@ -194,26 +194,6 @@ plug.set('systemController', ['loadMockData', 'accountRepository'], function (lo
 });
 
 plug.set('start', ['app'], function (app) {
-    app.get('/files/:file/shares', function (req, res) {
-
-    });
-
-    app.get('/files/:id/shares/:userId', function(req, res) {
-
-    });
-
-    app.post('/files/:id/shares/:userId', function(req, res) {
-
-    });
-
-    app.delete('/files/:id/shares/:user', function(req, res) {
-
-    });
-
-    app.post('/files/:id/genurl', function(req, res) {
-
-    });
-
     http.createServer(app).listen(app.get('port'), function(){
         console.log('Express server listening on port ' + app.get('port'));
     });
