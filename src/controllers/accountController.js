@@ -17,6 +17,13 @@ module.exports = function (accountRepository, planRepository, fileRepository) {
         })
     );
 
+    accountController.get('/whoami', Decorate(
+        ExpressRequest(),
+        function ($req) {
+            return $req.user;
+        }
+    ));
+
     accountController.get('/:account', Decorate(
         ExpressRequest(),
         MinLevel(20),

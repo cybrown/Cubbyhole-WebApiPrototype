@@ -172,6 +172,38 @@ describe ('Accounts Web Service', function () {
         });
     });
 
+    it ('should return current account', function (done) {
+        req1({
+            method: 'get',
+            url: url + '/accounts/whoami'
+        }, function (err, response, body) {
+            response.statusCode.should.equal(200);
+            JSON.parse(body).should.eql({
+                'id': 4,
+                'username': 'user',
+                'password': 'pass',
+                'plan': 0,
+                level: 100,
+                'home': 7
+            });
+            done();
+        });
+    });
+
+    it ('should not return current account', function (done) {
+        request({
+            method: 'get',
+            url: url + '/accounts/whoami',
+            auth: {
+                user: 'not_a',
+                pass: 'user'
+            }
+        }, function (err, response, body) {
+            response.statusCode.should.not.equal(404);
+            done();
+        });
+    });
+
     it ('should not return an account', function (done) {
         req1({
             method: 'get',
