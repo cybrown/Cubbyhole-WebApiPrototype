@@ -42,13 +42,14 @@ AccountRepository.prototype.save = function (account) {
     var _this = this;
     if (!account.id) {
         var home = {};
-        home.name = 'home-' + account.username;
+        home.name = 'home-tmp-' + account.username;
         home.parent = 0;
         home.isFolder = true;
         return this.fileRepository.save(home).then(function () {
             account.home = home.id;
             return GenericRepository.prototype.save.call(_this, account);
         }).then(function () {
+            home.name = 'home-' + account.id;
             home.owner = account.id;
             return _this.fileRepository.save(home);
         });

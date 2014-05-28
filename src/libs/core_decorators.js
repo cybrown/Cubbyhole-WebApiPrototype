@@ -45,12 +45,13 @@ var ExpressRequest = function (args) {
         var onErr = function (err) {
             var status = err.status ? err.status : 500;
             console.trace(err);
-            res.status(status).send(err);
+            res.status(status).send();
         };
         try {
             Q.when(this.call(this, kwargs), function (toSend) {
                 if (res && res.send) {
                     if (toSend instanceof HttpResponse) {
+                        res.status(toSend.status);
                         res.set(toSend.headers);
                         toSend = toSend.body;
                     }
