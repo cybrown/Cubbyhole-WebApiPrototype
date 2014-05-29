@@ -67,7 +67,7 @@ module.exports = function (loadMockData, accountRepository, fileRepository, file
                 return Q.promise(function (resolve, reject) {
                     var fs = require('fs');
                     if (file.url) {
-                        fs.exists('files/' + file.url, function (exists) {
+                        fs.exists(filesDir + file.url, function (exists) {
                             if (exists) {
                                 var response = new HttpResponse(fs.createReadStream(filesDir + file.url));
                                 response.headers = {
