@@ -2,11 +2,13 @@ var request = require('request');
 
 describe ('General app tests', function () {
 
-    var scheme = 'http://';
-    var host = 'localhost';
-    var port = 3000;
-    var user = 'user';
-    var pass = 'pass';
+    var conf = require('./conf.json');
+
+    var scheme = conf.scheme;
+    var host = conf.host;
+    var port = conf.port;
+    var user = conf.user;
+    var pass = conf.pass;
 
     var url = scheme + host + ':' + port;
 
