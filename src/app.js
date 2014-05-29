@@ -15,9 +15,13 @@ var SqlHelper = require('./libs/SqlHelper');
 
 var plug = new Plugme();
 
-plug.set('salt', function (done) {
-    return 'VerYsEcUredSalT';
-});
+plug.set('salt', 'VerYsEcUredSalT');
+plug.set('port', process.env.PORT || 3000);
+
+plug.set('fileController', ['fileRepository'], require('./controllers/fileController'));
+plug.set('accountController', ['accountRepository', 'planRepository'], require('./controllers/accountController'));
+plug.set('planController', ['planRepository'], require('./controllers/planController'));
+plug.set('systemController', ['loadMockData', 'accountRepository', 'fileRepository'], require('./controllers/systemController'));
 
 plug.set('hash', ['salt'], function (salt) {
     return function (string) {
@@ -30,43 +34,45 @@ plug.set('hash', ['salt'], function (salt) {
     };
 });
 
-plug.set('app', ['fileController', 'accountController', 'planController', 'systemController', 'authMiddleware'], function (fileController, accountController, planController, systemController, authMiddleware) {
-    var app = express();
+plug.set('app',
+    ['fileController', 'accountController', 'planController', 'systemController', 'authMiddleware'],
+    function (fileController, accountController, planController, systemController, authMiddleware) {
+        var app = express();
 
-    // all environments
-    app.set('port', process.env.PORT || 3000);
-    app.use(express.favicon());
-    app.use(express.logger('dev'));
-    app.use(express.json());
-    app.use(express.urlencoded());
-    app.use(express.multipart());
-    app.use(express.methodOverride());
+        // all environments
+        app.use(express.favicon());
+        app.use(express.logger('dev'));
+        app.use(express.json());
+        app.use(express.urlencoded());
+        app.use(express.multipart());
+        app.use(express.methodOverride());
 
-    app.use(function (req, res, next) {
-        if (req.url.indexOf('raw') === -1) {
-            cors()(req, res, next);
-        } else {
-            next();
+        app.use(function (req, res, next) {
+            if (req.url.indexOf('raw') === -1) {
+                cors()(req, res, next);
+            } else {
+                next();
+            }
+        });
+
+        app.use('/files', authMiddleware);
+        app.use('/accounts', authMiddleware);
+        app.use('/plans', authMiddleware);
+        app.use('/authping', authMiddleware);
+
+        // development only
+        if ('development' == app.get('env')) {
+            app.use(express.errorHandler());
         }
-    });
 
-    app.use('/files', authMiddleware);
-    app.use('/accounts', authMiddleware);
-    app.use('/plans', authMiddleware);
-    app.use('/authping', authMiddleware);
+        app.use('/', systemController);
+        app.use('/files', fileController);
+        app.use('/accounts', accountController);
+        app.use('/plans', planController);
 
-    // development only
-    if ('development' == app.get('env')) {
-        app.use(express.errorHandler());
+        return app;
     }
-
-    app.use('/', systemController);
-    app.use('/files', fileController);
-    app.use('/accounts', accountController);
-    app.use('/plans', planController);
-
-    return app;
-});
+);
 
 plug.set('authMiddleware', ['accountRepository'], function (accountRepository) {
     return express.basicAuth(function (username, password, done) {
@@ -78,40 +84,43 @@ plug.set('authMiddleware', ['accountRepository'], function (accountRepository) {
     });
 });
 
-plug.set('loadMockData', ['fileRepository', 'planRepository', 'accountRepository'], function (fileRepository, planRepository, accountRepository) {
-    return function () {
-        var filesData = require('./data/files.json');
-        var plansData = require('./data/plans.json');
-        var accountsData = require('./data/accounts.json');
+plug.set('loadMockData',
+    ['fileRepository', 'planRepository', 'accountRepository'],
+    function (fileRepository, planRepository, accountRepository) {
+        return function () {
+            var filesData = require('./data/files.json');
+            var plansData = require('./data/plans.json');
+            var accountsData = require('./data/accounts.json');
 
-        var clone = function (obj) {
-            return Object.keys(obj).reduce(function (prev, key) {
-                prev[key] = obj[key];
-                return prev;
-            }, {});
+            var clone = function (obj) {
+                return Object.keys(obj).reduce(function (prev, key) {
+                    prev[key] = obj[key];
+                    return prev;
+                }, {});
+            };
+
+            var accountPromise = accountRepository.clean().then(function () {
+                return Q.all(accountsData.map(function (account) {
+                    return accountRepository.save(clone(account));
+                }));
+            });
+
+            var planPromise = planRepository.clean().then(function () {
+                return Q.all(plansData.map(function (plan) {
+                    return planRepository.save(clone(plan));
+                }));
+            });
+
+            var filePromise = fileRepository.clean().then(function () {
+                return Q.all(filesData.map(function (file) {
+                    return fileRepository.save(clone(file));
+                }));
+            });
+
+            return Q.all([accountPromise, filePromise, planPromise]);
         };
-
-        var accountPromise = accountRepository.clean().then(function () {
-            return Q.all(accountsData.map(function (account) {
-                return accountRepository.save(clone(account));
-            }));
-        });
-
-        var planPromise = planRepository.clean().then(function () {
-            return Q.all(plansData.map(function (plan) {
-                return planRepository.save(clone(plan));
-            }));
-        });
-
-        var filePromise = fileRepository.clean().then(function () {
-            return Q.all(filesData.map(function (file) {
-                return fileRepository.save(clone(file));
-            }));
-        });
-
-        return Q.all([accountPromise, filePromise, planPromise]);
-    };
-});
+    }
+);
 
 plug.set('mysqlConnection', function () {
     var dbConf = require('./conf/db.json');
@@ -186,33 +195,20 @@ plug.set('planRepository', ['planSqlHelper'], function (planSqlHelper) {
     return planRepository;
 });
 
-plug.set('accountRepository', ['accountSqlHelper', 'fileRepository', 'hash'], function (accountSqlHelper, fileRepository, hash) {
-    var accountRepository = new AccountRepository();
-    accountRepository.fileRepository = fileRepository;
-    accountRepository.sql = accountSqlHelper;
-    accountRepository.hash = hash;
-    return accountRepository;
-});
+plug.set('accountRepository',
+    ['accountSqlHelper', 'fileRepository', 'hash'],
+    function (accountSqlHelper, fileRepository, hash) {
+        var accountRepository = new AccountRepository();
+        accountRepository.fileRepository = fileRepository;
+        accountRepository.sql = accountSqlHelper;
+        accountRepository.hash = hash;
+        return accountRepository;
+    }
+);
 
-plug.set('fileController', ['fileRepository'], function (fileRepository) {
-    return require('./controllers/fileController')(fileRepository);
-});
-
-plug.set('accountController', ['accountRepository', 'planRepository', 'fileRepository'], function (accountRepository, planRepository, fileRepository) {
-    return require('./controllers/accountController')(accountRepository, planRepository, fileRepository);
-});
-
-plug.set('planController', ['planRepository'], function (planRepository) {
-    return require('./controllers/planController')(planRepository);
-});
-
-plug.set('systemController', ['loadMockData', 'accountRepository', 'fileRepository'], function (loadMockData, accountRepository, fileRepository) {
-    return require('./controllers/systemController')(loadMockData, accountRepository, fileRepository);
-});
-
-plug.set('start', ['app'], function (app) {
-    http.createServer(app).listen(app.get('port'), function(){
-        console.log('Express server listening on port ' + app.get('port'));
+plug.set('start', ['app', 'port'], function (app, port) {
+    http.createServer(app).listen(port, function(){
+        console.log('Express server listening on port ' + port);
     });
 });
 
