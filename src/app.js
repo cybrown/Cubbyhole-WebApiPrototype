@@ -17,8 +17,9 @@ var plug = new Plugme();
 
 plug.set('salt', 'VerYsEcUredSalT');
 plug.set('port', process.env.PORT || 3000);
+plug.set('filesDir', __dirname + '/../files/');
 
-plug.set('fileController', ['fileRepository'], require('./controllers/fileController'));
+plug.set('fileController', ['fileRepository', 'filesDir'], require('./controllers/fileController'));
 plug.set('accountController', ['accountRepository', 'planRepository'], require('./controllers/accountController'));
 plug.set('planController', ['planRepository'], require('./controllers/planController'));
 plug.set('systemController', ['loadMockData', 'accountRepository', 'fileRepository'], require('./controllers/systemController'));

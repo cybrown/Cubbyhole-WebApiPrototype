@@ -9,7 +9,7 @@ var Ensure = CoreDecorators.Ensure;
 var MinLevel = CoreDecorators.MinLevel;
 var Default = CoreDecorators.Default;
 
-module.exports = function (fileRepository) {
+module.exports = function (fileRepository, filesDir) {
     return express()
         .get('/', Decorate(
                 ExpressRequest(),
@@ -106,9 +106,9 @@ module.exports = function (fileRepository) {
                 return Q.promise(function (resolve, reject) {
                     var fs = require('fs');
                     if (file.url) {
-                        fs.exists('files/' + file.url, function (exists) {
+                        fs.exists(filesDir + file.url, function (exists) {
                             if (exists) {
-                                resolve(fs.createReadStream('files/' + file.url));
+                                resolve(fs.createReadStream(filesDir + file.url));
                                 return;
                             } else {
                                 var err = new Error();
@@ -133,7 +133,7 @@ module.exports = function (fileRepository) {
                 var Sha1Stream = require('../libs/Sha1Stream');
 
                 var filename = crypto.randomBytes(4).readUInt32LE(0);
-                var output = fs.createWriteStream('files/' + filename);
+                var output = fs.createWriteStream(filesDir + filename);
                 var sha1Stream = new Sha1Stream();
 
                 $req.on('end', function () {
@@ -141,7 +141,7 @@ module.exports = function (fileRepository) {
                     file.url = sha1;
                     file.mdate = new Date();
                     fileRepository.save(file).done();
-                    fs.rename('files/' + filename, 'files/' + sha1, function (err) {
+                    fs.rename(filesDir + filename, filesDir + sha1, function (err) {
                         if (err) {
                             // TODO Throw error correctly
                             throw err;
