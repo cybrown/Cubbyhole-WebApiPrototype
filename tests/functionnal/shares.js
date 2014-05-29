@@ -60,7 +60,6 @@ describe ('Shares', function () {
             var account = JSON.parse(body);
             account.should.have.property('id', 6);
             account.should.have.property('username', 'user_a');
-            account.should.have.property('password', 'pass_a');
             account.should.have.property('plan', 1);
             account.should.have.property('level', 10);
             done();
@@ -82,7 +81,6 @@ describe ('Shares', function () {
             var account = JSON.parse(body);
             account.should.have.property('id', 7);
             account.should.have.property('username', 'user_b');
-            account.should.have.property('password', 'pass_b');
             account.should.have.property('plan', 1);
             account.should.have.property('level', 10);
             done();

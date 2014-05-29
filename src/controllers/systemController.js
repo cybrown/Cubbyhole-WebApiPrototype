@@ -15,35 +15,41 @@ module.exports = function (loadMockData, accountRepository, fileRepository) {
             var user = {};
             user.plan = 0;
             user.username = username;
-            user.password = password;
             user.level = 10;
             return accountRepository.save(user).then(function () {
+                return accountRepository.savePassword(user, password);
+            }).then(function () {
                 return;
             });
         }
     ));
 
-    systemController.get('/system/reset', function (req, res) {
-        return loadMockData().then(function () {
+    systemController.get('/system/reset', Decorate(
+        ExpressRequest(),
+        function () {
             var user = {
                 username: 'user',
-                password: 'pass',
                 level: 100,
                 plan: 0
             };
             var user_level10 = {
                 username: 'user.level10',
-                password: 'pass',
                 level: 10,
                 plan: 0
             };
-            accountRepository.save(user).then(function () {
+            return loadMockData().then(function () {
+                return accountRepository.save(user);
+            }).then(function () {
+                return accountRepository.savePassword(user, 'pass');
+            }).then(function () {
                 return accountRepository.save(user_level10);
             }).then(function () {
-                res.send('');
-            });
-        });
-    });
+                return accountRepository.savePassword(user_level10, 'pass');
+            }).then(function () {
+                return;
+            })
+        }
+    ));
 
     systemController.get('/ping', function (req, res) {
         res.send('pong');

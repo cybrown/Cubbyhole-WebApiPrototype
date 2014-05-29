@@ -41,9 +41,6 @@ module.exports = function (accountRepository, planRepository, fileRepository) {
             if (username !== undefined) {
                 account.username = username;
             }
-            if (password !== undefined) {
-                account.password = password;
-            }
             if (plan !== undefined) {
                 account.plan = plan.id;
             }
@@ -51,6 +48,11 @@ module.exports = function (accountRepository, planRepository, fileRepository) {
                 account.level = level;
             }
             return accountRepository.save(account).then(function () {
+                if (password !== undefined) {
+                    return accountRepository.savePassword(account, password);
+                }
+                return;
+            }).then(function () {
                 return account;
             });
         }
@@ -64,10 +66,11 @@ module.exports = function (accountRepository, planRepository, fileRepository) {
         function (username, password, plan, level) {
             var account = {};
             account.username = username;
-            account.password = password;
             account.plan = plan.id;
             account.level = level;
             return accountRepository.save(account).then(function () {
+                return accountRepository.savePassword(account, password);
+            }).then(function () {
                 return account;
             });
         })

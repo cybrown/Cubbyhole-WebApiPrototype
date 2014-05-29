@@ -82,7 +82,6 @@ describe ('Accounts Web Service', function () {
             var account = JSON.parse(body);
             account.should.have.property('id', 6);
             account.should.have.property('username', 'example1');
-            account.should.have.property('password', 'examplePwd1');
             account.should.have.property('plan', 1);
             account.should.have.property('level', 10);
             done();
@@ -118,7 +117,6 @@ describe ('Accounts Web Service', function () {
             JSON.parse(body).should.eql({
                 'id': 7,
                 'username': 'example2',
-                'password': 'examplePwd2',
                 'plan': 1,
                 'home': 10,
                 level: 1
@@ -137,7 +135,6 @@ describe ('Accounts Web Service', function () {
             users[5].should.eql({
                 'id': 6,
                 'username': 'example1',
-                'password': 'examplePwd1',
                 'plan': 1,
                 level: 10,
                 home: 9
@@ -145,7 +142,6 @@ describe ('Accounts Web Service', function () {
             users[6].should.eql({
                 'id': 7,
                 'username': 'example2',
-                'password': 'examplePwd2',
                 'plan': 1,
                 level: 1,
                 home: 10
@@ -163,7 +159,6 @@ describe ('Accounts Web Service', function () {
             JSON.parse(body).should.eql({
                 'id': 6,
                 'username': 'example1',
-                'password': 'examplePwd1',
                 'plan': 1,
                 level: 10,
                 'home': 9
@@ -181,7 +176,6 @@ describe ('Accounts Web Service', function () {
             JSON.parse(body).should.eql({
                 'id': 4,
                 'username': 'user',
-                'password': 'pass',
                 'plan': 0,
                 level: 100,
                 'home': 7
@@ -223,7 +217,6 @@ describe ('Accounts Web Service', function () {
             JSON.parse(body).should.eql({
                 'id': 7,
                 'username': 'example2',
-                'password': 'examplePwd2',
                 'plan': 1,
                 level: 1,
                 home: 10
@@ -245,7 +238,6 @@ describe ('Accounts Web Service', function () {
             JSON.parse(body).should.eql({
                 'id': 6,
                 'username': 'newExample',
-                'password': 'examplePwd1',
                 'plan': 3,
                 level: 10,
                 home: 9
@@ -263,7 +255,6 @@ describe ('Accounts Web Service', function () {
             JSON.parse(body).should.eql({
                 'id': 6,
                 'username': 'newExample',
-                'password': 'examplePwd1',
                 'plan': 3,
                 level: 10,
                 home: 9

@@ -3,6 +3,7 @@
 var express         = require('express');
 var http            = require('http');
 var cors            = require('cors');
+var crypto = require('crypto');
 var Plugme = require('plugme').Plugme;
 var mysql = require('mysql');
 var Q = require('q');
@@ -13,6 +14,21 @@ var AccountRepository = require('./repositories/AccountRepository');
 var SqlHelper = require('./libs/SqlHelper');
 
 var plug = new Plugme();
+
+plug.set('salt', function (done) {
+    return 'VerYsEcUredSalT';
+});
+
+plug.set('hash', ['salt'], function (salt) {
+    return function (string) {
+        return Q.promise(function (resolve, reject) {
+            var sha1 = crypto.createHash('sha1');
+            sha1.update(string);
+            sha1.update(salt);
+            resolve(sha1.digest('hex'));
+        });
+    };
+});
 
 plug.set('app', ['fileController', 'accountController', 'planController', 'systemController', 'authMiddleware'], function (fileController, accountController, planController, systemController, authMiddleware) {
     var app = express();
@@ -150,7 +166,6 @@ plug.set('accountSqlHelper', ['mysqlConnection'], function (mysqlConnection) {
     accountSqlHelper.COLUMN_CDATE = 'cdate';
     accountSqlHelper.TABLE_FIELDS = [
         'username',
-        'password',
         'plan_id',
         'home_id',
         'level'
@@ -171,10 +186,11 @@ plug.set('planRepository', ['planSqlHelper'], function (planSqlHelper) {
     return planRepository;
 });
 
-plug.set('accountRepository', ['accountSqlHelper', 'fileRepository'], function (accountSqlHelper, fileRepository) {
+plug.set('accountRepository', ['accountSqlHelper', 'fileRepository', 'hash'], function (accountSqlHelper, fileRepository, hash) {
     var accountRepository = new AccountRepository();
     accountRepository.fileRepository = fileRepository;
     accountRepository.sql = accountSqlHelper;
+    accountRepository.hash = hash;
     return accountRepository;
 });
 
