@@ -6,7 +6,7 @@ var HttpResponse = require('../libs/HttpResponse');
 var Convert = CoreDecorators.Convert;
 var ExpressRequest = CoreDecorators.ExpressRequest;
 
-module.exports = function (loadMockData, accountRepository, fileRepository) {
+module.exports = function (loadMockData, accountRepository, fileRepository, filesDir) {
     return express()
         .post('/register', Decorate(
             ExpressRequest(),
@@ -69,7 +69,7 @@ module.exports = function (loadMockData, accountRepository, fileRepository) {
                     if (file.url) {
                         fs.exists('files/' + file.url, function (exists) {
                             if (exists) {
-                                var response = new HttpResponse(fs.createReadStream('files/' + file.url));
+                                var response = new HttpResponse(fs.createReadStream(filesDir + file.url));
                                 response.headers = {
                                     'Content-Disposition':  'attachment; filename='+file.name
                                 };

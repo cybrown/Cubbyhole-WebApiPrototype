@@ -22,7 +22,7 @@ plug.set('filesDir', __dirname + '/../files/');
 plug.set('fileController', ['fileRepository', 'filesDir'], require('./controllers/fileController'));
 plug.set('accountController', ['accountRepository', 'planRepository'], require('./controllers/accountController'));
 plug.set('planController', ['planRepository'], require('./controllers/planController'));
-plug.set('systemController', ['loadMockData', 'accountRepository', 'fileRepository'], require('./controllers/systemController'));
+plug.set('systemController', ['loadMockData', 'accountRepository', 'fileRepository', 'filesDir'], require('./controllers/systemController'));
 
 plug.set('hash', ['salt'], function (salt) {
     return function (string) {
