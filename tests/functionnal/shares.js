@@ -239,4 +239,17 @@ describe ('Shares', function () {
             done();
         });
     });
+
+    it ('should not be possible to share a folder', function (done) {
+        req1({
+            method: 'put',
+            url: url + '/files/4/shares/READ',
+            form: {
+                account: 7
+            }
+        }, function (err, response, body) {
+            response.should.have.status(400);
+            done();
+        });
+    });
 });

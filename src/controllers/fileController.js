@@ -54,12 +54,12 @@ module.exports = function (fileRepository, filesDir, accountRepository, shareRep
             MinLevel(10),
             Convert('file', fileRepository.find.bind(fileRepository)),
             function (file, $req) {
-                if (!file.isFolder) {
-                    var err = new Error('Not a folder');
-                    err.status = 400;
-                    throw err;
-                }
                 return canHttp($req.user, 'READ', file).then(function () {
+                    if (!file.isFolder) {
+                        var err = new Error('Not a folder');
+                        err.status = 400;
+                        throw err;
+                    }
                     return fileRepository.findByParentId(file.id);
                 });
             }
@@ -207,6 +207,11 @@ module.exports = function (fileRepository, filesDir, accountRepository, shareRep
             Convert('account', accountRepository.find.bind(accountRepository)),
             function (file, $req, account, permission) {
                 return canHttp($req.user, 'PERM', file).then(function () {
+                    if (file.isFolder) {
+                        var err = new Error('Can not apply share to folder');
+                        err.status = 400;
+                        throw err;
+                    }
                     var share = {
                         file: file.id,
                         account: account.id,
