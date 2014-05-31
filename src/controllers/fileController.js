@@ -11,18 +11,18 @@ var Default = CoreDecorators.Default;
 
 module.exports = function (fileRepository, filesDir, accountRepository, shareRepository) {
 
-    var can = function (account, permission, file) {
-        if (file.owner === account.id) {
+    var can = function (account, permission, resource) {
+        if (resource.owner === account.id) {
             return Q(true);
         } else {
-            return shareRepository.findByFileAndAccountAndPermission(file.id, account.id, permission).then(function (perms) {
+            return shareRepository.findByFileAndAccountAndPermission(resource.id, account.id, permission).then(function (perms) {
                 return perms && (perms.length === 1);
             });
         }
     };
 
-    var canHttp = function (account, permission, file) {
-        return can(account, permission, file).then(function (ok) {
+    var canHttp = function (account, permission, resource) {
+        return can(account, permission, resource).then(function (ok) {
             if (!ok) {
                 var err = new Error('Not authorized');
                 err.status = 403;
@@ -53,13 +53,15 @@ module.exports = function (fileRepository, filesDir, accountRepository, shareRep
             ExpressRequest(),
             MinLevel(10),
             Convert('file', fileRepository.find.bind(fileRepository)),
-            function (file) {
+            function (file, $req) {
                 if (!file.isFolder) {
                     var err = new Error('Not a folder');
                     err.status = 400;
                     throw err;
                 }
-                return fileRepository.findByParentId(file.id);
+                return canHttp($req.user, 'READ', file).then(function () {
+                    return fileRepository.findByParentId(file.id);
+                });
             }
         ))
         .put('/', Decorate(
@@ -73,7 +75,14 @@ module.exports = function (fileRepository, filesDir, accountRepository, shareRep
                 file.parent = parent || $req.user.home;
                 file.isFolder = isFolder;
                 file.owner = $req.user.id;
-                return fileRepository.save(file).then(function () {
+                return fileRepository.find(file.parent).then(function (parentFile) {
+                    if (parentFile.owner !== $req.user.id) {
+                        var err = new Error('Not authorized');
+                        err.status = 403;
+                        throw err;
+                    }
+                    return fileRepository.save(file)
+                }).then(function () {
                     return file;
                 });
             }
@@ -109,8 +118,10 @@ module.exports = function (fileRepository, filesDir, accountRepository, shareRep
         .delete('/:file', Decorate(
             ExpressRequest(),
             Convert('file', fileRepository.find.bind(fileRepository)),
-            function (file) {
-                return fileRepository.removeRec(file).then(function () {});
+            function (file, $req) {
+                return canHttp($req.user, 'DELETE', file).then(function () {
+                    return fileRepository.removeRec(file);
+                }).then(function () {})
             })
         )
         .get('/:file/raw', Decorate(
@@ -144,51 +155,50 @@ module.exports = function (fileRepository, filesDir, accountRepository, shareRep
             ExpressRequest(),
             Convert('file', fileRepository.find.bind(fileRepository)),
             function (file, $req) {
-                var fs = require('fs');
-                var crypto = require('crypto');
-                var Sha1Stream = require('../libs/Sha1Stream');
+                return canHttp($req.user, 'WRITE', file).then(function () {
+                    var fs = require('fs');
+                    var crypto = require('crypto');
+                    var Sha1Stream = require('../libs/Sha1Stream');
 
-                var filename = crypto.randomBytes(4).readUInt32LE(0);
-                var output = fs.createWriteStream(filesDir + filename);
-                var sha1Stream = new Sha1Stream();
+                    var filename = crypto.randomBytes(4).readUInt32LE(0);
+                    var output = fs.createWriteStream(filesDir + filename);
+                    var sha1Stream = new Sha1Stream();
 
-                $req.on('end', function () {
-                    var sha1 = sha1Stream.digest('hex');
-                    file.url = sha1;
-                    file.mdate = new Date();
-                    fileRepository.save(file).done();
-                    fs.rename(filesDir + filename, filesDir + sha1, function (err) {
-                        if (err) {
-                            // TODO Throw error correctly
-                            throw err;
-                        }
+                    $req.on('end', function () {
+                        var sha1 = sha1Stream.digest('hex');
+                        file.url = sha1;
+                        file.mdate = new Date();
+                        fileRepository.save(file).done();
+                        fs.rename(filesDir + filename, filesDir + sha1, function (err) {
+                            if (err) {
+                                // TODO Throw error correctly
+                                throw err;
+                            }
+                        });
                     });
+                    $req.pipe(sha1Stream).pipe(output);
                 });
-                $req.pipe(sha1Stream).pipe(output);
             }
         ))
-        .get('/:file/link', Decorate(
+        .post('/:file/link', Decorate(
             ExpressRequest(),
             Convert('file', fileRepository.find.bind(fileRepository)),
             function (file, $req) {
-                if (file.owner !== $req.user.id) {
-                    var err = new Error('Not authorized');
-                    err.status = 403;
-                    throw err;
-                }
-                if (file.isFolder) {
-                    var err = new Error('Not applicable to folders');
-                    err.status = 400;
-                    throw err;
-                }
-                if (file.permalink) {
-                    return file.permalink;
-                } else {
-                    file.permalink = readableRandom.getString(10);
-                    return fileRepository.save(file).then(function () {
-                        return file.permalink;
-                    });
-                }
+                return canHttp($req.user, 'LINK', file).then(function () {
+                    if (file.isFolder) {
+                        var err = new Error('Not applicable to folders');
+                        err.status = 400;
+                        throw err;
+                    }
+                    if (file.permalink) {
+                        return file;
+                    } else {
+                        file.permalink = readableRandom.getString(10);
+                        return fileRepository.save(file).then(function () {
+                            return file;
+                        });
+                    }
+                });
             }
         ))
         .put('/:file/shares/:permission', Decorate(
@@ -196,23 +206,20 @@ module.exports = function (fileRepository, filesDir, accountRepository, shareRep
             Convert('file', fileRepository.find.bind(fileRepository)),
             Convert('account', accountRepository.find.bind(accountRepository)),
             function (file, $req, account, permission) {
-                if (file.owner !== $req.user.id) {
-                    var err = new Error('Not authorized');
-                    err.status = 403;
-                    throw err;
-                }
-                var share = {
-                    file: file.id,
-                    account: account.id,
-                    permission: permission
-                };
-                return shareRepository.findByFileAndAccountAndPermission(file.id, account.id, permission).then(function (res) {
-                    if (!res.length) {
-                        return shareRepository.save(share);
-                    }
-                    return null;
-                }).then(function () {
-                    return share;
+                return canHttp($req.user, 'PERM', file).then(function () {
+                    var share = {
+                        file: file.id,
+                        account: account.id,
+                        permission: permission
+                    };
+                    return shareRepository.findByFileAndAccountAndPermission(file.id, account.id, permission).then(function (res) {
+                        if (!res.length) {
+                            return shareRepository.save(share);
+                        }
+                        return null;
+                    }).then(function () {
+                        return share;
+                    });
                 });
             }
         ))
@@ -230,8 +237,10 @@ module.exports = function (fileRepository, filesDir, accountRepository, shareRep
             Convert('file', fileRepository.find.bind(fileRepository)),
             Convert('account', accountRepository.find.bind(accountRepository)),
             function (file, $req, account, permission) {
-                return shareRepository.deleteByFileAndAccountAndPermission(file.id, account.id, permission).then(function () {
-                    return;
+                return canHttp($req.user, 'PERM', file).then(function () {
+                    return shareRepository.deleteByFileAndAccountAndPermission(file.id, account.id, permission);
+                }).then(function () {
+
                 });
             }
         ));

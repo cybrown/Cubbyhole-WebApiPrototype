@@ -116,17 +116,17 @@ describe ('File Web Service', function () {
     it ('should list the content of a folder', function (done) {
         req1({
             method: 'get',
-            url: url + '/files/1/list'
+            url: url + '/files/4/list'
         }, function (err, response, body) {
             response.should.have.status(200);
             var files = JSON.parse(body);
             files[0].should.have.property('id', 5);
             files[0].should.have.property('name', 'file2');
-            files[0].should.have.property('parent', 1);
+            files[0].should.have.property('parent', 4);
             files[0].should.have.property('isFolder', false);
             files[1].should.have.property('id', 6);
             files[1].should.have.property('name', 'file3');
-            files[1].should.have.property('parent', 1);
+            files[1].should.have.property('parent', 4);
             files[1].should.have.property('isFolder', false);
             done();
         });
@@ -166,7 +166,7 @@ describe ('File Web Service', function () {
             var file = JSON.parse(body);
             file.should.have.property('id', 5);
             file.should.have.property('name', 'file2');
-            file.should.have.property('parent', 1);
+            file.should.have.property('parent', 4);
             file.should.have.property('isFolder', false);
             done();
         });
@@ -225,7 +225,7 @@ describe ('File Web Service', function () {
     it ('should delete one file', function (done) {
         req1({
             method: 'delete',
-            url: url + '/files/3'
+            url: url + '/files/6'
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
             done();
@@ -235,7 +235,7 @@ describe ('File Web Service', function () {
     it ('should not return one file', function (done) {
         req1({
             method: 'get',
-            url: url + '/files/3'
+            url: url + '/files/6'
         }, function (err, response, body) {
             response.statusCode.should.equal(404);
             done();
@@ -410,30 +410,32 @@ describe ('File Web Service', function () {
 
     it ('should generate a public url', function (done) {
     	req1({
-    		method: 'get',
+    		method: 'post',
     		url: url + '/files/5/link'
     	}, function (err, response, body) {
             response.should.have.status(200);
-            gen_url = body;
-            body.length.should.eql(10);
+            var file = JSON.parse(body);
+            gen_url = file.permalink;
+            file.permalink.length.should.eql(10);
             done();
     	});
     });
 
     it ('should get the same public url', function (done) {
         req1({
-            method: 'get',
+            method: 'post',
             url: url + '/files/5/link'
         }, function (err, response, body) {
             response.should.have.status(200);
-            body.should.eql(gen_url);
+            var file = JSON.parse(body);
+            file.permalink.should.eql(gen_url);
             done();
         });
     });
 
     it ('should not get a public url for a file from another account', function (done) {
         req1({
-            method: 'get',
+            method: 'post',
             url: url + '/files/2/link'
         }, function (err, response, body) {
             response.should.have.status(403);
@@ -443,7 +445,7 @@ describe ('File Web Service', function () {
 
     it ('should not get a public url for a folder', function (done) {
         req1({
-            method: 'get',
+            method: 'post',
             url: url + '/files/4/link'
         }, function (err, response, body) {
             response.should.have.status(400);
