@@ -51,3 +51,10 @@ ShareRepository.prototype.deleteByFileAndAccountAndPermission = function (fileId
         return;
     });
 };
+
+ShareRepository.prototype.findFilesSharedTo = function (accountId) {
+    var _this = this;
+    return this.sql.querySelectBy('account_id', accountId).then(function (result) {
+        return result.map(_this.hashToObject);
+    });
+};

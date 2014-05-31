@@ -39,6 +39,16 @@ module.exports = function (fileRepository, filesDir, accountRepository, shareRep
                     return fileRepository.findByParentId($req.user.home);
                 })
         )
+        .get('/shared', Decorate(
+            ExpressRequest(),
+            function($req) {
+                return shareRepository.findFilesSharedTo($req.user.id).then(function (shares) {
+                    return Q.all(shares.map(function (share) {
+                        return fileRepository.find(share.file);
+                    }));
+                });
+            }
+        ))
         .get('/:file', Decorate(
                 ExpressRequest(),
                 MinLevel(10),

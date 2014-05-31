@@ -217,6 +217,19 @@ describe ('Shares', function () {
         });
     });
 
+    it ('should return the list of shared files', function (done) {
+        req_user_b({
+            method: 'get',
+            url: url + '/files/shared'
+        }, function (err, response, body) {
+            response.should.have.status(200);
+            var files = JSON.parse(body);
+            files[0].should.have.property('id', 11);
+            files[0].should.have.property('name', 'sharedfile');
+            done();
+        });
+    });
+
     it ('should be possible to remove the share', function (done) {
         req_user_a({
             method: 'delete',
