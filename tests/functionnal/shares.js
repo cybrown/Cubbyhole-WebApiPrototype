@@ -152,7 +152,75 @@ describe ('Shares', function () {
     it ('should add a read only share on a file', function (done) {
         req_user_a({
             method: 'put',
-            url: url + '/files/11/shares',
+            url: url + '/files/11/shares/READ',
+            form: {
+                account: 7
+            }
+        }, function (err, response, body) {
+            response.should.have.status(200);
+            var share = JSON.parse(body);
+            share.file.should.eql(11);
+            share.account.should.eql(7);
+            share.permission.should.eql('READ');
+            done();
+        });
+    });
+
+    it ('should put only one permission per file and account', function (done) {
+        req_user_a({
+            method: 'put',
+            url: url + '/files/11/shares/READ',
+            form: {
+                account: 7
+            }
+        }, function (err, response, body) {
+            response.should.have.status(200);
+            var share = JSON.parse(body);
+            share.file.should.eql(11);
+            share.account.should.eql(7);
+            share.permission.should.eql('READ');
+            done();
+        });
+    });
+
+    it ('should return the list of shares on a file', function (done) {
+        req_user_a({
+            method: 'get',
+            url: url + '/files/11/shares'
+        }, function (err, response, body) {
+            response.should.have.status(200);
+            var shares = JSON.parse(body);
+            shares[0].file.should.eql(11);
+            shares[0].account.should.eql(7);
+            shares[0].permission.should.eql('READ');
+            done();
+        });
+    });
+
+    it ('should be possible to access file after the share is set', function (done) {
+        req_user_b({
+            method: 'get',
+            url: url + '/files/11'
+        }, function (err, response, body) {
+            response.should.have.status(200);
+            done();
+        });
+    });
+
+    it ('should be possible to access file content after the share is set', function (done) {
+        req_user_b({
+            method: 'get',
+            url: url + '/files/11/raw'
+        }, function (err, response, body) {
+            response.should.have.status(200);
+            done();
+        });
+    });
+
+    it ('should be possible to remove the share', function (done) {
+        req_user_a({
+            method: 'delete',
+            url: url + '/files/11/shares/READ',
             form: {
                 account: 7
             }
@@ -162,27 +230,13 @@ describe ('Shares', function () {
         });
     });
 
-    it ('should return the list of shares on a file', function (done) {
-        throw new Error('Test not implemented');
-    });
-
-    it ('should return the access of a user on a file', function (done) {
-        throw new Error('Test not implemented');
-    });
-
-    it ('should return read / write access on a file for the owner', function (done) {
-        throw new Error('Test not implemented');
-    });
-
-    it ('should be possible to access file after the share is set', function (done) {
-        throw new Error('Test not implemented');
-    });
-
-    it ('should be possible to remove the share', function (done) {
-        throw new Error('Test not implemented');
-    });
-
     it ('should not be possible to access the file when the share is removed', function (done) {
-        throw new Error('Test not implemented');
+        req_user_b({
+            method: 'get',
+            url: url + '/files/11'
+        }, function (err, response, body) {
+            response.should.have.status(403);
+            done();
+        });
     });
 });

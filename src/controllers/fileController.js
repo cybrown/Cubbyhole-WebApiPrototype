@@ -9,7 +9,29 @@ var Ensure = CoreDecorators.Ensure;
 var MinLevel = CoreDecorators.MinLevel;
 var Default = CoreDecorators.Default;
 
-module.exports = function (fileRepository, filesDir) {
+module.exports = function (fileRepository, filesDir, accountRepository, shareRepository) {
+
+    var can = function (account, permission, file) {
+        if (file.owner === account.id) {
+            return Q(true);
+        } else {
+            return shareRepository.findByFileAndAccountAndPermission(file.id, account.id, permission).then(function (perms) {
+                return perms && (perms.length === 1);
+            });
+        }
+    };
+
+    var canHttp = function (account, permission, file) {
+        return can(account, permission, file).then(function (ok) {
+            if (!ok) {
+                var err = new Error('Not authorized');
+                err.status = 403;
+                throw err;
+            }
+            return ok;
+        });
+    };
+
     return express()
         .get('/', Decorate(
                 ExpressRequest(),
@@ -22,12 +44,9 @@ module.exports = function (fileRepository, filesDir) {
                 MinLevel(10),
                 Convert('file', fileRepository.find.bind(fileRepository)),
                 function (file, $req) {
-                    if (file.owner !== $req.user.id) {
-                        var err = new Error('Not ahtorized');
-                        err.status = 403;
-                        throw err;
-                    }
-                    return file;
+                    return canHttp($req.user, 'READ', file).then(function () {
+                        return file;
+                    });
                 })
         )
         .get('/:file/list', Decorate(
@@ -98,29 +117,26 @@ module.exports = function (fileRepository, filesDir) {
             ExpressRequest(),
             Convert('file', fileRepository.find.bind(fileRepository)),
             function (file, $req) {
-                if (file.owner !== $req.user.id) {
-                    var err = new Error('Not ahtorized');
-                    err.status = 403;
-                    throw err;
-                }
-                return Q.promise(function (resolve, reject) {
-                    var fs = require('fs');
-                    if (file.url) {
-                        fs.exists(filesDir + file.url, function (exists) {
-                            if (exists) {
-                                resolve(fs.createReadStream(filesDir + file.url));
-                                return;
-                            } else {
-                                var err = new Error();
-                                err.status = 404;
-                                throw err;
-                            }
-                        });
-                    } else {
-                        var err = new Error();
-                        err.status = 404;
-                        throw err;
-                    }
+                return canHttp($req.user, 'READ', file).then(function () {
+                    return Q.promise(function (resolve, reject) {
+                        var fs = require('fs');
+                        if (file.url) {
+                            fs.exists(filesDir + file.url, function (exists) {
+                                if (exists) {
+                                    resolve(fs.createReadStream(filesDir + file.url));
+                                    return;
+                                } else {
+                                    var err = new Error();
+                                    err.status = 404;
+                                    throw err;
+                                }
+                            });
+                        } else {
+                            var err = new Error();
+                            err.status = 404;
+                            throw err;
+                        }
+                    });
                 });
             }
         ))
@@ -173,6 +189,50 @@ module.exports = function (fileRepository, filesDir) {
                         return file.permalink;
                     });
                 }
+            }
+        ))
+        .put('/:file/shares/:permission', Decorate(
+            ExpressRequest(),
+            Convert('file', fileRepository.find.bind(fileRepository)),
+            Convert('account', accountRepository.find.bind(accountRepository)),
+            function (file, $req, account, permission) {
+                if (file.owner !== $req.user.id) {
+                    var err = new Error('Not authorized');
+                    err.status = 403;
+                    throw err;
+                }
+                var share = {
+                    file: file.id,
+                    account: account.id,
+                    permission: permission
+                };
+                return shareRepository.findByFileAndAccountAndPermission(file.id, account.id, permission).then(function (res) {
+                    if (!res.length) {
+                        return shareRepository.save(share);
+                    }
+                    return null;
+                }).then(function () {
+                    return share;
+                });
+            }
+        ))
+        .get('/:file/shares', Decorate(
+            ExpressRequest(),
+            Convert('file', fileRepository.find.bind(fileRepository)),
+            function (file, $req) {
+                return canHttp($req.user, 'PERM', file).then(function () {
+                    return shareRepository.findByFile(file.id);
+                });
+            }
+        ))
+        .delete('/:file/shares/:permission', Decorate(
+            ExpressRequest(),
+            Convert('file', fileRepository.find.bind(fileRepository)),
+            Convert('account', accountRepository.find.bind(accountRepository)),
+            function (file, $req, account, permission) {
+                return shareRepository.deleteByFileAndAccountAndPermission(file.id, account.id, permission).then(function () {
+                    return;
+                });
             }
         ));
 };

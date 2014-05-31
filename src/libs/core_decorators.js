@@ -44,7 +44,8 @@ var ExpressRequest = function (args) {
         });
         var onErr = function (err) {
             var status = err.status ? err.status : 500;
-            console.trace(err);
+            console.log(err);
+            console.log(err.stack);
             res.status(status).send();
         };
         try {

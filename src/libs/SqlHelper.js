@@ -22,7 +22,9 @@ SqlHelper.QUERY_UPDATE = 'UPDATE ?? SET ? WHERE ?? = ?';
 SqlHelper.QUERY_SELECT_ALL = 'SELECT ??, ?? FROM ??';
 SqlHelper.QUERY_SELECT_BY = 'SELECT ??, ?? FROM ?? WHERE ?? = ?';
 SqlHelper.QUERY_SELECT_BY_2 = 'SELECT ??, ?? FROM ?? WHERE ?? = ? AND ?? = ?';
+SqlHelper.QUERY_SELECT_BY_3 = 'SELECT ??, ?? FROM ?? WHERE ?? = ? AND ?? = ? AND ?? = ?';
 SqlHelper.QUERY_DELETE_BY = 'DELETE FROM ?? WHERE ?? = ?';
+SqlHelper.QUERY_DELETE_BY_3 = 'DELETE FROM ?? WHERE ?? = ? AND ?? = ? AND ?? = ?';
 SqlHelper.QUERY_TRUNCATE = 'TRUNCATE ??';
 
 // Sql query wrappers
@@ -51,6 +53,16 @@ SqlHelper.prototype.querySelectBy2 = function (col1_name, col1_value, col2_name,
     var _this = this;
     return Q.promise(function (resolve, reject) {
         _this.connection.query(SqlHelper.QUERY_SELECT_BY_2, [_this.PK_NAME, _this.TABLE_FIELDS, _this.TABLE_NAME, col1_name, col1_value, col2_name, col2_value], function (err, result) {
+            _this.log(this.sql);
+            err ? reject(err) : resolve(result);
+        });
+    });
+};
+
+SqlHelper.prototype.querySelectBy3 = function (col1_name, col1_value, col2_name, col2_value, col3_name, col3_value) {
+    var _this = this;
+    return Q.promise(function (resolve, reject) {
+        _this.connection.query(SqlHelper.QUERY_SELECT_BY_3, [_this.PK_NAME, _this.TABLE_FIELDS, _this.TABLE_NAME, col1_name, col1_value, col2_name, col2_value, col3_name, col3_value], function (err, result) {
             _this.log(this.sql);
             err ? reject(err) : resolve(result);
         });
@@ -88,8 +100,18 @@ SqlHelper.prototype.queryUpdateBy = function (col_name, col_value, hash) {
 
 SqlHelper.prototype.queryDeleteBy = function (col_name, col_value) {
     var _this = this;
-    return Q.promise(function (resolve) {
+    return Q.promise(function (resolve, reject) {
         _this.connection.query(SqlHelper.QUERY_DELETE_BY, [_this.TABLE_NAME, col_name, col_value], function (err, result) {
+            _this.log(this.sql);
+            err ? reject(err) : resolve(result);
+        });
+    });
+};
+
+SqlHelper.prototype.queryDeleteBy3 = function (col_name, col_value, col_name2, col_value2, col_name3, col_value3) {
+    var _this = this;
+    return Q.promise(function (resolve, reject) {
+        _this.connection.query(SqlHelper.QUERY_DELETE_BY_3, [_this.TABLE_NAME, col_name, col_value, col_name2, col_value2, col_name3, col_value3], function (err, result) {
             _this.log(this.sql);
             err ? reject(err) : resolve(result);
         });

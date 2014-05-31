@@ -11,6 +11,7 @@ var Q = require('q');
 var FileRepository = require('./repositories/FileRepository');
 var PlanRepository = require('./repositories/PlanRepository');
 var AccountRepository = require('./repositories/AccountRepository');
+var ShareRepository = require('./repositories/ShareRepository');
 var SqlHelper = require('./libs/SqlHelper');
 
 var plug = new Plugme();
@@ -19,7 +20,7 @@ plug.set('salt', 'VerYsEcUredSalT');
 plug.set('port', process.env.PORT || 3000);
 plug.set('filesDir', __dirname + '/../files/');
 
-plug.set('fileController', ['fileRepository', 'filesDir'], require('./controllers/fileController'));
+plug.set('fileController', ['fileRepository', 'filesDir', 'accountRepository', 'shareRepository'], require('./controllers/fileController'));
 plug.set('accountController', ['accountRepository', 'planRepository'], require('./controllers/accountController'));
 plug.set('planController', ['planRepository'], require('./controllers/planController'));
 plug.set('systemController', ['loadMockData', 'accountRepository', 'fileRepository', 'filesDir'], require('./controllers/systemController'));
@@ -86,8 +87,8 @@ plug.set('authMiddleware', ['accountRepository'], function (accountRepository) {
 });
 
 plug.set('loadMockData',
-    ['fileRepository', 'planRepository', 'accountRepository'],
-    function (fileRepository, planRepository, accountRepository) {
+    ['fileRepository', 'planRepository', 'accountRepository', 'shareRepository'],
+    function (fileRepository, planRepository, accountRepository, shareRepository) {
         return function () {
             var filesData = require('./data/files.json');
             var plansData = require('./data/plans.json');
@@ -118,7 +119,9 @@ plug.set('loadMockData',
                 }));
             });
 
-            return Q.all([accountPromise, filePromise, planPromise]);
+            var sharePromise = shareRepository.clean()
+
+            return Q.all([accountPromise, filePromise, planPromise, sharePromise]);
         };
     }
 );
@@ -184,6 +187,20 @@ plug.set('accountSqlHelper', ['mysqlConnection'], function (mysqlConnection) {
     return accountSqlHelper;
 });
 
+plug.set('shareSqlHelper', ['mysqlConnection'], function (mysqlConnection) {
+    var shareSqlHelper = new SqlHelper();
+    shareSqlHelper.PK_NAME = 'id';
+    shareSqlHelper.TABLE_NAME = 'shares';
+    shareSqlHelper.COLUMN_CDATE = 'cdate';
+    shareSqlHelper.TABLE_FIELDS = [
+        'file_id',
+        'account_id',
+        'permission'
+    ];
+    shareSqlHelper.connection = mysqlConnection;
+    return shareSqlHelper;
+});
+
 plug.set('fileRepository', ['fileSqlHelper'], function (fileSqlHelper) {
     var fileRepository = new FileRepository();
     fileRepository.sql = fileSqlHelper;
@@ -194,6 +211,12 @@ plug.set('planRepository', ['planSqlHelper'], function (planSqlHelper) {
     var planRepository = new PlanRepository();
     planRepository.sql = planSqlHelper;
     return planRepository;
+});
+
+plug.set('shareRepository', ['shareSqlHelper'], function (shareSqlHelper) {
+    var shareRepository = new ShareRepository();
+    shareRepository.sql = shareSqlHelper;
+    return shareRepository;
 });
 
 plug.set('accountRepository',
