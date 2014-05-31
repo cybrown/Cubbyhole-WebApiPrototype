@@ -2,6 +2,7 @@
     "scheme": "http://",
     "host": "localhost",
     "port": 3000,
+    "path": "",
     "user": "user",
     "pass": "pass"
 }

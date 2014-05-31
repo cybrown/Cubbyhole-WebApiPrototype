@@ -7,10 +7,11 @@ describe ('General app tests', function () {
     var scheme = conf.scheme;
     var host = conf.host;
     var port = conf.port;
+    var path = conf.path;
     var user = conf.user;
     var pass = conf.pass;
 
-    var url = scheme + host + ':' + port;
+    var url = scheme + host + ':' + port + path;
 
     it ('should respond to ping', function (done) {
         request({
