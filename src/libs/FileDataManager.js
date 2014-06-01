@@ -11,24 +11,27 @@ var FileDataManager = function (filesDir, fileRepository) {
 
 FileDataManager.prototype.write = function (file, inputStream) {
     var _this = this;
-    var filename = crypto.randomBytes(4).readUInt32LE(0);
-    var output = fs.createWriteStream(this.filesDir + filename);
-    var sha1Stream = new Sha1Stream();
-    var sizeStream = new SizeStream();
-    inputStream.on('end', function () {
-        var sha1 = sha1Stream.digest('hex');
-        file.url = sha1;
-        file.size = sizeStream.size;
-        file.mdate = new Date();
-        _this.fileRepository.save(file).done();
-        fs.rename(_this.filesDir + filename, _this.filesDir + sha1, function (err) {
-            if (err) {
-                // TODO Throw error correctly
-                throw err;
-            }
+    return Q.promise(function (resolve, reject) {
+        var filename = crypto.randomBytes(4).readUInt32LE(0);
+        var output = fs.createWriteStream(_this.filesDir + filename);
+        var sha1Stream = new Sha1Stream();
+        var sizeStream = new SizeStream();
+        inputStream.on('end', function () {
+            var sha1 = sha1Stream.digest('hex');
+            file.url = sha1;
+            file.size = sizeStream.size;
+            file.mdate = new Date();
+            _this.fileRepository.save(file).done();
+            fs.rename(_this.filesDir + filename, _this.filesDir + sha1, function (err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve();
+                }
+            });
         });
+        inputStream.pipe(sha1Stream).pipe(sizeStream).pipe(output);
     });
-    inputStream.pipe(sha1Stream).pipe(sizeStream).pipe(output);
 };
 
 FileDataManager.prototype.read = function (file) {
