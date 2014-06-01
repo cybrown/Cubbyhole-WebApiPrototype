@@ -47,8 +47,6 @@ module.exports = function (accountRepository, planRepository) {
                     if (password !== undefined) {
                         return accountRepository.savePassword(account, password);
                     }
-                    return;
-                }).then(function () {
                     return account;
                 });
             }
@@ -65,8 +63,6 @@ module.exports = function (accountRepository, planRepository) {
                 account.level = level;
                 return accountRepository.save(account).then(function () {
                     return accountRepository.savePassword(account, password);
-                }).then(function () {
-                    return account;
                 });
             })
         )

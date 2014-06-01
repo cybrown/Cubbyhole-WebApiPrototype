@@ -29,7 +29,9 @@ GenericRepository.prototype.findAll = function () {
 
 GenericRepository.prototype.save = function (object) {
     if (object.id) {
-        return this.sql.queryUpdateById(object.id, this.objectToHash(object));
+        return this.sql.queryUpdateById(object.id, this.objectToHash(object)).then(function () {
+            return object;
+        });
     } else {
         return this.sql.queryInsert(this.objectToHash(object)).then(function (result) {
             object.id = result.insertId;

@@ -56,6 +56,8 @@ AccountRepository.prototype.save = function (account) {
             home.name = 'home-' + account.id;
             home.owner = account.id;
             return _this.fileRepository.save(home);
+        }).then(function () {
+            return account;
         });
     } else {
         return GenericRepository.prototype.save.call(this, account);
@@ -66,5 +68,7 @@ AccountRepository.prototype.savePassword = function (account, password) {
     var _this = this;
     return _this.hash(password).then(function (hash) {
         return _this.sql.queryUpdateById(account.id, {password: hash})
+    }).then(function () {
+        return account;
     });
 };
