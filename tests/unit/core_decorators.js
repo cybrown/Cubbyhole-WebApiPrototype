@@ -271,7 +271,6 @@ describe ('Core Decorators', function () {
                     return {
                         send: function (err) {
                             statusCode.should.eql(401);
-                            err.status.should.eql(401);
                             done();
                         }
                     }
@@ -300,7 +299,6 @@ describe ('Core Decorators', function () {
                     return {
                         send: function (err) {
                             statusCode.should.eql(403);
-                            err.status.should.eql(403);
                             done();
                         }
                     }
