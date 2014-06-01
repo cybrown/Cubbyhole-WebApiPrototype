@@ -26,7 +26,7 @@ FileDataManager.prototype.write = function (file, inputStream) {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve();
+                    resolve(file);
                 }
             });
         });

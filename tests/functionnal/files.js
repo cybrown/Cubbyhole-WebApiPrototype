@@ -289,6 +289,10 @@ describe ('File Web Service', function () {
             body: 'test content'
         }, function (err, response, body) {
             response.should.have.status(200);
+            var file = JSON.parse(body);
+            file.should.have.property('id', 5);
+            file.should.have.property('url', '1eebdf4fdc9fc7bf283031b93f9aef3338de9052');
+            file.should.have.property('size', 12);
             done();
         });
     });

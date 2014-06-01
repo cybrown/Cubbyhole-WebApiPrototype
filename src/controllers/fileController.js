@@ -172,7 +172,7 @@ module.exports = function (fileRepository, accountRepository, shareRepository, f
             Convert('file', fileRepository.find.bind(fileRepository)),
             function (file, $req) {
                 return canHttp($req.user, 'WRITE', file).then(function () {
-                    fileDataManager.write(file, $req);
+                    return fileDataManager.write(file, $req);
                 });
             }
         ))
