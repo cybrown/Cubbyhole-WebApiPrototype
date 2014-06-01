@@ -242,7 +242,8 @@ plug.set('start', ['app', 'port'], function (app, port) {
 });
 
 plug.onError(function (err) {
-    console.trace(err);
+    console.log(err);
+    console.log(err.stack);
 });
 
 plug.start();
