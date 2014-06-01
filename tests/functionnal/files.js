@@ -217,7 +217,7 @@ describe ('File Web Service', function () {
             var resp = JSON.parse(body);
             resp.id.should.eql(11);
             resp.name.should.eql('file1copy');
-            resp.parent.should.eql(0);
+            resp.parent.should.eql(7);
             done();
         });
     });

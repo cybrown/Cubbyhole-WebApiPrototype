@@ -28,7 +28,6 @@ module.exports = function (fileRepository, accountRepository, shareRepository, f
                 err.status = 403;
                 throw err;
             }
-            return ok;
         });
     };
 
@@ -92,14 +91,9 @@ module.exports = function (fileRepository, accountRepository, shareRepository, f
                     file.isFolder = isFolder;
                     file.owner = $req.user.id;
                     return fileRepository.find(file.parent).then(function (parentFile) {
-                        if (parentFile.owner !== $req.user.id) {
-                            var err = new Error('Not authorized');
-                            err.status = 403;
-                            throw err;
-                        }
-                        return fileRepository.save(file)
+                        return canHttp($req.user, 'WRITE', parentFile);
                     }).then(function () {
-                        return file;
+                        return fileRepository.save(file);
                     });
                 });
             }
@@ -109,15 +103,15 @@ module.exports = function (fileRepository, accountRepository, shareRepository, f
             Ensure('parent', 'number'),
             Convert('file', fileRepository.find.bind(fileRepository)),
             function (file, name, parent, $req) {
-                name && (file.name = name);
-                if (parent !== undefined) {
-                    file.parent = (parent === 0 ? $req.user.home : parent);
-                }
-                return fileRepository.findOrDefault(file.parent, null).then(function (parentFile) {
+                return canHttp($req.user, 'WRITE', file).then(function () {
+                    name && (file.name = name);
+                    if (parent !== undefined) {
+                        file.parent = (parent === 0 ? $req.user.home : parent);
+                    }
+                    return fileRepository.findOrDefault(file.parent, null);
+                }).then(function (parentFile) {
                     if (parentFile) {
                         return canHttp($req.user, 'WRITE', parentFile);
-                    } else {
-                        return true;
                     }
                 }).then(function () {
                     return fileRepository.save(file);
@@ -128,18 +122,23 @@ module.exports = function (fileRepository, accountRepository, shareRepository, f
             ExpressRequest(['file', '?name', '?parent']),
             Ensure('parent', 'number'),
             Convert('file', fileRepository.find.bind(fileRepository)),
-            function (file, name, parent) {
+            function (file, name, parent, $req) {
                 var fileToSave = {};
-                fileToSave.name = file.name;
-                fileToSave.parent = file.parent;
-                fileToSave.isFolder = file.isFolder;
-                fileToSave.owner = file.owner;
-                fileToSave.size = file.size;
-                fileToSave.url = file.url;
-                name && (fileToSave.name = name);
-                parent && (fileToSave.parent = parent);
-                return fileRepository.save(fileToSave).then(function () {
-                    return fileToSave;
+                return canHttp($req.user, 'READ', file).then(function () {
+                    fileToSave.name = file.name;
+                    fileToSave.parent = file.parent;
+                    fileToSave.isFolder = file.isFolder;
+                    fileToSave.owner = file.owner;
+                    fileToSave.size = file.size;
+                    fileToSave.url = file.url;
+                    name && (fileToSave.name = name);
+                    parent && (fileToSave.parent = parent);
+                    fileToSave.parent = fileToSave.parent === 0 ? $req.user.home : fileToSave.parent;
+                    return fileRepository.find(fileToSave.parent);
+                }).then(function (parentFile) {
+                    canHttp($req.user, 'WRITE', parentFile);
+                }).then(function () {
+                    return fileRepository.save(fileToSave);
                 });
             }
         ))
