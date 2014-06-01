@@ -304,6 +304,18 @@ describe ('File Web Service', function () {
         });
     });
 
+    it ('should have set file size', function (done) {
+        req1({
+            method: 'get',
+            url: url + '/files/5'
+        }, function (err, response, body) {
+            response.should.have.status(200);
+            var file = JSON.parse(body);
+            file.should.have.property('size', 12);
+            done();
+        });
+    });
+
     it ('should not upload file data to an unexisting file', function (done) {
         req1({
             method: 'put',
