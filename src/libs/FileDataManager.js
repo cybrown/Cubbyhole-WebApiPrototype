@@ -1,12 +1,12 @@
 var fs = require('fs');
 var crypto = require('crypto');
 var Q = require('q');
-var Sha1Stream = require('./Sha1Stream');
 var SizeStream = require('./SizeStream');
 
-var FileDataManager = function (filesDir, fileRepository) {
+var FileDataManager = function (filesDir, sha1StreamFactory, fileRepository) {
     this.filesDir = filesDir;
     this.fileRepository = fileRepository;
+    this.sha1StreamFactory = sha1StreamFactory;
 };
 
 FileDataManager.prototype.write = function (file, inputStream) {
@@ -14,15 +14,15 @@ FileDataManager.prototype.write = function (file, inputStream) {
     return Q.promise(function (resolve, reject) {
         var filename = crypto.randomBytes(4).readUInt32LE(0);
         var output = fs.createWriteStream(_this.filesDir + filename);
-        var sha1Stream = new Sha1Stream();
+        var sha1Stream = _this.sha1StreamFactory();
         var sizeStream = new SizeStream();
         inputStream.on('end', function () {
-            var sha1 = sha1Stream.digest('hex');
-            file.url = sha1;
+            sha1Stream.end();
+            file.url = sha1Stream.read().hexSlice(0, 20);
             file.size = sizeStream.size;
             file.mdate = new Date();
             _this.fileRepository.save(file).done();
-            fs.rename(_this.filesDir + filename, _this.filesDir + sha1, function (err) {
+            fs.rename(_this.filesDir + filename, _this.filesDir + file.url, function (err) {
                 if (err) {
                     reject(err);
                 } else {
@@ -30,7 +30,8 @@ FileDataManager.prototype.write = function (file, inputStream) {
                 }
             });
         });
-        inputStream.pipe(sha1Stream).pipe(sizeStream).pipe(output);
+        inputStream.pipe(sha1Stream);
+        inputStream.pipe(sizeStream).pipe(output);
     });
 };
 

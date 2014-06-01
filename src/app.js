@@ -26,8 +26,14 @@ plug.set('accountController', ['accountRepository', 'planRepository'], require('
 plug.set('planController', ['planRepository'], require('./controllers/planController'));
 plug.set('systemController', ['loadMockData', 'accountRepository', 'fileRepository', 'filesDir'], require('./controllers/systemController'));
 
-plug.set('fileDataManager', ['filesDir', 'fileRepository'], function (filesDir, fileRepository) {
-    return new FileDataManager(filesDir, fileRepository);
+plug.set({
+    'sha1StreamFactory': function () {
+        return crypto.createHash('sha1');
+    }
+});
+
+plug.set('fileDataManager', ['filesDir', 'sha1StreamFactory', 'fileRepository'], function (filesDir, sha1StreamFactory, fileRepository) {
+    return new FileDataManager(filesDir, sha1StreamFactory, fileRepository);
 });
 
 plug.set('hash', ['salt'], function (salt) {
