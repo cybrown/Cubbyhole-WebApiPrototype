@@ -208,7 +208,7 @@ describe ('File Web Service', function () {
     it ('should copy one file', function (done) {
         req1({
             method: 'post',
-            url: url + '/files/4?copy=true',
+            url: url + '/files/4/copy',
             form: {
                 name: 'file1copy'
             }

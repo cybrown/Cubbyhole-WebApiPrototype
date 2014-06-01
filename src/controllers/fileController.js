@@ -97,34 +97,37 @@ module.exports = function (fileRepository, filesDir, accountRepository, shareRep
                 });
             }
         ))
-        .post('/:id', function (req, res) {
-            Q.when(fileRepository.find(req.params.id), function (selectedFile) {
-                if (selectedFile) {
-                    var fileToModify = selectedFile;
-                    if (req.query.hasOwnProperty('copy') && req.query.copy == 'true') {
-                        fileToModify = {};
-                        fileToModify.name = selectedFile.name,
-                        fileToModify.parent = selectedFile.parent,
-                        fileToModify.isFolder = selectedFile.isFolder,
-                        fileToModify.owner = selectedFile.owner,
-                        fileToModify.size = selectedFile.size,
-                        fileToModify.url = selectedFile.url
-                    }
-
-                    if (req.body.hasOwnProperty('parent')) {
-                        fileToModify.parent = Number(req.body.parent);
-                    }
-                    if (req.body.hasOwnProperty('name')) {
-                        fileToModify.name = req.body.name;
-                    }
-                    fileRepository.save(fileToModify).then(function () {
-                        res.json(fileToModify);
-                    });
-                } else {
-                    res.status(404).send('');
-                }
-            });
-        })
+        .post('/:file', Decorate(
+            ExpressRequest(['file', '?name', '?parent']),
+            Ensure('parent', 'number'),
+            Convert('file', fileRepository.find.bind(fileRepository)),
+            function (file, name, parent) {
+                name && (file.name = name);
+                parent && (file.parent = parent);
+                return fileRepository.save(file).then(function () {
+                    return file;
+                });
+            }
+        ))
+        .post('/:file/copy', Decorate(
+            ExpressRequest(['file', '?name', '?parent']),
+            Ensure('parent', 'number'),
+            Convert('file', fileRepository.find.bind(fileRepository)),
+            function (file, name, parent) {
+                var fileToSave = {};
+                fileToSave.name = file.name;
+                fileToSave.parent = file.parent;
+                fileToSave.isFolder = file.isFolder;
+                fileToSave.owner = file.owner;
+                fileToSave.size = file.size;
+                fileToSave.url = file.url;
+                name && (fileToSave.name = name);
+                parent && (fileToSave.parent = parent);
+                return fileRepository.save(fileToSave).then(function () {
+                    return fileToSave;
+                });
+            }
+        ))
         .delete('/:file', Decorate(
             ExpressRequest(),
             Convert('file', fileRepository.find.bind(fileRepository)),
