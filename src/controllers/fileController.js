@@ -80,20 +80,27 @@ module.exports = function (fileRepository, accountRepository, shareRepository, f
             Ensure('isFolder', 'boolean'),
             Ensure('parent', 'number'),
             function (name, parent, isFolder, $req) {
-                var file = {};
-                file.name = name;
-                file.parent = parent || $req.user.home;
-                file.isFolder = isFolder;
-                file.owner = $req.user.id;
-                return fileRepository.find(file.parent).then(function (parentFile) {
-                    if (parentFile.owner !== $req.user.id) {
-                        var err = new Error('Not authorized');
-                        err.status = 403;
-                        throw err;
-                    }
-                    return fileRepository.save(file)
+                if (parent === 0) {
+                    parent = $req.user.home;
+                }
+                return fileRepository.find(parent).then(function (parentFile) {
+                    return canHttp($req.user, 'WRITE', parentFile);
                 }).then(function () {
-                    return file;
+                    var file = {};
+                    file.name = name;
+                    file.parent = parent || $req.user.home;
+                    file.isFolder = isFolder;
+                    file.owner = $req.user.id;
+                    return fileRepository.find(file.parent).then(function (parentFile) {
+                        if (parentFile.owner !== $req.user.id) {
+                            var err = new Error('Not authorized');
+                            err.status = 403;
+                            throw err;
+                        }
+                        return fileRepository.save(file)
+                    }).then(function () {
+                        return file;
+                    });
                 });
             }
         ))
