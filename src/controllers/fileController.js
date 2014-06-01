@@ -9,7 +9,7 @@ var Ensure = CoreDecorators.Ensure;
 var MinLevel = CoreDecorators.MinLevel;
 var Default = CoreDecorators.Default;
 
-module.exports = function (fileRepository, filesDir, accountRepository, shareRepository) {
+module.exports = function (fileRepository, accountRepository, shareRepository, fileDataManager) {
 
     var can = function (account, permission, resource) {
         if (resource.owner === account.id) {
@@ -142,24 +142,13 @@ module.exports = function (fileRepository, filesDir, accountRepository, shareRep
             Convert('file', fileRepository.find.bind(fileRepository)),
             function (file, $req) {
                 return canHttp($req.user, 'READ', file).then(function () {
-                    return Q.promise(function (resolve, reject) {
-                        var fs = require('fs');
-                        if (file.url) {
-                            fs.exists(filesDir + file.url, function (exists) {
-                                if (exists) {
-                                    resolve(fs.createReadStream(filesDir + file.url));
-                                    return;
-                                } else {
-                                    var err = new Error();
-                                    err.status = 404;
-                                    throw err;
-                                }
-                            });
-                        } else {
-                            var err = new Error();
+                    return fileDataManager.read(file).catch(function (err) {
+                        if (err.message.match(/not found/)) {
                             err.status = 404;
-                            throw err;
+                        } else {
+                            err.status = 500;
                         }
+                        throw err;
                     });
                 });
             }
@@ -169,27 +158,7 @@ module.exports = function (fileRepository, filesDir, accountRepository, shareRep
             Convert('file', fileRepository.find.bind(fileRepository)),
             function (file, $req) {
                 return canHttp($req.user, 'WRITE', file).then(function () {
-                    var fs = require('fs');
-                    var crypto = require('crypto');
-                    var Sha1Stream = require('../libs/Sha1Stream');
-
-                    var filename = crypto.randomBytes(4).readUInt32LE(0);
-                    var output = fs.createWriteStream(filesDir + filename);
-                    var sha1Stream = new Sha1Stream();
-
-                    $req.on('end', function () {
-                        var sha1 = sha1Stream.digest('hex');
-                        file.url = sha1;
-                        file.mdate = new Date();
-                        fileRepository.save(file).done();
-                        fs.rename(filesDir + filename, filesDir + sha1, function (err) {
-                            if (err) {
-                                // TODO Throw error correctly
-                                throw err;
-                            }
-                        });
-                    });
-                    $req.pipe(sha1Stream).pipe(output);
+                    fileDataManager.write(file, $req);
                 });
             }
         ))

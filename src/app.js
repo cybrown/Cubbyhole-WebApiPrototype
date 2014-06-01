@@ -13,6 +13,7 @@ var PlanRepository = require('./repositories/PlanRepository');
 var AccountRepository = require('./repositories/AccountRepository');
 var ShareRepository = require('./repositories/ShareRepository');
 var SqlHelper = require('./libs/SqlHelper');
+var FileDataManager = require('./libs/FileDataManager');
 
 var plug = new Plugme();
 
@@ -20,10 +21,14 @@ plug.set('salt', 'VerYsEcUredSalT');
 plug.set('port', process.env.PORT || 3000);
 plug.set('filesDir', __dirname + '/../files/');
 
-plug.set('fileController', ['fileRepository', 'filesDir', 'accountRepository', 'shareRepository'], require('./controllers/fileController'));
+plug.set('fileController', ['fileRepository', 'accountRepository', 'shareRepository', 'fileDataManager'], require('./controllers/fileController'));
 plug.set('accountController', ['accountRepository', 'planRepository'], require('./controllers/accountController'));
 plug.set('planController', ['planRepository'], require('./controllers/planController'));
 plug.set('systemController', ['loadMockData', 'accountRepository', 'fileRepository', 'filesDir'], require('./controllers/systemController'));
+
+plug.set('fileDataManager', ['filesDir', 'fileRepository'], function (filesDir, fileRepository) {
+    return new FileDataManager(filesDir, fileRepository);
+});
 
 plug.set('hash', ['salt'], function (salt) {
     return function (string) {
