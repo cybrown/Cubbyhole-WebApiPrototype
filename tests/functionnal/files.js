@@ -475,17 +475,35 @@ describe ('File Web Service', function () {
         });
     });
 
+    var testdirid = 0;
+
+    it ('should create a directory', function (done) {
+        req1({
+            method: 'put',
+            url: url + '/files/',
+            form: {
+                parent: 0,
+                name: 'testdir'
+            }
+        }, function (err, response, body) {
+            response.should.have.status(200);
+            var file = JSON.parse(body);
+            testdirid = file.id;
+            done();
+        })
+    });
+
     it ('should move a file', function () {
         req1({
             method: 'post',
             url: url + '/files/5',
             form: {
-                parent: 3
+                parent: testdirid
             }
         }, function (err, response, body) {
             response.should.have.status(200);
             var file = JSON.parse(body);
-            file.should.have.property('parent', 3);
+            file.should.have.property('parent', testdirid);
         });
     });
 });

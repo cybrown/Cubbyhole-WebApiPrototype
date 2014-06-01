@@ -108,11 +108,19 @@ module.exports = function (fileRepository, accountRepository, shareRepository, f
             ExpressRequest(['file', '?name', '?parent']),
             Ensure('parent', 'number'),
             Convert('file', fileRepository.find.bind(fileRepository)),
-            function (file, name, parent) {
+            function (file, name, parent, $req) {
                 name && (file.name = name);
-                parent && (file.parent = parent);
-                return fileRepository.save(file).then(function () {
-                    return file;
+                if (parent !== undefined) {
+                    file.parent = (parent === 0 ? $req.user.home : parent);
+                }
+                return fileRepository.findOrDefault(file.parent, null).then(function (parentFile) {
+                    if (parentFile) {
+                        return canHttp($req.user, 'WRITE', parentFile);
+                    } else {
+                        return true;
+                    }
+                }).then(function () {
+                    return fileRepository.save(file);
                 });
             }
         ))

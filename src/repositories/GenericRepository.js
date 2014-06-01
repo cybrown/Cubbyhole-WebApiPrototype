@@ -12,6 +12,16 @@ GenericRepository.prototype.find = function (id) {
     });
 };
 
+GenericRepository.prototype.findOrDefault = function (id, def) {
+    var _this = this;
+    return this.sql.querySelectById(id).then(function (result) {
+        if (!result.length) {
+            return def;
+        }
+        return _this.hashToObject(result[0]);
+    });
+};
+
 GenericRepository.prototype.clean = function () {
     return this.sql.queryTruncate();
 };

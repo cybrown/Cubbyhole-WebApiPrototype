@@ -123,7 +123,7 @@ var Ensure = function (map, func) {
                         }
                         break;
                     case 'number':
-                        kwargs[key] = Number(kwargs[key]);
+                        kwargs[key] = kwargs[key] === undefined ? undefined : Number(kwargs[key]);
                         break;
                     default:
                         var err = new Error();
