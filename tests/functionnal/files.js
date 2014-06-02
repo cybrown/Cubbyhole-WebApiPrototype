@@ -286,13 +286,17 @@ describe ('File Web Service', function () {
         req1({
             method: 'put',
             url: url + '/files/5/raw',
-            body: 'test content'
+            body: 'test content',
+            headers: {
+                'Content-type': 'text/plain'
+            }
         }, function (err, response, body) {
             response.should.have.status(200);
             var file = JSON.parse(body);
             file.should.have.property('id', 5);
             file.should.have.property('url', '1eebdf4fdc9fc7bf283031b93f9aef3338de9052');
             file.should.have.property('size', 12);
+            file.should.have.property('mimetype', 'text/plain');
             done();
         });
     });

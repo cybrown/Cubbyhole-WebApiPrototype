@@ -160,7 +160,8 @@ plug.set('fileSqlHelper', ['mysqlConnection'], function (mysqlConnection) {
         'url',
         'cdate',
         'mdate',
-        'permalink'
+        'permalink',
+        'mimetype'
     ];
     fileSqlHelper.connection = mysqlConnection;
     return fileSqlHelper;

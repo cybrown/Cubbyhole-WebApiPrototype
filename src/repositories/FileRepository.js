@@ -18,7 +18,8 @@ FileRepository.prototype.objectToHash = function (file) {
         url: file.url,
         cdate: file.cdate,
         mdate: file.mdate,
-        permalink: file.permalink
+        permalink: file.permalink,
+        mimetype: file.mimetype
     };
 };
 
@@ -33,7 +34,8 @@ FileRepository.prototype.hashToObject = function (hash) {
         url: hash.url,
         cdate: hash.cdate,
         mdate: hash.mdate,
-        permalink: hash.permalink
+        permalink: hash.permalink,
+        mimetype: hash.mimetype
     };
 };
 

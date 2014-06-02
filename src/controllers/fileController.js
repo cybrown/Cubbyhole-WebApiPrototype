@@ -172,6 +172,9 @@ module.exports = function (fileRepository, accountRepository, shareRepository, f
             Convert('file', fileRepository.find.bind(fileRepository)),
             function (file, $req) {
                 return canHttp($req.user, 'WRITE', file).then(function () {
+                    file.mimetype = $req.header('Content-type');
+                    return fileRepository.save(file);
+                }).then(function () {
                     return fileDataManager.write(file, $req);
                 });
             }

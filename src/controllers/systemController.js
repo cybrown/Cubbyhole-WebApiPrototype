@@ -71,7 +71,8 @@ module.exports = function (loadMockData, accountRepository, fileRepository, file
                             if (exists) {
                                 var response = new HttpResponse(fs.createReadStream(filesDir + file.url));
                                 response.headers = {
-                                    'Content-Disposition':  'attachment; filename='+file.name
+                                    'Content-Disposition':  'attachment; filename='+file.name,
+                                    'Content-type': file.mimetype || 'application/octet-stream'
                                 };
                                 resolve(response);
                                 return;
