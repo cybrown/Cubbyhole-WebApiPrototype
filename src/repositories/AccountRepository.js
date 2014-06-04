@@ -30,6 +30,13 @@ AccountRepository.prototype.hashToObject = function (hash) {
     };
 };
 
+AccountRepository.prototype.findByUsernameOrDefault = function (username, def) {
+    var _this = this;
+    return GenericRepository.prototype.findByOrDefault.call(this, 'username', username, def).then(function (hash) {
+        return hash == def ? def : _this.hashToObject(hash);
+    });
+};
+
 AccountRepository.prototype.findByUsernameAndPassword = function (username, password) {
     var _this = this;
     return _this.hash(password).then(function (hash) {

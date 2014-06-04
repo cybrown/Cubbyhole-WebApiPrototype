@@ -61,7 +61,14 @@ module.exports = function (accountRepository, planRepository) {
                 account.username = username;
                 account.plan = plan.id;
                 account.level = level;
-                return accountRepository.save(account).then(function () {
+                return accountRepository.findByUsernameOrDefault(account.username, null).then(function (res) {
+                    if (res !== null) {
+                        var err = new Error('Username not available');
+                        err.status = 409;
+                        throw err;
+                    }
+                    return accountRepository.save(account);
+                }).then(function () {
                     return accountRepository.savePassword(account, password);
                 });
             })
