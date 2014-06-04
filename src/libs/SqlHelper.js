@@ -80,7 +80,8 @@ SqlHelper.prototype.queryInsert = function (hash) {
         }
         _this.connection.query(SqlHelper.QUERY_INSERT, [_this.TABLE_NAME, hash], function (err, result) {
             _this.log(this.sql);
-            err ? reject(err) : resolve(result);
+            hash.id = result.insertId;
+            err ? reject(err) : resolve(hash);
         });
     });
 };

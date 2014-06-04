@@ -56,6 +56,8 @@ describe ('File Web Service', function () {
             file.should.have.property('name', 'file1');
             file.should.have.property('parent', 7);
             file.should.have.property('isFolder', false);
+            file.should.have.property('cdate');
+            file.should.have.property('mdate');
             done();
         });
     });
