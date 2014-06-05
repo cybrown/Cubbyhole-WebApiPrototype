@@ -309,6 +309,9 @@ describe ('Accounts Web Service', function () {
             var files = JSON.parse(body);
             files.should.have.length(1);
             files[0].should.have.property('username', 'toto_');
+            files[0].should.not.have.property('home');
+            files[0].should.not.have.property('plan');
+            files[0].should.not.have.property('level');
             done();
         });
     });

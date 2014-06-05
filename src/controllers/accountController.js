@@ -84,7 +84,14 @@ module.exports = function (accountRepository, planRepository) {
         .get('/starts-with/:username', Decorate(
             ExpressRequest(),
             function (username) {
-                return accountRepository.findLikeUsernameAndMaxLevelLimit(username, 10, 5);
+                return accountRepository.findLikeUsernameAndMaxLevelLimit(username, 10, 5).then(function (accounts) {
+                    return accounts.map(function (account) {
+                        return {
+                            id: account.id,
+                            username: account.username
+                        };
+                    });
+                });
             }
         ));
 };
