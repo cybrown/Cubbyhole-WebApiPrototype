@@ -81,7 +81,7 @@ module.exports = function (accountRepository, planRepository) {
                 accountRepository.remove(account);
             })
         )
-        .get('/starts-with/:username', Decorate(
+        .get('/partial/starts-with/:username', Decorate(
             ExpressRequest(),
             function (username) {
                 return accountRepository.findLikeUsernameAndMaxLevelLimit(username, 10, 5).then(function (accounts) {
@@ -92,6 +92,16 @@ module.exports = function (accountRepository, planRepository) {
                         };
                     });
                 });
+            }
+        ))
+        .get('/partial/by-username/:partialAccount', Decorate(
+            ExpressRequest(),
+            Convert('partialAccount', accountRepository.findByUsername.bind(accountRepository)),
+            function (partialAccount) {
+                return {
+                    id: partialAccount.id,
+                    username: partialAccount.username
+                };
             }
         ));
 };

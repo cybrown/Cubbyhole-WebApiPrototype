@@ -282,13 +282,13 @@ describe ('Accounts Web Service', function () {
         });
     });
 
-    it ('should return accounts beggining by toto of level 10, max 5 results', function (done) {
+    it ('should return accounts bggining by toto of level 10, max 5 results', function (done) {
         Q.all([5, 6, 7, 8, 9].map(function (num) {
             return req1({method: 'put', url: url + '/accounts', form: {username: 'toto' + num, password: 'pwd', level: 10, plan: 1}});
         })).then(function () {
             req1({
                 method: 'get',
-                url: url + '/accounts/starts-with/' + 'toto'
+                url: url + '/accounts/partial/starts-with/' + 'toto'
             }, function (err, response, body) {
                 response.should.have.status(200);
                 var files = JSON.parse(body);
@@ -300,10 +300,10 @@ describe ('Accounts Web Service', function () {
         })
     });
 
-    it ('should return accounts beggining by toto_', function (done) {
+    it ('should return accounts begining by toto_', function (done) {
         req1({
             method: 'get',
-            url: url + '/accounts/starts-with/' + 'toto_'
+            url: url + '/accounts/partial/starts-with/' + 'toto_'
         }, function (err, response, body) {
             response.should.have.status(200);
             var files = JSON.parse(body);
@@ -312,6 +312,31 @@ describe ('Accounts Web Service', function () {
             files[0].should.not.have.property('home');
             files[0].should.not.have.property('plan');
             files[0].should.not.have.property('level');
+            done();
+        });
+    });
+
+    it ('should return account toto6', function (done) {
+        req1({
+            method: 'get',
+            url: url + '/accounts/partial/by-username/toto6'
+        }, function (err, response, body) {
+            response.should.have.status(200);
+            var file = JSON.parse(body);
+            file.should.have.property('username', 'toto6');
+            file.should.not.have.property('home');
+            file.should.not.have.property('plan');
+            file.should.not.have.property('level');
+            done();
+        });
+    });
+
+    it ('should not return an account', function (done) {
+        req1({
+            method: 'get',
+            url: url + '/accounts/partial/by-username/does_not_exists'
+        }, function (err, response, body) {
+            response.should.have.status(404);
             done();
         });
     });
