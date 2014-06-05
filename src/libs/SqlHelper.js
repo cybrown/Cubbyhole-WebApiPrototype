@@ -20,6 +20,7 @@ var SqlHelper = module.exports = function () {
 SqlHelper.QUERY_INSERT = 'INSERT INTO ?? SET ?';
 SqlHelper.QUERY_UPDATE = 'UPDATE ?? SET ? WHERE ?? = ?';
 SqlHelper.QUERY_SELECT_ALL = 'SELECT ??, ?? FROM ??';
+SqlHelper.QUERY_SELECT_LIKE_START_AND_BY_MAX_LIMIT = 'SELECT ??, ?? FROM ?? WHERE ?? LIKE ? AND ?? <= ? LIMIT ?';
 SqlHelper.QUERY_SELECT_BY = 'SELECT ??, ?? FROM ?? WHERE ?? = ?';
 SqlHelper.QUERY_SELECT_BY_2 = 'SELECT ??, ?? FROM ?? WHERE ?? = ? AND ?? = ?';
 SqlHelper.QUERY_SELECT_BY_3 = 'SELECT ??, ?? FROM ?? WHERE ?? = ? AND ?? = ? AND ?? = ?';
@@ -33,6 +34,18 @@ SqlHelper.prototype.querySelectAll = function () {
     var _this = this;
     return Q.promise(function (resolve, reject) {
         _this.connection.query(SqlHelper.QUERY_SELECT_ALL, [_this.PK_NAME, _this.TABLE_FIELDS, _this.TABLE_NAME], function (err, result) {
+            _this.log(this.sql);
+            err ? reject(err) : resolve(result);
+        });
+    });
+};
+
+SqlHelper.prototype.querySelectStartsLikeAndByMaxLimit = function (col_name, col_start_value, col2_name, col2_max_value, limit) {
+    var _this = this;
+    return Q.promise(function (resolve, reject) {
+        col_start_value = col_start_value.replace(/_/i, '\\_');
+        col_start_value = col_start_value.replace(/%/i, '\\%');
+        _this.connection.query(SqlHelper.QUERY_SELECT_LIKE_START_AND_BY_MAX_LIMIT, [_this.PK_NAME, _this.TABLE_FIELDS, _this.TABLE_NAME, col_name, col_start_value + '%', col2_name, col2_max_value, limit], function (err, result) {
             _this.log(this.sql);
             err ? reject(err) : resolve(result);
         });

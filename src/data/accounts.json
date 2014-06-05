@@ -6,7 +6,7 @@
         "level": 10
     },
     {
-        "username": "toto2",
+        "username": "toto_",
         "password": "totomdp",
         "plan": 1,
         "level": 10
@@ -15,6 +15,6 @@
         "username": "toto3",
         "password": "totomdp",
         "plan": 2,
-        "level": 10
+        "level": 20
     }
 ]

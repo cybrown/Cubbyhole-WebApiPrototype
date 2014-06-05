@@ -1,3 +1,4 @@
+var Q = require('q');
 var request = require('request');
 
 describe ('Accounts Web Service', function () {
@@ -277,6 +278,37 @@ describe ('Accounts Web Service', function () {
             }
         }, function (err, response, body) {
             response.should.have.status(409);
+            done();
+        });
+    });
+
+    it ('should return accounts beggining by toto of level 10, max 5 results', function (done) {
+        Q.all([5, 6, 7, 8, 9].map(function (num) {
+            return req1({method: 'put', url: url + '/accounts', form: {username: 'toto' + num, password: 'pwd', level: 10, plan: 1}});
+        })).then(function () {
+            req1({
+                method: 'get',
+                url: url + '/accounts/starts-with/' + 'toto'
+            }, function (err, response, body) {
+                response.should.have.status(200);
+                var files = JSON.parse(body);
+                files.should.have.length(5);
+                files[0].should.have.property('username', 'toto1');
+                files[1].should.have.property('username', 'toto_');
+                done();
+            });
+        })
+    });
+
+    it ('should return accounts beggining by toto_', function (done) {
+        req1({
+            method: 'get',
+            url: url + '/accounts/starts-with/' + 'toto_'
+        }, function (err, response, body) {
+            response.should.have.status(200);
+            var files = JSON.parse(body);
+            files.should.have.length(1);
+            files[0].should.have.property('username', 'toto_');
             done();
         });
     });

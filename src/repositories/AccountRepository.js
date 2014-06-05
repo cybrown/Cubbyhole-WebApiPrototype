@@ -79,3 +79,10 @@ AccountRepository.prototype.savePassword = function (account, password) {
         return account;
     });
 };
+
+AccountRepository.prototype.findLikeUsernameAndMaxLevelLimit = function (username, maxLevel, limit) {
+    var _this = this;
+    return this.sql.querySelectStartsLikeAndByMaxLimit('username', username, 'level', 10, limit).then(function (accountsHash) {
+        return accountsHash.map(_this.hashToObject);
+    });
+};

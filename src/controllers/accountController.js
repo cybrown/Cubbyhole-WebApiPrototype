@@ -80,5 +80,11 @@ module.exports = function (accountRepository, planRepository) {
             function (account) {
                 accountRepository.remove(account);
             })
-        );
+        )
+        .get('/starts-with/:username', Decorate(
+            ExpressRequest(),
+            function (username) {
+                return accountRepository.findLikeUsernameAndMaxLevelLimit(username, 10, 5);
+            }
+        ));
 };
