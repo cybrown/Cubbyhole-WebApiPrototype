@@ -81,6 +81,16 @@ module.exports = function (accountRepository, planRepository) {
                 accountRepository.remove(account);
             })
         )
+        .get('/partial/by-id/:account', Decorate(
+            ExpressRequest(),
+            Convert('account', accountRepository.find.bind(accountRepository)),
+            function (account) {
+                return {
+                    id: account.id,
+                    username: account.username
+                };
+            })
+        )
         .get('/partial/starts-with/:username', Decorate(
             ExpressRequest(),
             function (username) {

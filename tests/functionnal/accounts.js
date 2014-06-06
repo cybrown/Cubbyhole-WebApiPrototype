@@ -340,4 +340,19 @@ describe ('Accounts Web Service', function () {
             done();
         });
     });
+
+    it ('should return a partial account by id', function (done) {
+        req1({
+            method: 'get',
+            url: url + '/accounts/partial/by-id/8'
+        }, function (err, response, body) {
+            response.should.have.status(200);
+            var file = JSON.parse(body);
+            file.should.have.property('username', 'toto5');
+            file.should.not.have.property('home');
+            file.should.not.have.property('plan');
+            file.should.not.have.property('level');
+            done();
+        });
+    });
 });
