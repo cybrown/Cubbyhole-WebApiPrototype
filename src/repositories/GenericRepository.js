@@ -46,8 +46,8 @@ GenericRepository.prototype.clean = function () {
     return this.sql.queryTruncate();
 };
 
-GenericRepository.prototype.remove = function (account) {
-    return this.sql.queryDeleteById(account.id);
+GenericRepository.prototype.remove = function (object) {
+    return this.sql.queryDeleteById(object.id);
 };
 
 GenericRepository.prototype.findAll = function () {

@@ -159,6 +159,7 @@ describe ('Shares', function () {
         }, function (err, response, body) {
             response.should.have.status(200);
             var share = JSON.parse(body);
+            share.id.should.eql(1);
             share.file.should.eql(11);
             share.account.should.eql(7);
             share.permission.should.eql('READ');
@@ -175,10 +176,6 @@ describe ('Shares', function () {
             }
         }, function (err, response, body) {
             response.should.have.status(200);
-            var share = JSON.parse(body);
-            share.file.should.eql(11);
-            share.account.should.eql(7);
-            share.permission.should.eql('READ');
             done();
         });
     });
@@ -233,10 +230,7 @@ describe ('Shares', function () {
     it ('should be possible to remove the share', function (done) {
         req_user_a({
             method: 'delete',
-            url: url + '/files/11/shares/READ',
-            form: {
-                account: 7
-            }
+            url: url + '/files/11/shares/1'
         }, function (err, response, body) {
             response.should.have.status(200);
             done();

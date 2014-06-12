@@ -219,10 +219,9 @@ module.exports = function (fileRepository, accountRepository, shareRepository, f
                     return shareRepository.findByFileAndAccountAndPermission(file.id, account.id, permission).then(function (res) {
                         if (!res.length) {
                             return shareRepository.save(share);
+                        } else {
+                            return null;
                         }
-                        return null;
-                    }).then(function () {
-                        return share;
                     });
                 });
             }
@@ -236,13 +235,13 @@ module.exports = function (fileRepository, accountRepository, shareRepository, f
                 });
             }
         ))
-        .delete('/:file/shares/:permission', Decorate(
+        .delete('/:file/shares/:share', Decorate(
             ExpressRequest(),
             Convert('file', fileRepository.find.bind(fileRepository)),
-            Convert('account', accountRepository.find.bind(accountRepository)),
-            function (file, $req, account, permission) {
+            Convert('share', shareRepository.find.bind(shareRepository)),
+            function (file, share, $req) {
                 return canHttp($req.user, 'PERM', file).then(function () {
-                    return shareRepository.deleteByFileAndAccountAndPermission(file.id, account.id, permission);
+                    return shareRepository.remove(share);
                 }).then(function () {
 
                 });
