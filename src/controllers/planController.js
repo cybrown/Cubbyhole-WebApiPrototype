@@ -31,23 +31,24 @@ module.exports = function (planRepository) {
             }
         ))
         .post('/:plan', Decorate(
-            ExpressRequest(['plan', '?name', '?price', '?bandwidthDownload', '?bandwidthUpload', '?space', '?shareQuota']),
+            ExpressRequest(['plan', '?name', '?price', '?bandwidthDownload', '?bandwidthUpload', '?space', '?shareQuota', '?idpaypal']),
             MinLevel(30),
             Convert('plan', planRepository.find.bind(planRepository)),
-            function (plan, name, price, bandwidthDownload, bandwidthUpload, space, shareQuota) {
+            function (plan, name, price, bandwidthDownload, bandwidthUpload, space, shareQuota, idpaypal) {
                 name !== undefined && (plan.name = name);
                 price !== undefined && (plan.price = price);
                 bandwidthDownload !== undefined && (plan.bandwidthDownload = bandwidthDownload);
                 bandwidthUpload !== undefined && (plan.bandwidthUpload = bandwidthUpload);
                 space !== undefined && (plan.space = space);
                 shareQuota !== undefined && (plan.shareQuota = shareQuota);
+                idpaypal !== undefined && (plan.idpaypal = idpaypal);
                 return planRepository.save(plan);
             }
         ))
         .put('/', Decorate(
             ExpressRequest(),
             MinLevel(30),
-            function(name, price, bandwidthDownload, bandwidthUpload, space, shareQuota) {
+            function(name, price, bandwidthDownload, bandwidthUpload, space, shareQuota, idpaypal) {
                 var plan = {};
                 plan.name = name;
                 plan.price = price;
@@ -55,6 +56,7 @@ module.exports = function (planRepository) {
                 plan.bandwidthUpload = bandwidthUpload;
                 plan.space = space;
                 plan.shareQuota = shareQuota;
+                plan.idpaypal = idpaypal;
                 return planRepository.save(plan);
             }
         ));

@@ -13,7 +13,8 @@ PlanRepository.prototype.objectToHash = function (plan) {
         bandwidthUpload: plan.bandwidthUpload,
         space: plan.space,
         price: plan.price,
-        shareQuota: plan.shareQuota
+        shareQuota: plan.shareQuota,
+        idpaypal: plan.idpaypal
     };
 };
 
@@ -25,6 +26,7 @@ PlanRepository.prototype.hashToObject = function (hash) {
         bandwidthUpload: hash.bandwidthUpload,
         price: hash.price,
         space: hash.space,
-        shareQuota: hash.shareQuota
+        shareQuota: hash.shareQuota,
+        idpaypal: hash.idpaypal
     };
 };

@@ -178,7 +178,8 @@ plug.set('planSqlHelper', ['mysqlConnection'], function (mysqlConnection) {
         'bandwidthDownload',
         'bandwidthUpload',
         'space',
-        'shareQuota'
+        'shareQuota',
+        'idpaypal'
     ];
     planSqlHelper.connection = mysqlConnection;
     return planSqlHelper;

@@ -65,7 +65,8 @@ describe ('Plan Web Service', function () {
                 bandwidthDownload: 100,
                 bandwidthUpload: 100,
                 space: 30,
-                shareQuota: 30
+                shareQuota: 30,
+                idpaypal: 'okok'
             },
             auth: {
                 user: 'user.level10',
@@ -87,7 +88,8 @@ describe ('Plan Web Service', function () {
                 bandwidthDownload: 100,
                 bandwidthUpload: 100,
                 space: 30,
-                shareQuota: 30
+                shareQuota: 30,
+                idpaypal: 'abcd'
             }
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
@@ -99,7 +101,8 @@ describe ('Plan Web Service', function () {
                 'bandwidthDownload': 100,
                 'bandwidthUpload': 100,
                 'space': 30,
-                'shareQuota': 30
+                'shareQuota': 30,
+                'idpaypal': 'abcd'
             });
 
             done();
@@ -116,7 +119,8 @@ describe ('Plan Web Service', function () {
                 bandwidthDownload: 1000,
                 bandwidthUpload: 1000,
                 space: 300,
-                shareQuota: 300
+                shareQuota: 300,
+                idpaypal: 'efgh'
             }
         }, function (err, response, body) {
             response.statusCode.should.equal(200);
@@ -128,7 +132,8 @@ describe ('Plan Web Service', function () {
                 'bandwidthDownload': 1000,
                 'bandwidthUpload': 1000,
                 'space': 300,
-                'shareQuota': 300
+                'shareQuota': 300,
+                idpaypal: 'efgh'
             });
 
             done();
@@ -161,7 +166,8 @@ describe ('Plan Web Service', function () {
             plan.should.have.property('bandwidthDownload', 100);
             plan.should.have.property('bandwidthUpload', 100);
             plan.should.have.property('space', 30);
-            plan.should.have.property('shareQuota',30 );
+            plan.should.have.property('shareQuota', 30);
+            plan.should.have.property('idpaypal', 'abcd');
             done();
         });
     });
@@ -186,7 +192,7 @@ describe ('Plan Web Service', function () {
         });
     });
 
-    it ('should edit a plan', function (done) {
+    it ('should edit a plan name', function (done) {
         req1({
             method: 'post',
             url: url + '/plans/3',
@@ -198,6 +204,22 @@ describe ('Plan Web Service', function () {
             var plan = JSON.parse(body);
             plan.id.should.eql(3);
             plan.name.should.eql('toto plan');
+            done();
+        });
+    });
+
+    it ('should edit a plan idpaypal', function (done) {
+        req1({
+            method: 'post',
+            url: url + '/plans/3',
+            form: {
+                idpaypal: 'newidpaypal'
+            }
+        }, function (err, response, body) {
+            response.should.have.status(200);
+            var plan = JSON.parse(body);
+            plan.id.should.eql(3);
+            plan.idpaypal.should.eql('newidpaypal');
             done();
         });
     });
