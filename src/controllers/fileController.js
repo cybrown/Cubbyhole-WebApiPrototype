@@ -3,6 +3,7 @@ var Q = require('q');
 var readableRandom = require('readable-random');
 var Decorate = require('../libs/decorate');
 var CoreDecorators = require('../libs/core_decorators');
+var HttpResponse = require('../libs/HttpResponse');
 var ExpressRequest = CoreDecorators.ExpressRequest;
 var Convert = CoreDecorators.Convert;
 var Ensure = CoreDecorators.Ensure;
@@ -156,7 +157,14 @@ module.exports = function (fileRepository, accountRepository, shareRepository, f
             Convert('file', fileRepository.find.bind(fileRepository)),
             function (file, $req) {
                 return canHttp($req.user, 'READ', file).then(function () {
-                    return fileDataManager.read(file).catch(function (err) {
+                    return fileDataManager.read(file).then(function (data) {
+                        var response = new HttpResponse(data);
+                        response.headers = {
+                            'Content-Disposition':  'attachment; filename='+file.name,
+                            'Content-type': file.mimetype || 'application/octet-stream'
+                        };
+                        return response;
+                    }).catch(function (err) {
                         if (err.message.match(/not found/)) {
                             err.status = 404;
                         } else {
