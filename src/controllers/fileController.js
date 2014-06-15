@@ -1,3 +1,4 @@
+var fs = require('fs');
 var express = require('express');
 var Q = require('q');
 var readableRandom = require('readable-random');
@@ -184,6 +185,20 @@ module.exports = function (fileRepository, accountRepository, shareRepository, f
                     return fileRepository.save(file);
                 }).then(function () {
                     return fileDataManager.write(file, $req);
+                });
+            }
+        ))
+        .post('/:file/raw', Decorate(
+            ExpressRequest(),
+            Convert('file', fileRepository.find.bind(fileRepository)),
+            function (file, $req) {
+                var files = null;
+                return canHttp($req.user, 'WRITE', file).then(function () {
+                    files = $req.files;
+                    file.mimetype = files.content.type;
+                    return fileRepository.save(file);
+                }).then(function () {
+                    return fileDataManager.write(file, fs.createReadStream(files.content.path));
                 });
             }
         ))

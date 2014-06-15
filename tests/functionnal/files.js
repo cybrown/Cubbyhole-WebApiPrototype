@@ -497,6 +497,32 @@ describe ('File Web Service', function () {
         });
     });
 
+    it ('should put content in multipart in file', function (done) {
+        var r = req1({
+            method: 'post',
+            url: url + '/files/5/raw'
+        }, function (err, response, body) {
+            response.should.have.status(200);
+            done();
+        });
+        var form = r.form();
+        form.append("content", "content 2", {
+            filename: 'unicycle.jpg',
+            contentType: 'image/jpg'
+        });
+    });
+
+    it ('should get content posted in multipart from file', function (done) {
+        req1({
+            method: 'get',
+            url: url + '/files/5/raw'
+        }, function (err, response, body) {
+            response.should.have.status(200);
+            body.should.eql("content 2");
+            done();
+        });
+    });
+
     var testdirid = 0;
 
     it ('should create a directory', function (done) {
