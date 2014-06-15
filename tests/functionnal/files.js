@@ -18,7 +18,7 @@ describe ('File Web Service', function () {
             user: user,
             pass: pass
         };
-        request(options, next);
+        return request(options, next);
     };
 
     it ('should return 401 status code without http basic', function (done) {
