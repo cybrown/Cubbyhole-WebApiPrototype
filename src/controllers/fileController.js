@@ -188,7 +188,7 @@ module.exports = function (fileRepository, accountRepository, shareRepository, f
                 });
             }
         ))
-        .post('/:file/raw', Decorate(
+        .post('/:file/upload', Decorate(
             ExpressRequest(),
             Convert('file', fileRepository.find.bind(fileRepository)),
             function (file, $req) {
